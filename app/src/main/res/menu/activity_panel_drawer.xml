@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_download_campaign"
+            android:icon="@drawable/ic_menu_download"
+            android:title="Descargar campaña" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/register"
+            android:title="Registrar mascota" />
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/ic_menu_anestesia"
+            android:title="Anestesia" />
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/ic_menu_cirugia"
+            android:title="Cirugía" />
+        <item
+            android:id="@+id/nav_recuperacion"
+            android:icon="@drawable/ic_menu_recuperacion"
+            android:title="Recuperación" />
+        <item
+            android:id="@+id/nav_medicina"
+            android:icon="@drawable/ic_menu_medicamento"
+            android:title="Medicamento" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Send" />
+        </menu>
+    </item>
+
+</menu>

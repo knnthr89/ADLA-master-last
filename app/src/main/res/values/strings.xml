@@ -1,0 +1,62 @@
+<resources>
+    <string name="app_name">ADLA</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_name">Nombre</string>
+    <string name="prompt_email">Correo</string>
+    <string name="prompt_uname">Usuario</string>
+    <string name="prompt_password">Contraseña</string>
+    <string name="prompt_password2">Confirme Contraseña</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="action_sign_up_short">Sign Up</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_server">Server Error</string>
+    <string name="error_network">No internet connection</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="title_activity_recuperacion">RecuperacionActivity</string>
+    <string name="title_activity_cmedicamento">MedicamentoActivity</string>
+    <string name="title_activity_operacion">OperacionActivity</string>
+    <string name="title_activity_medicamento">AnestesiaActivity</string>
+    <string name="title_activity_panel">PanelActivity</string>
+    <string name="title_download_activity">DownloadActivity</string>
+    <string name="title_createpdf_activity">CreatePdfActivity</string>
+    <string name="title_signup_activity">Sign Up Activity</string>
+    <string name="title_register_animal">Registrar</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="save_new_user_bottom">Registrar</string>
+    <string name="save_dosis">Guardar</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_exit">Exit</string>
+    <string name="action_comments">Comentarios...</string>
+
+    <!-- Strings related to register animal -->
+   <string name="name_register">Nombre</string>
+    <string name="address_register">Dirección</string>
+    <string name="phone_register">Teléfono</string>
+    <string name="email_register">Email</string>
+    <string name="name_animal_register">Nombre de la mascota</string>
+    <string name="animal_race_register">Raza (o raza aproximada)</string>
+    <string name="age_register">Edad de la mascota</string>
+    <string name="coments_register">Comentarios</string>
+    <string name="surgery_register">Si ha recibido tratamientos médicos o se ha sometido a alguna cirugía por favor indique la fecha y el tipo de tratamiento o cirugía</string>
+    <string name="rescued_time_register">Si es rescatado, ¿Cuánto tiempo tiene de rescatado?</string>
+    <string name="time_vaccine_register">Fecha de su última vacuna</string>
+    <string name="time_deprivation_register">Fecha de su última desparasitación</string>
+    <string name="last_zeal_register">Si es hembra indicanos cuándo fué su ultimo celo</string>
+    <string name="time_breastfeed_register">Si ha tenido cachorros recientemente cuanto tiempo tiene sin lactar</string>
+    <string name="medicamento_dosis">Dosis 1</string>
+    <string name="medicamento_dosis2">Dosis 2</string>
+    <string name="medicamento_dosis3">Dosis 3</string>
+
+</resources>
