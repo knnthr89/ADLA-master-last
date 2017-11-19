@@ -4,15 +4,38 @@
     android:layout_height="match_parent">
 
 
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/busqueda"
+        android:layout_below="@+id/spinner"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="17dp"
+        android:layout_alignParentEnd="true">
 
-    <Spinner
-        android:id="@+id/spinner"
+        <AutoCompleteTextView
+            android:id="@+id/busqueda_registro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/busqueda_registro"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:layout_above="@+id/btn"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="57dp" />
+
+    </android.support.design.widget.TextInputLayout>
+
+
+    <EditText
+        android:id="@+id/opero_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:hint="Médico que operó"
+        android:layout_below="@+id/busqueda"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="10dp"
-        android:layout_alignParentEnd="true"></Spinner>
+        android:layout_marginTop="28dp" />
 
     <EditText
         android:id="@+id/et"
@@ -24,10 +47,10 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:scrollbars="vertical"
-        android:layout_marginTop="13dp"
         android:hint="@string/action_comments"
-        android:layout_below="@+id/spinner"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/opero_et"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="14dp" />
 
     <Button
         android:id="@+id/btn"

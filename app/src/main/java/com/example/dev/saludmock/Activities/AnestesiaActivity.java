@@ -13,13 +13,19 @@ import android.widget.Toast;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.Emitter;
 import com.couchbase.lite.Manager;
+import com.couchbase.lite.Mapper;
 import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
 import com.example.dev.saludmock.R;
 
+import org.json.JSONException;
+
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,18 +36,22 @@ import java.util.Map;
 
 public class AnestesiaActivity extends AppCompatActivity{
 
-    AutoCompleteTextView dosis1, dosis2, dosis3;
-    Spinner sp;
+    AutoCompleteTextView  busqueda_registro, dosis1, dosis2, dosis3;
+
     Button guardar;
+
+    private static SimpleDateFormat mDateFormatter =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anestesia_main);
-        sp = (Spinner)findViewById(R.id.spinner);
-        addItemsOnSpinner();
 
-        dosis1 = (AutoCompleteTextView)findViewById(R.id.dosis);
+        busqueda_registro = (AutoCompleteTextView)findViewById(R.id.busqueda_registro);
+
+        dosis1 = (AutoCompleteTextView)findViewById(R.id.dosis1);
         dosis2 = (AutoCompleteTextView)findViewById(R.id.dosis2);
         dosis3 = (AutoCompleteTextView)findViewById(R.id.dosis3);
 
@@ -49,42 +59,8 @@ public class AnestesiaActivity extends AppCompatActivity{
         guardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String Dosis = dosis1.getText().toString();
-                final   String Dosis2 = dosis2.getText().toString();
-                final   String Dosis3 = dosis3.getText().toString();
 
-                //Create manager
-                Manager manager = null;
-                try{
-                    manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-
-                //Create or open the database named app
-                Database database = null;
-                try{
-                    database = manager.getDatabase("registro");
-                }catch (CouchbaseLiteException e){
-                    e.printStackTrace();
-                }
-
-                Document document = database.getDocument("");
-                try {
-                    document.update(new Document.DocumentUpdater() {
-                        @Override
-                        public boolean update(UnsavedRevision unsavedRevision) {
-                            Map<String, Object> properties = new HashMap<String, Object>();
-                            properties.put("dosis", Dosis);
-                            properties.put("dosis2", Dosis2);
-                            properties.put("dosis3", Dosis3);
-                            return true;
-                        }
-                    });
-                } catch (CouchbaseLiteException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
-                }
+                updateDocument();
 
                 Toast.makeText(getApplicationContext(), "Se ha registrado correctamente la dosis de la mascota", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(AnestesiaActivity.this, PanelActivity.class);
@@ -94,15 +70,49 @@ public class AnestesiaActivity extends AppCompatActivity{
         });
     }
 
-    public void addItemsOnSpinner(){
+    public void updateDocument(){
+        final String busqueda_reg = busqueda_registro.getText().toString();
 
-        List<String> list = new ArrayList<String>();
-        list.add("Seleccione el número de ficha de la mascota");
-        //Cambiar por variable
-        list.add("000000001");
-        list.add("000000002");
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sp.setAdapter(dataAdapter);
+        final String currentTimeString = mDateFormatter.format(new Date());
+
+              final String Dosis = dosis1.getText().toString();
+              final   String Dosis2 = dosis2.getText().toString();
+              final   String Dosis3 = dosis3.getText().toString();
+
+        //Create manager
+        Manager manager = null;
+        try{
+            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        //Create or open the database named app
+        Database database = null;
+        try{
+            database = manager.getDatabase("adla");
+        }catch (CouchbaseLiteException e){
+            e.printStackTrace();
+        }
+
+        final Document document = database.getDocument(busqueda_reg);
+
+
+        try {
+            document.update(new Document.DocumentUpdater() {
+                @Override
+                public boolean update(UnsavedRevision newRevision) {
+                    Map<String, Object> properties = newRevision.getProperties();
+                    properties.put("primeradosis", Dosis);
+                    properties.put("segundadosis", Dosis2);
+                    properties.put("terceradosis", Dosis3);
+                    properties.put("hora_anestesia", currentTimeString );
+                    newRevision.setUserProperties(properties);
+                    return true;
+                }
+            });
+        }catch (CouchbaseLiteException e){
+            e.printStackTrace();
+        }
     }
 }

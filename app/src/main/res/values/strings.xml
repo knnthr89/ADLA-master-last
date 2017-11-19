@@ -58,5 +58,6 @@
     <string name="medicamento_dosis">Dosis 1</string>
     <string name="medicamento_dosis2">Dosis 2</string>
     <string name="medicamento_dosis3">Dosis 3</string>
+    <string name="busqueda_registro">Id Registro</string>
 
 </resources>

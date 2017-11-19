@@ -15,6 +15,7 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Manager;
+import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
 import com.couchbase.lite.replicator.Replication;
 import com.couchbase.lite.util.Log;
@@ -25,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,22 +38,26 @@ import java.util.Random;
 
 public class RegistroActivity extends AppCompatActivity {
 
-     AutoCompleteTextView nombre, direccion, telefono, correo, nombre_mascota, raza, edad, comentarios, cirugia, rescatado, vacuna, desparacitacion, celo, lactar;
+    AutoCompleteTextView nombre, direccion, telefono, correo, nombre_mascota, raza, edad, comentarios, cirugia, rescatado, vacuna, desparacitacion, celo, lactar;
 
-    private String[] arraySpinner;
-    private String[] arraySpinner2;
+   // private String[] arraySpinner;
+   // private String[] arraySpinner2;
+
+    public ArrayList<String> spinnerlist;
+    String spinnertext;
+
+    public ArrayList<String> spinnersecondlist;
+    String spinnertexttwo;
+
     Button button;
+
+    private static SimpleDateFormat mDateFormatter =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registra_main);
-
-        final Date date = new Date();
-        final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-       final Random rnd = new Random();
-
-
 
         nombre = (AutoCompleteTextView)findViewById(R.id.nombre_dueño);
         direccion = (AutoCompleteTextView)findViewById(R.id.direccion);
@@ -69,9 +75,7 @@ public class RegistroActivity extends AppCompatActivity {
         lactar = (AutoCompleteTextView)findViewById(R.id.lactar);
         button = (Button)findViewById(R.id.registrar);
 
-
-
-        this.arraySpinner = new String[]{
+    /*    this.arraySpinner = new String[]{
          "Seleccione una opción","Perra","Perro","Gata","Gato"
         };
 
@@ -86,18 +90,69 @@ public class RegistroActivity extends AppCompatActivity {
         Spinner s2 = (Spinner)findViewById(R.id.spinner2);
         ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arraySpinner2);
         s2.setAdapter(adapter2);
+**/
+
+        final Spinner spinner = (Spinner)findViewById(R.id.spinner);
+
+        spinnerlist= new ArrayList<String>();
+        spinnerlist.add("Detalles de la mascota");
+        spinnerlist.add("Perra");
+        spinnerlist.add("Perro");
+        spinnerlist.add("Gata");
+        spinnerlist.add("Gato");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerlist);
+        adapter.setNotifyOnChange(true);
+        spinner.setAdapter(adapter);
+        spinner.setLongClickable(true);
+        spinner.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                spinner.getSelectedItem().toString();
+                return false;
+            }
+        });
+
+
+        final Spinner spinnerdos = (Spinner)findViewById(R.id.spinner2);
+
+        spinnersecondlist= new ArrayList<String>();
+        spinnersecondlist.add("¿Cómo te entaraste de la campaña?");
+        spinnersecondlist.add("Facebook");
+        spinnersecondlist.add("Volante");
+        spinnersecondlist.add("Vi una lona en el lugar de campaña");
+        spinnersecondlist.add("Ya he ido a otras campañas de Abpogados de los Animales");
+        spinnersecondlist.add("Recomendación de otra persona");
+        spinnersecondlist.add("Otro");
+
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnersecondlist);
+        adapter2.setNotifyOnChange(true);
+        spinnerdos.setAdapter(adapter2);
+        spinnerdos.setLongClickable(true);
+        spinnerdos.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                spinnerdos.getSelectedItem().toString();
+                return false;
+            }
+        });
+
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                String currentTimeString = mDateFormatter.format(new Date());
 
                 String Nombre = nombre.getText().toString();
                 String Direccion = direccion.getText().toString();
                 String Telefono = telefono.getText().toString();
                 String Correo = correo.getText().toString();
                 String Nombre_Mascota = nombre_mascota.getText().toString();
+                String Tipo_Mascota = spinner.getSelectedItem().toString();
                 String Raza = raza.getText().toString();
                 String Edad = edad.getText().toString();
+                String Medio = spinnerdos.getSelectedItem().toString();
                 String Comentarios = comentarios.getText().toString();
                 String Cirugia = cirugia.getText().toString();
                 String Rescatado = rescatado.getText().toString();
@@ -105,7 +160,6 @@ public class RegistroActivity extends AppCompatActivity {
                 String Desparacitacion = desparacitacion.getText().toString();
                 String Celo = celo.getText().toString();
                 String Lactar = lactar.getText().toString();
-
 
 
                 //Create a manager
@@ -119,61 +173,73 @@ public class RegistroActivity extends AppCompatActivity {
                 //Create or open the database named app
                 Database database = null;
                 try {
-                    database = manager.getDatabase("registro");
+                    database = manager.getDatabase("adla");
                 }catch (CouchbaseLiteException e){
                     e.printStackTrace();
                 }
 
-                //The properties that will be saved on the document
-                Map<String, Object> properties = new HashMap<String, Object>();
-
-             //   properties.put("ficha", rnd.nextInt());
-                properties.put("nombre", Nombre);
-                properties.put("direccion", Direccion);
-                properties.put("telefono", Telefono);
-                properties.put("correo", Correo);
-                properties.put("nombre_mascota", Nombre_Mascota);
-                properties.put("raza", Raza);
-                properties.put("edad", Edad);
-                properties.put("comentarios", Comentarios);
-                properties.put("cirugia", Cirugia);
-                properties.put("rescatado", Rescatado);
-                properties.put("vacuna", Vacuna);
-                properties.put("desparacitacion", Desparacitacion);
-                properties.put("celo", Celo);
-                properties.put("lactar", Lactar);
 
 
-                //Create a new document
-                Document document = database.createDocument();
-                //Save the document to the database
-                try{
-                    document.putProperties(properties);
-                }catch(CouchbaseLiteException e){
-                    e.printStackTrace();
-                }
+                    //The properties that will be saved on the document
+                    Map<String, Object> properties = new HashMap<String, Object>();
 
-                //Log the document ID (generated by the database)
-                //and properties
-                Log.d("registro", String.format("Document ID :: %s", document.getId()));
-                Log.d("registro", String.format("Los datos que han sido guardados son: ",
-                    //    (String) document.getProperty("ficha"),
-                        (String) document.getProperty("nombre"),
-                        (String)document.getProperty("direccion"),
-                        (String) document.getProperty("telefono"),
-                        (String) document.getProperty("correo"),
-                        (String) document.getProperty("nombre_mascota"),
-                        (String) document.getProperty("raza"),
-                        (String) document.getProperty("edad"),
-                        (String) document.getProperty("comentarios"),
-                        (String) document.getProperty("cirugia"),
-                        (String) document.getProperty("rescatado"),
-                        (String) document.getProperty("vacuna"),
-                        (String) document.getProperty("desparacitacion"),
-                        (String) document.getProperty("celo"),
-                        (String) document.getProperty("lactar")));
+                    //properties.put("ficha", rnd.nextInt());
+                    //  properties.put("_rev", String.valueOf(i));
 
-                //Create replicators to push & pull changes to & from Sync Gateway.
+                    properties.put("nombre", Nombre);
+                    properties.put("direccion", Direccion);
+                    properties.put("telefono", Telefono);
+                    properties.put("correo", Correo);
+                    properties.put("nombre_mascota", Nombre_Mascota);
+                    properties.put("tipo_mascota", Tipo_Mascota);
+                    properties.put("raza", Raza);
+                    properties.put("edad", Edad);
+                    properties.put("medio", Medio);
+                    properties.put("comentarios_registro", Comentarios);
+                    properties.put("cirugia", Cirugia);
+                    properties.put("rescatado", Rescatado);
+                    properties.put("vacuna", Vacuna);
+                    properties.put("desparacitacion", Desparacitacion);
+                    properties.put("celo", Celo);
+                    properties.put("lactar", Lactar);
+                    properties.put("created_at", currentTimeString);
+
+
+                   int numero = (int) (Math.random() * 10000000) + 1;
+                   String numeroString = Integer.toString(numero);
+
+                    //Create a new document
+                    Document document = database.getDocument(numeroString);
+                    //     UnsavedRevision revision = document.createRevision();
+                     //    revision.setUserProperties(properties);
+                    //Save the document to the database
+                    try {
+                        document.putProperties(properties);
+                    } catch (CouchbaseLiteException e) {
+                        e.printStackTrace();
+                    }
+
+                    //Log the document ID (generated by the database)
+                    //and properties
+                    Log.d("registro", String.format("Document ID :: %s", document.getId()));
+                    Log.d("registro", String.format("Los datos que han sido guardados son: ",
+                            //    (String) document.getProperty("ficha"),
+                            (String) document.getProperty("nombre"),
+                            (String) document.getProperty("direccion"),
+                            (String) document.getProperty("telefono"),
+                            (String) document.getProperty("correo"),
+                            (String) document.getProperty("nombre_mascota"),
+                            (String) document.getProperty("raza"),
+                            (String) document.getProperty("edad"),
+                            (String) document.getProperty("comentarios_registro"),
+                            (String) document.getProperty("cirugia"),
+                            (String) document.getProperty("rescatado"),
+                            (String) document.getProperty("vacuna"),
+                            (String) document.getProperty("desparacitacion"),
+                            (String) document.getProperty("celo"),
+                            (String) document.getProperty("lactar")));
+
+                    //Create replicators to push & pull changes to & from Sync Gateway.
      /*           URL url = null;
                 try{
                     url = new URL("http://10.0.0.2:4984/hello");
@@ -190,12 +256,11 @@ public class RegistroActivity extends AppCompatActivity {
                 pull.start();
                 */
 
-                Toast.makeText(getApplicationContext(), "Su mascota ha sido registrada correctamente!", Toast.LENGTH_LONG).show();
+
+                Toast.makeText(getApplicationContext(), "Su mascota ha sido registrada correctamente con el número de folio !" +numeroString, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(RegistroActivity.this, PanelActivity.class);
                 startActivity(intent);
             }
         });
-
-
     }
 }

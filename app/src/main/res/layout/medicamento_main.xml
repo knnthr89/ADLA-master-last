@@ -3,46 +3,58 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/busqueda"
+        android:layout_below="@+id/spinner"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentEnd="true">
+
+        <AutoCompleteTextView
+            android:id="@+id/busqueda_registro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/busqueda_registro"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:layout_above="@+id/btn"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="20dp" />
+
+    </android.support.design.widget.TextInputLayout>
+
+
     <TextView
         android:id="@+id/tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="¿El dueño de la mascota lleva su medicamento?"/>
+        android:text="¿El dueño de la mascota lleva su medicamento?"
+        android:layout_below="@+id/busqueda"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="26dp" />
 
 
-
-        <RadioButton
-            android:id="@+id/rbsi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv"
-            android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:id="@+id/tv1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/tv2"
-        android:layout_alignBottom="@+id/tv2"
-        android:layout_toEndOf="@+id/rbno"
-        android:text="Si" />
+<RadioGroup
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/tv"
+    android:layout_alignParentStart="true"
+    android:layout_marginTop="46dp"
+    android:id="@+id/radioGroup">
 
 
-        <RadioButton
-            android:id="@+id/rbno"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/tv" />
-
+</RadioGroup>
     <TextView
         android:id="@+id/tv2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/rbsi"
-        android:layout_alignBottom="@+id/rbsi"
-        android:layout_toEndOf="@+id/rbsi"
-        android:text="No" />
+        android:text="No"
+        android:layout_alignBaseline="@+id/rbno"
+        android:layout_alignBottom="@+id/rbno"
+        android:layout_toEndOf="@+id/rbno" />
 
     <Button
         android:id="@+id/btn"
@@ -52,5 +64,29 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="63dp" />
+
+    <TextView
+        android:id="@+id/tv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Si"
+        android:layout_alignBaseline="@+id/rbsi"
+        android:layout_alignBottom="@+id/rbsi"
+        android:layout_toEndOf="@+id/rbsi" />
+
+    <RadioButton
+        android:id="@+id/rbno"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rbsi"
+        android:layout_alignParentStart="true" />
+
+    <RadioButton
+        android:id="@+id/rbsi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="26dp" />
 
 </RelativeLayout>
