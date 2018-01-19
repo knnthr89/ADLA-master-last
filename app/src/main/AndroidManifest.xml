@@ -9,9 +9,8 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    
 
     <application
         android:allowBackup="true"
@@ -28,36 +27,44 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.LoginActivity"
+            android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
-            android:name=".Activities.PanelActivity"
-            android:label="@string/title_activity_panel"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity
-            android:name=".Activities.DownloadActivity"
+            android:name=".activities.DownloadActivity"
             android:label="@string/title_download_activity" />
         <activity
-            android:name=".Activities.CreatePdfActivity"
+            android:name=".activities.CreatePdfActivity"
             android:label="@string/title_createpdf_activity" />
         <activity
-            android:name=".Activities.SignUpActivity"
+            android:name=".activities.SignUpActivity"
             android:label="@string/title_signup_activity" />
         <activity
-            android:name=".Activities.RegistroActivity"
+            android:name=".activities.RegistroActivity"
             android:label="@string/title_register_animal" />
         <activity
-            android:name=".Activities.AnestesiaActivity"
+            android:name=".activities.AnestesiaActivity"
             android:label="@string/title_activity_medicamento" />
         <activity
-            android:name=".Activities.OperacionActivity"
+            android:name=".activities.OperacionActivity"
             android:label="@string/title_activity_operacion" />
         <activity
-            android:name=".Activities.RecuperacionActivity"
+            android:name=".activities.RecuperacionActivity"
             android:label="@string/title_activity_recuperacion" />
         <activity
-            android:name=".Activities.MedicamentoActivity"
+            android:name=".activities.MedicamentoActivity"
             android:label="@string/title_activity_cmedicamento" />
+        <activity
+            android:name=".activities.DownloadSheetToCouchbase"
+            android:label="@string/title_activity_descargacampaña" />
+        <activity
+            android:name=".activities.ContentPanelActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_contentpanel" />
+        <activity
+            android:name=".activities.ReporteActivity"
+            android:label="@string/title_activity_reporte" />
+        <activity android:name=".activities.AddUrlSheet"
+            android:label="@string/title_activity_addurlsheet"/>
     </application>
 
 </manifest>

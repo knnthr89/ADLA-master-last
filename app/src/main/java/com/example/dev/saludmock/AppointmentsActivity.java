@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.example.dev.saludmock.Activities.LoginActivity;
+import com.example.dev.saludmock.activities.LoginActivity;
 
 public class AppointmentsActivity extends AppCompatActivity {
 
