@@ -8,8 +8,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +45,7 @@ import com.example.dev.saludmock.db.DBHelper;
 import com.example.dev.saludmock.R;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +59,8 @@ import butterknife.OnClick;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    private static final int SELECT_PHOTO = 1;
+    private String mFileName;
+    private static final int RESULT_LOAD_IMG = 1;
 
     DBHelper helper = new DBHelper(this);
 
@@ -91,15 +95,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
          img.setOnClickListener(new OnClickListener() {
              @Override
              public void onClick(View view) {
-                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                 intent.setType("image/*");
-                 startActivityForResult(intent, SELECT_PHOTO);
+                 Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
 
-                 //probar con dispositivo físico
-                 SharedPreferences saveImage = getSharedPreferences("SaveImage", MODE_PRIVATE);
-                 SharedPreferences.Editor editor = saveImage.edit();
-                 editor.putInt("SavedImage", SELECT_PHOTO);
-                 editor.apply();
+
              }
          });
 
@@ -442,18 +441,54 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent      data) {
-        if (resultCode != RESULT_OK) {
-            return;
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK && null != data){
+           Uri SelectedImage = data.getData();
+           String[] FilePathColumn = {MediaStore.Images.Media.DATA};
+
+           Cursor SelectedCursor = getContentResolver().query(SelectedImage, FilePathColumn, null, null, null);
+           SelectedCursor.moveToFirst();
+
+           int columnIndex = SelectedCursor.getColumnIndex(FilePathColumn[0]);
+           String picturePath = SelectedCursor.getString(columnIndex);
+           SelectedCursor.close();
+
+           img.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+           Toast.makeText(getApplicationContext(), picturePath, Toast.LENGTH_SHORT).show();
         }
-        if (requestCode == 1) {
-            final Bundle extras = data.getExtras();
-            if (extras != null) {
-                //Get image
-                Bitmap bitmap = extras.getParcelable("data");
-                img.setImageBitmap(bitmap);
-            }
+        storePath();
+        retrievePath();
+        convertPathImage();
+    }
+
+    private void storePath(){
+        final SharedPreferences sharedPreferences = getSharedPreferences("pref_key", MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("img_path", mFileName);
+        editor.commit();
+    }
+
+    private void retrievePath(){
+        final SharedPreferences sharedPreferences = getSharedPreferences("pref_key", MODE_PRIVATE);
+        if(sharedPreferences.contains("img_path")){
+            mFileName = sharedPreferences.getString("img_path", null);
+        }
+
+    }
+
+    private void convertPathImage(){
+        File imgFile = new File (mFileName);
+        if(imgFile.exists()){
+
+            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
+            img = findViewById(R.id.logo_button);
+            img.setImageBitmap(myBitmap);
+
         }
     }
+
 }
 

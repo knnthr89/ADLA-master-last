@@ -184,9 +184,9 @@
 
             <TextView
                 android:id="@+id/message"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="54dp"
+                android:layout_marginStart="35dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -194,9 +194,9 @@
 
             <TextView
                 android:id="@+id/message2"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -204,9 +204,9 @@
 
             <TextView
                 android:id="@+id/message3"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -214,9 +214,9 @@
 
             <TextView
                 android:id="@+id/message4"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -224,9 +224,9 @@
 
             <TextView
                 android:id="@+id/message5"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -234,9 +234,9 @@
 
             <TextView
                 android:id="@+id/message6"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -244,9 +244,9 @@
 
             <TextView
                 android:id="@+id/message7"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -254,9 +254,9 @@
 
             <TextView
                 android:id="@+id/message8"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -264,9 +264,9 @@
 
             <TextView
                 android:id="@+id/message9"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -274,9 +274,9 @@
 
             <TextView
                 android:id="@+id/message10"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -284,9 +284,9 @@
 
             <TextView
                 android:id="@+id/message11"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -294,9 +294,9 @@
 
             <TextView
                 android:id="@+id/message12"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="30dp"
                 android:text="@string/folio_mascota"
                 android:visibility="gone"
                 android:textAlignment="center"
@@ -467,99 +467,111 @@
 
             <TextView
                 android:id="@+id/message13"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="54dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="35dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message14"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message15"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message16"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message17"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message18"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message19"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message20"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message21"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message22"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message23"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message24"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
         </LinearLayout>
 
@@ -723,109 +735,121 @@
 
             <TextView
                 android:id="@+id/message25"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="54dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="35dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message26"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
             <TextView
                 android:id="@+id/message27"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
             <TextView
                 android:id="@+id/message28"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
             <TextView
                 android:id="@+id/message29"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
             <TextView
                 android:id="@+id/message30"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
             <TextView
                 android:id="@+id/message31"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
             <TextView
                 android:id="@+id/message32"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
             <TextView
                 android:id="@+id/message33"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
             <TextView
                 android:id="@+id/message34"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
             <TextView
                 android:id="@+id/message35"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
             <TextView
                 android:id="@+id/message36"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"
+                android:textAlignment="center"
                 />
 
         </LinearLayout>
@@ -991,102 +1015,114 @@
 
             <TextView
                 android:id="@+id/message37"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginStart="54dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="35dp"
+                android:text=""
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message38"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message39"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message40"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message41"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message42"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message43"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message44"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message45"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message46"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message47"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message48"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
         </LinearLayout>
 
@@ -1249,101 +1285,112 @@
 
             <TextView
                 android:id="@+id/message49"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginStart="54dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="35dp"
+                android:text=""
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message50"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message51"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message52"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message53"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message54"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message55"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message56"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message57"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message58"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message59"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message60"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"/>
 
         </LinearLayout>
@@ -1508,102 +1555,113 @@
 
             <TextView
                 android:id="@+id/message61"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginStart="54dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="35dp"
+                android:text=""
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message62"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message63"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message64"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message65"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
+                android:layout_marginStart="30dp"
+                android:text=""
                 android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/message66"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message67"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message68"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message69"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message70"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message71"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/message72"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="70dp"
-                android:text="@string/folio_mascota"
-                android:visibility="gone"/>
+                android:layout_marginStart="30dp"
+                android:text=""
+                android:visibility="gone"
+                android:textAlignment="center"/>
 
 
         </LinearLayout>

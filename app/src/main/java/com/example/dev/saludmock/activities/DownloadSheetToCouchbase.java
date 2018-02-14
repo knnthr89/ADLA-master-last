@@ -1,6 +1,7 @@
 package com.example.dev.saludmock.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ import java.util.Map;
  */
 
 public class DownloadSheetToCouchbase extends AppCompatActivity{
+
+    int idDocument;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,12 +93,20 @@ public class DownloadSheetToCouchbase extends AppCompatActivity{
         properties.put("lactar", tlactar);
         properties.put("created_at", numero);
 
+        SharedPreferences preferences = getSharedPreferences("values", MODE_PRIVATE);
+        idDocument = preferences.getInt("idDocument", 0);
 
-        int numerofolio = (int) (Math.random() * 10000000) + 1;
-        String numeroString = Integer.toString(numerofolio);
+        idDocument++;
+
+        SharedPreferences prefs = getSharedPreferences("values", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("idDocument", idDocument);
+        editor.commit();
+
+        String idDocumentS = Integer.toString(idDocument);
 
         //Create a new document
-        Document document = database.getDocument(numeroString);
+        Document document = database.getDocument(idDocumentS);
         //     UnsavedRevision revision = document.createRevision();
         //    revision.setUserProperties(properties);
         //Save the document to the database
@@ -126,10 +137,10 @@ public class DownloadSheetToCouchbase extends AppCompatActivity{
                 (String) document.getProperty("lactar")));
 
 
-        Toast.makeText(getApplicationContext(), "Se ha subido la campaña de pre-registro correctamente!", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), idDocumentS, Toast.LENGTH_LONG).show();
         Intent i = new Intent(DownloadSheetToCouchbase.this, CreatePdfActivity.class);
 
-        i.putExtra("numero_folio", numeroString);
+        i.putExtra("numero_folio", idDocumentS);
         i.putExtra("nombre",nombre);
         i.putExtra("numero", numero);
         i.putExtra("mascota", mascota);

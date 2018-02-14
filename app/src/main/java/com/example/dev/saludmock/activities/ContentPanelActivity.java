@@ -1,21 +1,32 @@
 package com.example.dev.saludmock.activities;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.text.InputType;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,10 +34,12 @@ import android.view.ViewGroup;
 import android.widget.ActionMenuView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -40,12 +53,24 @@ import com.couchbase.lite.Manager;
 import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
 import com.example.dev.saludmock.R;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.draw.LineSeparator;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -54,6 +79,7 @@ import at.markushi.ui.CircleButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.internal.DiskLruCache;
 
 import static android.widget.ListPopupWindow.MATCH_PARENT;
 import static android.widget.ListPopupWindow.WRAP_CONTENT;
@@ -63,6 +89,14 @@ import static android.widget.ListPopupWindow.WRAP_CONTENT;
  */
 
 public class ContentPanelActivity extends AppCompatActivity {
+
+    private static final String CIRCLEBUTTON_COLOR = "CIRCLEBUTTON_COLOR";
+
+    private static final int REQUEST_ID_READ_PERMISSION = 100;
+    private static final int REQUEST_ID_WRITE_PERMISSION = 200;
+
+    boolean sdDisponible = false;
+    boolean sdAccesoEscritura = false;
 
     BottomNavigationView bottomNavigationView;
 
@@ -75,7 +109,6 @@ public class ContentPanelActivity extends AppCompatActivity {
     String mascota = null;
     //  String tmascota = "perro";
     //  String t2mascota = "gato";
-
 
     //botones de gatos
     CircleButton circleButton1,
@@ -230,23 +263,23 @@ public class ContentPanelActivity extends AppCompatActivity {
     tv71,
     tv72;
 
-    Spinner smodulos, smedida, smedio, stmascota;
+    Spinner smedida, smedio, stmascota;
 
 
     Locale l = new Locale("es", "MX");
    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"),l);
-    String fecha = cal.get(Calendar.YEAR) + "/" + (cal.get(Calendar.MONTH) + 1) + "/" + cal.get(Calendar.DATE) + "T" + cal.get(Calendar.HOUR) + ":" + cal.get(Calendar.MINUTE) + ":"  + cal.get(Calendar.SECOND);
+    String fecha = cal.get(Calendar.YEAR) + "/" + (cal.get(Calendar.MONTH) + 1) + "/" + cal.get(Calendar.DATE)/* + "T" + cal.get(Calendar.HOUR) + ":" + cal.get(Calendar.MINUTE) + ":"  + cal.get(Calendar.SECOND)*/;
 
-
-    private int color = 0;
-
-   int idDocument;
+    int idDocument;
 
 
   //  String [] modulos = {"Anestesia", "Cirugía", "Recuperación"};
-    String [] medida = {"Chico", "Mediano", "Grande", "Gigante"};
+    String [] medida = {"Tamaño de la mascota","Chico", "Mediano", "Grande", "Gigante"};
     String [] medio = {"¿Cómo te enteraste de la campaña?","Facebook","Volante","Vi una lona en la campaña", "Ya he ido a otra campaña de Abogados de los Animales", "Recomendación de otra persona", "Otro"};
-    String [] tmascota = {"Detalles de las Mascotas", "Perro", "Perra", "Gato", "Gata"};
+   // String [] tamano_mascota = {"Detalles de las Mascotas", "Perro", "Perra", "Gato", "Gata"};
+   String [] pet_size = {"Detalles de las Mascotas", "Perro", "Perra", "Gato", "Gata"};
+
+   private String PREFS_KEY = "mispreferencias";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,7 +290,6 @@ public class ContentPanelActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        String user_name = getIntent().getStringExtra("username");
 
 
       //  imageButton = (ImageButton)findViewById(R.id.imageButton);
@@ -422,10 +454,24 @@ public class ContentPanelActivity extends AppCompatActivity {
         smedio = findViewById(R.id.medio);
         stmascota = findViewById(R.id.tmascota);
 
-        smedida.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, medida));
 
-       SharedPreferences preferences = getSharedPreferences("values", Context.MODE_PRIVATE);
-        idDocument = preferences.getInt("idDocument", 0);
+
+//        smedida.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, medida));
+
+
+      //  String idDocumentS = Integer.toString(idDocument);
+
+      //  Toast.makeText(getApplicationContext(), idDocumentS, Toast.LENGTH_SHORT).show();
+
+
+        Bundle datos = this.getIntent().getExtras();
+        String idDocumentStringS = datos.getString("idDocumentStringS");
+        String tmascota = datos.getString("tmascota");
+
+        if(idDocumentStringS != null){
+            buscaDesocupado(idDocumentStringS);
+        }
+
 
     }
 
@@ -468,17 +514,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                     startActivity(intent);
                     return true;
                 case R.id.navigation_home:
-                /*    Intent i = new Intent(ContentPanelActivity.this, RegistroActivity.class);
+                   /* Intent i = new Intent(ContentPanelActivity.this, RegistroActivity.class);
                     startActivity(i);*/
                     registroActivity();
                     return true;
                 case R.id.navigation_dashboard:
-               recuperacionDialog();
+               //recuperacionDialog();
                     return true;
                 case R.id.navigation_notifications:
                     reporteRegistros();
-                  //  Intent tintent = new Intent(ContentPanelActivity.this, ReporteActivity.class);
-                  //  startActivity(tintent);
+                   // Intent tintent = new Intent(ContentPanelActivity.this, ReporteActivity.class);
+                   // startActivity(tintent);
                     return true;
             }
             return false;
@@ -486,126 +532,71 @@ public class ContentPanelActivity extends AppCompatActivity {
     };
 
 
-
-
     public void registroActivity(){
 
-       /* final ArrayAdapter<String> adp = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, medio);
-        final Spinner sp = new Spinner(ContentPanelActivity.this);
-        sp.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        sp.setAdapter(adp);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.registroalert_main, null);
+
+        final AutoCompleteTextView nombre = view.findViewById(R.id.nombre_dueño);
+        final AutoCompleteTextView direccion = view.findViewById(R.id.direccion);
+        final AutoCompleteTextView telefono = view.findViewById(R.id.telefono);
+        final AutoCompleteTextView email = view.findViewById(R.id.email);
+        final AutoCompleteTextView nmascota = view.findViewById(R.id.mascota);
+        final Spinner tmascota =view.findViewById(R.id.tmascota);
+        final AutoCompleteTextView raza = view.findViewById(R.id.raza);
+        final AutoCompleteTextView edad = view.findViewById(R.id.edad);
+        final Spinner msocial = view.findViewById(R.id.msocial);
+        final AutoCompleteTextView comentarios = view.findViewById(R.id.comentarios);
+        final AutoCompleteTextView tratamiento = view.findViewById(R.id.tratamiento);
+        final AutoCompleteTextView rescatado = view.findViewById(R.id.rescatado);
+        final AutoCompleteTextView vacuna = view.findViewById(R.id.vacuna);
+        final AutoCompleteTextView desparacitacion = view.findViewById(R.id.desparacitacion);
+        final AutoCompleteTextView celo = view.findViewById(R.id.celo);
+        final AutoCompleteTextView lactar = view.findViewById(R.id.lactar);
+        final Spinner tamano_mascota = view.findViewById(R.id.tamano_mascota);
+        final AutoCompleteTextView peso = view.findViewById(R.id.peso);
+
+
+        final ArrayAdapter<String> adp = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, medio);
+        tmascota.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        tmascota.setAdapter(adp);
 
         final ArrayAdapter<String> adp1 = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, medida);
-        final Spinner sp1 = new Spinner(ContentPanelActivity.this);
-        sp.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        sp1.setAdapter(adp1);*/
+        msocial.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        msocial.setAdapter(adp1);
+
+        final ArrayAdapter<String> adp2 = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, pet_size);
+        tamano_mascota.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        tamano_mascota.setAdapter(adp2);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Registra nueva mascota");
 
-        Context context = builder.getContext();
-        LinearLayout layout = new LinearLayout(getApplicationContext());
-        layout.setOrientation(LinearLayout.VERTICAL);
+        builder.setView(view);
 
-        final EditText nombre = new EditText(this);
-        nombre.setHint("Nombre completo del dueño");
-        layout.addView(nombre);
-        nombre.setInputType(InputType.TYPE_CLASS_TEXT);
-
-        final EditText direccion = new EditText(this);
-        direccion.setHint("Dirección");
-        layout.addView(direccion);
-        direccion.setInputType(InputType.TYPE_CLASS_TEXT);
-
-        final EditText telefono = new EditText(this);
-        telefono.setHint("Teléfono o celular de contacto");
-        layout.addView(telefono);
-        telefono.setInputType(InputType.TYPE_CLASS_PHONE);
-
-        final EditText email = new EditText(this);
-        email.setHint("Correo electrónico");
-        layout.addView(email);
-        email.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-
-        final EditText mascota = new EditText(this);
-        mascota.setHint("Nombre de la mascota");
-        layout.addView(mascota);
-        mascota.setInputType(InputType.TYPE_CLASS_TEXT);
-
-        //falta spinner de tipo de mascota
-
-        final EditText raza = new EditText(this);
-        raza.setHint("Raza (o raza aproximada)");
-        layout.addView(raza);
-        raza.setInputType(InputType.TYPE_CLASS_TEXT);
-
-        final EditText edad = new EditText(this);
-        edad.setHint("Edad");
-        layout.addView(edad);
-        edad.setInputType(InputType.TYPE_CLASS_NUMBER);
-
-        //falta spinner de medio social
-
-        final EditText comentarios = new EditText(this);
-        comentarios.setHint("Comentarios");
-        layout.addView(comentarios);
-        comentarios.setInputType(InputType.TYPE_CLASS_TEXT);
-
-        final EditText tratamiento = new EditText(this);
-        tratamiento.setHint("Si ha recibido tratamientos médicos o se ha sometido a alguna cirugía por favor indique la fecha y el tipo de tratamiento o cirugía");
-        layout.addView(tratamiento);
-        tratamiento.setInputType(InputType.TYPE_CLASS_TEXT);
-
-        final EditText rescatado = new EditText(this);
-        rescatado.setHint("Si es rescatado, ¿Cuánto tiempo tiene de rescatado?");
-        layout.addView(rescatado);
-        rescatado.setInputType(InputType.TYPE_CLASS_TEXT);
-
-      final EditText vacuna = new EditText(this);
-        vacuna.setHint("Fecha de su última vacuna");
-        layout.addView(vacuna);
-        vacuna.setInputType(InputType.TYPE_CLASS_TEXT);
-
-      final EditText desparacitacion = new EditText(this);
-        desparacitacion.setHint("Fecha de su última desparasitación");
-        layout.addView(desparacitacion);
-        desparacitacion.setInputType(InputType.TYPE_CLASS_TEXT);
-
-          final EditText celo = new EditText(this);
-        celo.setHint("Fecha de su última desparasitación");
-        layout.addView(celo);
-        celo.setInputType(InputType.TYPE_CLASS_TEXT);
-
-      /*  final EditText lactar = new EditText(this);
-        lactar.setHint("Si ha tenido cachorros recientemente cuanto tiempo tiene sin lactar");
-        layout.addView(lactar);
-        lactar.setInputType(InputType.TYPE_CLASS_TEXT);*/
-
-        //falta spinner de tamaño de mascota
-
-        builder.setView(layout);
-        // builder.setView(sp);
         builder.setPositiveButton("Guardar",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-
-
-                            String nombreString = nombre.getText().toString();
-                            String direccionString = direccion.getText().toString();
-                            String telefonoString = telefono.getText().toString();
-                            String emailString = email.getText().toString();
-                            String mascotaString = mascota.getText().toString();
-                            String razaString = raza.getText().toString();
-                            String edadString = edad.getText().toString();
-                            String comentarioString = comentarios.getText().toString();
-                            String tratamientoString = tratamiento.getText().toString();
-                            String rescatadoString = rescatado.getText().toString();
-                            String vacunaString = vacuna.getText().toString();
-                            String desparacitacionString = desparacitacion.getText().toString();
-                            String celoString = celo.getText().toString();
-                          //  String lactarString = lactar.getText().toString();
+                            String nombreString = nombre.getText().toString(); //
+                            String direccionString = direccion.getText().toString();//
+                            String telefonoString = telefono.getText().toString(); //
+                            String emailString = email.getText().toString();//
+                            String mascota = nmascota.getText().toString();//
+                            String tmascotaString = tmascota.getSelectedItem().toString(); //
+                            String razaString = raza.getText().toString();//
+                            String edadString = edad.getText().toString();//
+                            String msocialString = msocial.getSelectedItem().toString(); //
+                            String comentarioString = comentarios.getText().toString(); //
+                            String tratamientoString = tratamiento.getText().toString(); //
+                            String rescatadoString = rescatado.getText().toString(); //
+                            String vacunaString = vacuna.getText().toString();  //
+                            String desparacitacionString = desparacitacion.getText().toString(); //
+                            String celoString = celo.getText().toString();//
+                            String lactarString = lactar.getText().toString();//
+                            String tamanoMascotaString = tamano_mascota.getSelectedItem().toString();
+                            String pesoString = peso.getText().toString();
 
                           //create manager
                              Manager manager = null;
@@ -630,17 +621,24 @@ public class ContentPanelActivity extends AppCompatActivity {
                         properties.put("direccion", direccionString);
                         properties.put("telefono", telefonoString);
                         properties.put("correo", emailString);
-                        properties.put("nombreMascota", mascotaString);
+                        properties.put("nombreMascota", mascota);
+                        properties.put("tipoMascota", tmascotaString);
                         properties.put("raza", razaString);
                         properties.put("edad", edadString);
+                        properties.put("msocial", msocialString);
                         properties.put("comentarioRegistro", comentarioString);
                         properties.put("tratamiento", tratamientoString);
                         properties.put("rescatado", rescatadoString);
                         properties.put("vacuna", vacunaString);
                         properties.put("desparacitacion", desparacitacionString);
                         properties.put("celo", celoString);
-                     //   properties.put("lactar", lactarString);
+                        properties.put("lactar", lactarString);
+                        properties.put("tamanoMascota", tamanoMascotaString);
+                        properties.put("peso", pesoString);
                         properties.put("creat_at", fecha);
+
+                        SharedPreferences preferences = getSharedPreferences("values", MODE_PRIVATE);
+                        idDocument = preferences.getInt("idDocument", 0);
 
                         idDocument++;
 
@@ -650,8 +648,6 @@ public class ContentPanelActivity extends AppCompatActivity {
                         editor.commit();
 
                         String idDocumentS = Integer.toString(idDocument);
-
-
 
                         //Create a new document
                         Document document = database.getDocument(idDocumentS);
@@ -665,7 +661,9 @@ public class ContentPanelActivity extends AppCompatActivity {
                         }
 
                         Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
+                        askPermissionAndWriteFile();
                         buscaDesocupado(idDocumentS);
+                      //  buscaDesocupadoAlternativa(idDocumentS);
                     }
                 });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -679,7 +677,7 @@ public class ContentPanelActivity extends AppCompatActivity {
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
-    public void anestesiaDialog(){
+    public void anestesiaDialog(final String idDocumentStringS){
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Dosis de anestesia");
@@ -735,10 +733,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         properties.put("dosis1", dosisuno);
                         properties.put("dosis2", dosisdos);
                         properties.put("dosis3", dosistres);
-                        properties.put("fecha", fecha);
+                        properties.put("fecha_anestesia", fecha);
 
                         //Create a new document
-                        Document document = database.getDocument("tapes");
+                        Document document = database.getDocument(idDocumentStringS);
 
                         //Save the document to the database
                         try{
@@ -748,7 +746,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         }
 
 
-                        Toast.makeText(getApplicationContext(), fecha, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
                     }
                 });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -760,7 +758,7 @@ public class ContentPanelActivity extends AppCompatActivity {
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
-    public void cirugiaDialog(){
+    public void cirugiaDialog(final String idDocumentStringS){
         AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Cirugía");
         LinearLayout layout = new LinearLayout(getApplicationContext());
@@ -803,10 +801,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         Map<String, Object> properties = new HashMap<String, Object>();
                         properties.put("cirujano", ncirujano);
                         properties.put("comentario", ncomentario);
-                        properties.put("fecha", fecha);
+                        properties.put("fecha_cirugia", fecha);
 
                         //create a new document
-                        Document document = database.createDocument();
+                        Document document = database.getDocument(idDocumentStringS);
 
                         //Save the document tothe database
                         try{
@@ -815,7 +813,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
 
-                        Toast.makeText(getApplicationContext(), "Se ha registrado correctamente los datos de la cirugía", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_SHORT).show();
 
                     }
                 });
@@ -828,56 +826,22 @@ public class ContentPanelActivity extends AppCompatActivity {
         builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
     }
 
-    public void recuperacionDialog(){
+    public void recuperacionDialog(final String idDocumentStringS){
         AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Recuperación");
 
-        String comentario;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.recuperacionalert_main, null);
 
-        LinearLayout params = new LinearLayout(ContentPanelActivity.this);
-        params.setOrientation(LinearLayout.VERTICAL);
+        final Switch antibiotico = view.findViewById(R.id.antibiotico_switch);
+        final Switch tatuaje = view.findViewById(R.id.tatuaje_switch);
+        final Switch analgesico = view.findViewById(R.id.analgesico_switch);
+        final Switch suero = view.findViewById(R.id.suero_switch);
+        final Switch cicatrizante = view.findViewById(R.id.cicatrizante_switch);
+        final Switch otro = view.findViewById(R.id.otro_switch);
+        final AutoCompleteTextView comentario = view.findViewById(R.id.comentario);
 
-
-        /*final TextView textAntibiotico = new TextView(ContentPanelActivity.this);
-        textAntibiotico.setText("Antibiótico");
-        layoutText.addView(textAntibiotico);*/
-
-        final Switch sw1 = new Switch(ContentPanelActivity.this);
-        params.addView(sw1);
-
-       /* final TextView textTatuaje = new TextView(ContentPanelActivity.this);
-        textTatuaje.setText("Tatuaje");
-        layoutText.addView(textTatuaje);*/
-
-        final Switch sw2 = new Switch(ContentPanelActivity.this);
-        params.addView(sw2);
-
-        final Switch sw3 = new Switch(ContentPanelActivity.this);
-        params.addView(sw3);
-
-        final Switch sw4 = new Switch(ContentPanelActivity.this);
-        params.addView(sw4);
-
-        final Switch sw5 = new Switch(ContentPanelActivity.this);
-        params.addView(sw5);
-
-        final Switch sw6 = new Switch(ContentPanelActivity.this);
-        params.addView(sw6);
-
-        final Switch sw7 = new Switch(ContentPanelActivity.this);
-         params.addView(sw7);
-
-        final EditText et2 = new EditText(ContentPanelActivity.this);
-        et2.setVisibility(View.GONE);
-        params.addView(et2);
-
-        /*  if(sw7.isChecked()){
-            et2.setVisibility(View.VISIBLE);
-        }*/
-
-
-        builder.setView(params);
-       // builder.setView(layoutText);
+        builder.setView(view);
 
         builder.setPositiveButton("Guardar",
                 new DialogInterface.OnClickListener() {
@@ -891,7 +855,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         final String cicatrizanteString;
                         final String otroString;
 
-                        if(sw1.isChecked()){
+                        if(antibiotico.isChecked()){
                        antibioticoString = "si";
                       Toast.makeText(getApplicationContext(), "Antibiótico" + antibioticoString, Toast.LENGTH_SHORT).show();
 
@@ -900,7 +864,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                        Toast.makeText(getApplicationContext(), "Antibiótico" + antibioticoString, Toast.LENGTH_SHORT).show();
                       }
 
-                   if(sw2.isChecked()){
+                   if(tatuaje.isChecked()){
                        tatuajeString = "si";
                        Toast.makeText(getApplicationContext(), "Tatuaje" + tatuajeString, Toast.LENGTH_SHORT).show();
                    }else{
@@ -908,7 +872,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                        Toast.makeText(getApplicationContext(), "Tatuaje" + tatuajeString, Toast.LENGTH_SHORT).show();
                        }
 
-                   if(sw3.isChecked()){
+                   if(analgesico.isChecked()){
                        analgesicoString = "si";
                             Toast.makeText(getApplicationContext(), "Analgésico" + analgesicoString, Toast.LENGTH_SHORT).show();
                         }else{
@@ -916,7 +880,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Analgésico" + analgesicoString, Toast.LENGTH_SHORT).show();
                         }
 
-                   if(sw4.isChecked()){
+                   if(suero.isChecked()){
                        sueroString = "si";
                             Toast.makeText(getApplicationContext(), "Suero" + sueroString, Toast.LENGTH_SHORT).show();
                         }else{
@@ -924,7 +888,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Suero" + sueroString, Toast.LENGTH_SHORT).show();
                         }
 
-                        if(sw5.isChecked()){
+                        if(cicatrizante.isChecked()){
                        cicatrizanteString = "si";
                             Toast.makeText(getApplicationContext(), "Cicatrizante" + cicatrizanteString, Toast.LENGTH_SHORT).show();
                         }else{
@@ -932,13 +896,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Cicatrizante" + cicatrizanteString, Toast.LENGTH_SHORT).show();
                         }
 
-                        if(sw6.isChecked()){
+                        if(otro.isChecked()){
                             otroString = "si";
                             Toast.makeText(getApplicationContext(), "Otro" + otroString, Toast.LENGTH_SHORT).show();
+
                         }else{
                             otroString = "no";
                             Toast.makeText(getApplicationContext(), "Otro" + otroString, Toast.LENGTH_SHORT).show();
                         }
+
+                        comentario.getText().toString();
 
                         //Create manager
                         Manager manager = null;
@@ -958,7 +925,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
 
-                        Document document = database.createDocument();
+                        Document document = database.getDocument(idDocumentStringS);
 
                         try{
                             document.update(new Document.DocumentUpdater() {
@@ -972,10 +939,11 @@ public class ContentPanelActivity extends AppCompatActivity {
                                     properties.put("cicatrizante", cicatrizanteString);
                                     properties.put("otro", otroString);
                                     properties.put("recuperacion_fecha", fecha);
-                                //    properties.put("comentario_recuperacion", Comentario);
+                                    properties.put("comentario_recuperacion", comentario);
                                     return true;
                                 }
                             });
+                            Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
                         }catch (CouchbaseLiteException e){
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
@@ -990,6 +958,82 @@ public class ContentPanelActivity extends AppCompatActivity {
         });
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
+
+    public void compraMedicamentoDialog(final String idDocumentStringS){
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
+        builder.setTitle("Medicamento");
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.compramedicamentoalert_main, null);
+
+        final Switch pregunta = view.findViewById(R.id.antibiotico_switch);
+
+        builder.setView(view);
+
+        builder.setPositiveButton("Guardar",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        String idDocumentStringS1 = idDocumentStringS;
+                        final String preguntaString;
+
+                        if (pregunta.isChecked()) {
+                            preguntaString = "Si";
+                        } else {
+                            preguntaString = "No";
+                        }
+
+                        //Create manager
+                        Manager manager = null;
+
+                        try {
+                            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        //Create or open the database named app
+                        Database database = null;
+
+                        try {
+                            database = manager.getDatabase("adla");
+                        } catch (CouchbaseLiteException e) {
+                            e.printStackTrace();
+                        }
+
+                        Document document = database.getDocument(idDocumentStringS1);
+
+                        try {
+                            document.update(new Document.DocumentUpdater() {
+                                @Override
+                                public boolean update(UnsavedRevision newRevision) {
+                                    Map<String, Object> properties = newRevision.getProperties();
+                                    properties.put("pregunta_medicamento", preguntaString);
+                                    properties.put("recuperacion_fecha", fecha);
+                                    return true;
+                                }
+                            });
+                            Toast.makeText(getApplicationContext(), preguntaString, Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
+                        } catch (CouchbaseLiteException e) {
+                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Hay un problema al guardar los datos de mediacmento!", Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+
+                    });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+        builder.show();
+    }
+
 
     public void reporteRegistros(){
 
@@ -1022,16 +1066,132 @@ public class ContentPanelActivity extends AppCompatActivity {
         datePickerDialog.show();
             }
 
-    public void buscaDesocupado(String idDocumentStringS){
+
+    public void buscaDesocupado(final String idDocumentStringS){
+
+
+      /*  final SharedPreferences prefs = getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE);
+
+        circleButton1.setVisibility(prefs.getBoolean("boton1", false) ? View.VISIBLE : View.GONE);
+        tv1.setVisibility(prefs.getBoolean("tv1", false)  ? View.VISIBLE : View.GONE);
+
+        circleButton2.setVisibility(prefs.getBoolean("boton2", false) ? View.VISIBLE : View.GONE);
+        tv2.setVisibility(prefs.getBoolean("tv2", false)  ? View.VISIBLE : View.GONE);
+
+        circleButton3.setVisibility(prefs.getBoolean("boton3", false) ? View.VISIBLE : View.GONE);
+        tv3.setVisibility(prefs.getBoolean("tv3", false)  ? View.VISIBLE : View.GONE);
+
+        circleButton4.setVisibility(prefs.getBoolean("boton4", false) ? View.VISIBLE : View.GONE);
+        tv4.setVisibility(prefs.getBoolean("tv4", false) ? View.VISIBLE : View.GONE);
+
+        circleButton5.setVisibility(prefs.getBoolean("boton5", false) ? View.VISIBLE : View.GONE);
+        tv5.setVisibility(prefs.getBoolean("tv5", false) ? View.VISIBLE : View.GONE);
+
+        circleButton6.setVisibility(prefs.getBoolean("boton6", false) ? View.VISIBLE : View.GONE);
+        tv6.setVisibility(prefs.getBoolean("tv6", false) ? View.VISIBLE : View.GONE);
+
+        circleButton7.setVisibility(prefs.getBoolean("boton7", false) ? View.VISIBLE : View.GONE);
+        tv7.setVisibility(prefs.getBoolean("tv7", false) ? View.VISIBLE : View.GONE);
+
+        circleButton8.setVisibility(prefs.getBoolean("boton8", false) ? View.VISIBLE : View.GONE);
+        tv8.setVisibility(prefs.getBoolean("tv8", false) ? View.VISIBLE : View.GONE);
+
+        circleButton9.setVisibility(prefs.getBoolean("boton9", false) ? View.VISIBLE : View.GONE);
+        tv9.setVisibility(prefs.getBoolean("tv9", false) ? View.VISIBLE : View.GONE);
+
+        circleButton10.setVisibility(prefs.getBoolean("boton10", false) ? View.VISIBLE : View.GONE);
+        tv10.setVisibility(prefs.getBoolean("tv10", false) ? View.VISIBLE : View.GONE);
+
+        circleButton11.setVisibility(prefs.getBoolean("boton11", false) ? View.VISIBLE : View.GONE);
+        tv11.setVisibility(prefs.getBoolean("tv11", false) ? View.VISIBLE : View.GONE);
+
+        circleButton12.setVisibility(prefs.getBoolean("boton12", false) ? View.VISIBLE : View.GONE);
+        tv12.setVisibility(prefs.getBoolean("tv12", false) ? View.VISIBLE : View.GONE);
+
+        circleButton13.setVisibility(prefs.getBoolean("boton13", false) ? View.VISIBLE : View.GONE);
+        tv13.setVisibility(prefs.getBoolean("tv13", false) ? View.VISIBLE : View.GONE);
+
+        circleButton14.setVisibility(prefs.getBoolean("boton14", false) ? View.VISIBLE : View.GONE);
+        tv14.setVisibility(prefs.getBoolean("tv14", false) ? View.VISIBLE : View.GONE);
+
+        circleButton15.setVisibility(prefs.getBoolean("boton15", false) ? View.VISIBLE : View.GONE);
+        tv15.setVisibility(prefs.getBoolean("tv15", false) ? View.VISIBLE : View.GONE);
+
+        circleButton16.setVisibility(prefs.getBoolean("boton16", false) ? View.VISIBLE : View.GONE);
+        tv16.setVisibility(prefs.getBoolean("tv16", false) ? View.VISIBLE : View.GONE);
+
+        circleButton17.setVisibility(prefs.getBoolean("boton17", false) ? View.VISIBLE : View.GONE);
+        tv17.setVisibility(prefs.getBoolean("tv17", false) ? View.VISIBLE : View.GONE);
+
+        circleButton18.setVisibility(prefs.getBoolean("boton18", false) ? View.VISIBLE : View.GONE);
+        tv18.setVisibility(prefs.getBoolean("tv18", false) ? View.VISIBLE : View.GONE);
+
+        circleButton19.setVisibility(prefs.getBoolean("boton19", false) ? View.VISIBLE : View.GONE);
+        tv19.setVisibility(prefs.getBoolean("tv19", false) ? View.VISIBLE : View.GONE);
+
+        circleButton20.setVisibility(prefs.getBoolean("boton20", false) ? View.VISIBLE : View.GONE);
+        tv20.setVisibility(prefs.getBoolean("tv20", false) ? View.VISIBLE : View.GONE);
+
+
+        circleButton21.setVisibility(prefs.getBoolean("boton21", false) ? View.VISIBLE : View.GONE);
+        tv21.setVisibility(prefs.getBoolean("tv21", false) ? View.VISIBLE : View.GONE);
+
+        circleButton22.setVisibility(prefs.getBoolean("boton22", false) ? View.VISIBLE : View.GONE);
+        tv22.setVisibility(prefs.getBoolean("tv22", false) ? View.VISIBLE : View.GONE);
+
+        circleButton23.setVisibility(prefs.getBoolean("boton23", false) ? View.VISIBLE : View.GONE);
+        tv23.setVisibility(prefs.getBoolean("tv23", false) ? View.VISIBLE : View.GONE);
+
+        circleButton24.setVisibility(prefs.getBoolean("boton24", false) ? View.VISIBLE : View.GONE);
+        tv24.setVisibility(prefs.getBoolean("tv24", false) ? View.VISIBLE : View.GONE);
+
+        circleButton25.setVisibility(prefs.getBoolean("boton25", false) ? View.VISIBLE : View.GONE);
+        tv25.setVisibility(prefs.getBoolean("tv25", false) ? View.VISIBLE : View.GONE);
+
+        circleButton26.setVisibility(prefs.getBoolean("boton26", false) ? View.VISIBLE : View.GONE);
+        tv26.setVisibility(prefs.getBoolean("tv26", false) ? View.VISIBLE : View.GONE);
+
+        circleButton27.setVisibility(prefs.getBoolean("boton27", false) ? View.VISIBLE : View.GONE);
+        tv27.setVisibility(prefs.getBoolean("tv27", false) ? View.VISIBLE : View.GONE);
+
+        circleButton28.setVisibility(prefs.getBoolean("boton28", false) ? View.VISIBLE : View.GONE);
+        tv28.setVisibility(prefs.getBoolean("tv28", false) ? View.VISIBLE : View.GONE);
+
+        circleButton29.setVisibility(prefs.getBoolean("boton29", false) ? View.VISIBLE : View.GONE);
+        tv29.setVisibility(prefs.getBoolean("tv29", false) ? View.VISIBLE : View.GONE);
+
+        circleButton30.setVisibility(prefs.getBoolean("boton30", false) ? View.VISIBLE : View.GONE);
+        tv30.setVisibility(prefs.getBoolean("tv30", false) ? View.VISIBLE : View.GONE);
+
+        circleButton31.setVisibility(prefs.getBoolean("boton31", false) ? View.VISIBLE : View.GONE);
+        tv31.setVisibility(prefs.getBoolean("tv31", false) ? View.VISIBLE : View.GONE);
+
+        circleButton32.setVisibility(prefs.getBoolean("boton32", false) ? View.VISIBLE : View.GONE);
+        tv32.setVisibility(prefs.getBoolean("tv32", false) ? View.VISIBLE : View.GONE);
+
+        circleButton33.setVisibility(prefs.getBoolean("boton33", false) ? View.VISIBLE : View.GONE);
+        tv33.setVisibility(prefs.getBoolean("tv33", false) ? View.VISIBLE : View.GONE);
+
+        circleButton34.setVisibility(prefs.getBoolean("boton34", false) ? View.VISIBLE : View.GONE);
+        tv34.setVisibility(prefs.getBoolean("tv34", false) ? View.VISIBLE : View.GONE);
+
+        circleButton35.setVisibility(prefs.getBoolean("boton35", false) ? View.VISIBLE : View.GONE);
+        tv35.setVisibility(prefs.getBoolean("tv35", false) ? View.VISIBLE : View.GONE);
+
+        circleButton36.setVisibility(prefs.getBoolean("boton36", false) ? View.VISIBLE : View.GONE);
+        tv36.setVisibility(prefs.getBoolean("tv36", false) ? View.VISIBLE : View.GONE);*/
+
+
 
         if(circleButton1.getVisibility() == View.GONE && tv1.getVisibility() == View.GONE){
+
             circleButton1.setVisibility(View.VISIBLE);
             tv1.setVisibility(View.VISIBLE);
             tv1.setText(idDocumentStringS);
             circleButton1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1040,16 +1200,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton1.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton1.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton1.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton1.setVisibility(View.GONE);
+                                tv1.setVisibility(View.GONE);
                             }
 
                         }
@@ -1057,14 +1219,20 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
+
+
+
+
         } else if(circleButton2.getVisibility() == View.GONE && tv2.getVisibility() == View.GONE){
+
+
             circleButton2.setVisibility(View.VISIBLE);
             tv2.setVisibility(View.VISIBLE);
             tv2.setText(idDocumentStringS);
             circleButton2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1073,16 +1241,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton2.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton2.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton2.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton2.setVisibility(View.GONE);
+                                tv2.setVisibility(View.GONE);
                             }
 
                         }
@@ -1090,14 +1260,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
+
+
+
         }else if (circleButton3.getVisibility() == View.GONE && tv3.getVisibility() == View.GONE){
+
             circleButton3.setVisibility(View.VISIBLE);
             tv3.setVisibility(View.VISIBLE);
             tv3.setText(idDocumentStringS);
             circleButton3.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1106,16 +1280,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton3.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton3.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton3.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton3.setVisibility(View.GONE);
+                                tv3.setVisibility(View.GONE);
                             }
 
                         }
@@ -1123,14 +1299,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
+
+
         }else if(circleButton4.getVisibility() == View.GONE && tv4.getVisibility() == View.GONE){
+
             circleButton4.setVisibility(View.VISIBLE);
             tv4.setVisibility(View.VISIBLE);
             tv4.setText(idDocumentStringS);
             circleButton4.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1139,16 +1318,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton4.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton4.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton4.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton4.setVisibility(View.GONE);
+                                tv4.setVisibility(View.GONE);
                             }
 
                         }
@@ -1156,14 +1337,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
+
+
         }else if(circleButton5.getVisibility() == View.GONE && tv5.getVisibility() == View.GONE){
+
             circleButton5.setVisibility(View.VISIBLE);
             tv5.setVisibility(View.VISIBLE);
             tv5.setText(idDocumentStringS);
             circleButton5.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1172,16 +1356,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton5.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton5.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton5.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton5.setVisibility(View.GONE);
+                                tv5.setVisibility(View.GONE);
                             }
 
                         }
@@ -1189,14 +1375,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
+
+
         }else if(circleButton6.getVisibility() == View.GONE && tv6.getVisibility() == View.GONE){
+
             circleButton6.setVisibility(View.VISIBLE);
             tv6.setVisibility(View.VISIBLE);
             tv6.setText(idDocumentStringS);
             circleButton6.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1205,16 +1394,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton6.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton6.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton6.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton6.setVisibility(View.GONE);
+                                tv6.setVisibility(View.GONE);
                             }
 
                         }
@@ -1222,14 +1413,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
+
         }else if(circleButton7.getVisibility() == View.GONE && tv7.getVisibility() == View.GONE){
+
             circleButton7.setVisibility(View.VISIBLE);
             tv7.setVisibility(View.VISIBLE);
             tv7.setText(idDocumentStringS);
             circleButton7.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1238,16 +1431,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton7.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton7.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton7.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton7.setVisibility(View.GONE);
+                                tv7.setVisibility(View.GONE);
                             }
 
                         }
@@ -1255,14 +1450,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
+
+
         }else if(circleButton8.getVisibility() == View.GONE && tv8.getVisibility() == View.GONE){
+
+
             circleButton8.setVisibility(View.VISIBLE);
             tv8.setVisibility(View.VISIBLE);
             tv8.setText(idDocumentStringS);
             circleButton8.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1271,16 +1470,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton8.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton8.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton8.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton8.setVisibility(View.GONE);
+                                tv8.setVisibility(View.GONE);
                             }
 
                         }
@@ -1288,14 +1489,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
+
         }else if(circleButton9.getVisibility() == View.GONE && tv9.getVisibility() == View.GONE){
+
             circleButton9.setVisibility(View.VISIBLE);
             tv9.setVisibility(View.VISIBLE);
             tv9.setText(idDocumentStringS);
             circleButton9.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1304,16 +1507,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton9.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton9.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton9.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton9.setVisibility(View.GONE);
+                                tv9.setVisibility(View.GONE);
                             }
 
                         }
@@ -1321,14 +1526,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
+
+
         }else if(circleButton10.getVisibility() == View.GONE && tv10.getVisibility() == View.GONE){
+
             circleButton10.setVisibility(View.VISIBLE);
             tv10.setVisibility(View.VISIBLE);
             tv10.setText(idDocumentStringS);
             circleButton10.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1337,16 +1545,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton10.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton10.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton10.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton10.setVisibility(View.GONE);
+                                tv10.setVisibility(View.GONE);
                             }
 
                         }
@@ -1354,14 +1564,21 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
+
+
+
         }else if(circleButton11.getVisibility() == View.GONE && tv11.getVisibility() == View.GONE){
+
+    //        prefs.edit().putBoolean("boton11", true).apply();
+    //        prefs.edit().putBoolean("tv11", true).apply();
+
             circleButton11.setVisibility(View.VISIBLE);
             tv11.setVisibility(View.VISIBLE);
             tv11.setText(idDocumentStringS);
             circleButton11.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1370,16 +1587,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton11.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton11.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton11.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton11.setVisibility(View.GONE);
+                                tv11.setVisibility(View.GONE);
                             }
 
                         }
@@ -1388,13 +1607,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton12.getVisibility() == View.GONE && tv12.getVisibility() == View.GONE){
+
+    //        prefs.edit().putBoolean("boton12", true).apply();
+    //        prefs.edit().putBoolean("tv12", true).apply();
+
             circleButton12.setVisibility(View.VISIBLE);
             tv12.setVisibility(View.VISIBLE);
             tv12.setText(idDocumentStringS);
             circleButton12.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1403,16 +1626,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton12.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton12.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton12.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton12.setVisibility(View.GONE);
+                                tv12.setVisibility(View.GONE);
                             }
 
                         }
@@ -1421,13 +1646,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton13.getVisibility() == View.GONE && tv13.getVisibility() == View.GONE){
+
+        //   prefs.edit().putBoolean("boton13", true).apply();
+        //    prefs.edit().putBoolean("tv13", true).apply();
+
             circleButton13.setVisibility(View.VISIBLE);
             tv13.setVisibility(View.VISIBLE);
             tv13.setText(idDocumentStringS);
             circleButton13.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1436,16 +1665,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton13.setVisibility(View.GONE);
+                                tv13.setVisibility(View.GONE);
                             }
 
                         }
@@ -1454,13 +1685,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton14.getVisibility() == View.GONE && tv14.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton14", true).apply();
+        //    prefs.edit().putBoolean("tv14", true).apply();
+
             circleButton14.setVisibility(View.VISIBLE);
             tv14.setVisibility(View.VISIBLE);
             tv14.setText(idDocumentStringS);
             circleButton14.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1469,16 +1704,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton14.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton14.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton14.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton14.setVisibility(View.GONE);
+                                tv14.setVisibility(View.GONE);
                             }
 
                         }
@@ -1487,13 +1724,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton15.getVisibility() == View.GONE && tv15.getVisibility() == View.GONE){
+
+       //    prefs.edit().putBoolean("boton15", true).apply();
+       //     prefs.edit().putBoolean("tv15", true).apply();
+
             circleButton15.setVisibility(View.VISIBLE);
             tv15.setVisibility(View.VISIBLE);
             tv15.setText(idDocumentStringS);
             circleButton15.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1502,16 +1743,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton15.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton15.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton15.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton15.setVisibility(View.GONE);
+                                tv15.setVisibility(View.GONE);
                             }
 
                         }
@@ -1520,13 +1763,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton16.getVisibility() == View.GONE && tv16.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton16", true).apply();
+        //    prefs.edit().putBoolean("tv16", true).apply();
+
             circleButton16.setVisibility(View.VISIBLE);
             tv16.setVisibility(View.VISIBLE);
             tv16.setText(idDocumentStringS);
             circleButton16.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1535,16 +1782,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton16.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton16.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton16.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton16.setVisibility(View.GONE);
+                                tv16.setVisibility(View.GONE);
                             }
 
                         }
@@ -1553,13 +1802,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton17.getVisibility() == View.GONE && tv17.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton17", true).apply();
+        //    prefs.edit().putBoolean("tv17", true).apply();
+
             circleButton17.setVisibility(View.VISIBLE);
             tv17.setVisibility(View.VISIBLE);
             tv17.setText(idDocumentStringS);
             circleButton17.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1568,16 +1821,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton17.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton17.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton17.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton17.setVisibility(View.GONE);
+                                tv17.setVisibility(View.GONE);
                             }
 
                         }
@@ -1586,13 +1841,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton18.getVisibility() == View.GONE && tv18.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton18", true).apply();
+        //    prefs.edit().putBoolean("tv18", true).apply();
+
             circleButton18.setVisibility(View.VISIBLE);
             tv18.setVisibility(View.VISIBLE);
             tv18.setText(idDocumentStringS);
             circleButton18.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1601,16 +1860,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton18.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton18.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton18.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton18.setVisibility(View.GONE);
+                                tv18.setVisibility(View.GONE);
                             }
 
                         }
@@ -1619,13 +1880,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton19.getVisibility() == View.GONE && tv19.getVisibility() == View.GONE){
+
+         //   prefs.edit().putBoolean("boton19", true).apply();
+         //   prefs.edit().putBoolean("tv19", true).apply();
+
             circleButton19.setVisibility(View.VISIBLE);
             tv19.setVisibility(View.VISIBLE);
             tv19.setText(idDocumentStringS);
             circleButton19.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1634,16 +1899,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton19.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton19.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton19.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton19.setVisibility(View.GONE);
+                                tv19.setVisibility(View.GONE);
                             }
 
                         }
@@ -1652,13 +1919,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton20.getVisibility() == View.GONE && tv20.getVisibility() == View.GONE){
+
+         //   prefs.edit().putBoolean("boton20", true).apply();
+         //   prefs.edit().putBoolean("tv20", true).apply();
+
             circleButton20.setVisibility(View.VISIBLE);
             tv20.setVisibility(View.VISIBLE);
             tv20.setText(idDocumentStringS);
             circleButton20.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1667,16 +1938,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton20.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton20.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton20.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton20.setVisibility(View.GONE);
+                                tv20.setVisibility(View.GONE);
                             }
 
                         }
@@ -1685,13 +1958,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton21.getVisibility() == View.GONE && tv21.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton21", true).apply();
+        //    prefs.edit().putBoolean("tv21", true).apply();
+
             circleButton21.setVisibility(View.VISIBLE);
             tv21.setVisibility(View.VISIBLE);
             tv21.setText(idDocumentStringS);
             circleButton21.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1700,16 +1977,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton21.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton21.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton21.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton21.setVisibility(View.GONE);
+                                tv21.setVisibility(View.GONE);
                             }
 
                         }
@@ -1718,13 +1997,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton22.getVisibility() == View.GONE && tv22.getVisibility() == View.GONE){
+
+         //   prefs.edit().putBoolean("boton22", true).apply();
+         //   prefs.edit().putBoolean("tv22", true).apply();
+
             circleButton22.setVisibility(View.VISIBLE);
             tv22.setVisibility(View.VISIBLE);
             tv22.setText(idDocumentStringS);
             circleButton22.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1733,16 +2016,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton22.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton22.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton22.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton22.setVisibility(View.GONE);
+                                tv22.setVisibility(View.GONE);
                             }
 
                         }
@@ -1751,13 +2036,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton23.getVisibility() == View.GONE && tv23.getVisibility() == View.GONE){
+
+         //   prefs.edit().putBoolean("boton23", true).apply();
+        //    prefs.edit().putBoolean("tv23", true).apply();
+
             circleButton23.setVisibility(View.VISIBLE);
             tv23.setVisibility(View.VISIBLE);
             tv23.setText(idDocumentStringS);
             circleButton23.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1766,16 +2055,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton23.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton23.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton23.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton23.setVisibility(View.GONE);
+                                tv23.setVisibility(View.GONE);
                             }
 
                         }
@@ -1784,13 +2075,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton24.getVisibility() == View.GONE && tv24.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton24", true).apply();
+        //    prefs.edit().putBoolean("tv24", true).apply();
+
             circleButton24.setVisibility(View.VISIBLE);
             tv24.setVisibility(View.VISIBLE);
             tv24.setText(idDocumentStringS);
             circleButton24.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1799,16 +2094,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton24.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton24.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton24.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton24.setVisibility(View.GONE);
+                                tv24.setVisibility(View.GONE);
                             }
 
                         }
@@ -1817,13 +2114,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton25.getVisibility() == View.GONE && tv25.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton25", true).apply();
+        //    prefs.edit().putBoolean("tv25", true).apply();
+
             circleButton25.setVisibility(View.VISIBLE);
             tv25.setVisibility(View.VISIBLE);
             tv25.setText(idDocumentStringS);
             circleButton25.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1832,16 +2133,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton25.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton25.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton25.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton25.setVisibility(View.GONE);
+                                tv25.setVisibility(View.GONE);
                             }
 
                         }
@@ -1850,13 +2153,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton26.getVisibility() == View.GONE && tv26.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton26", true).apply();
+        //    prefs.edit().putBoolean("tv26", true).apply();
+
             circleButton26.setVisibility(View.VISIBLE);
             tv26.setVisibility(View.VISIBLE);
             tv26.setText(idDocumentStringS);
             circleButton26.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1865,16 +2172,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton26.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton26.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton26.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton26.setVisibility(View.GONE);
+                                tv26.setVisibility(View.GONE);
                             }
 
                         }
@@ -1883,13 +2192,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton27.getVisibility() == View.GONE && tv27.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton27", true).apply();
+        //    prefs.edit().putBoolean("tv27", true).apply();
+
             circleButton27.setVisibility(View.VISIBLE);
             tv27.setVisibility(View.VISIBLE);
             tv27.setText(idDocumentStringS);
             circleButton27.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1898,16 +2211,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton27.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton27.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton27.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton27.setVisibility(View.GONE);
+                                tv27.setVisibility(View.GONE);
                             }
 
                         }
@@ -1916,13 +2231,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton28.getVisibility() == View.GONE && tv28.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton28", true).apply();
+        //    prefs.edit().putBoolean("tv28", true).apply();
+
             circleButton28.setVisibility(View.VISIBLE);
             tv28.setVisibility(View.VISIBLE);
             tv28.setText(idDocumentStringS);
             circleButton28.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1931,16 +2250,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton28.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton28.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton28.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton28.setVisibility(View.GONE);
+                                tv28.setVisibility(View.GONE);
                             }
 
                         }
@@ -1949,13 +2270,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton29.getVisibility() == View.GONE && tv29.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton29", true).apply();
+        //    prefs.edit().putBoolean("tv29", true).apply();
+
             circleButton29.setVisibility(View.VISIBLE);
             tv29.setVisibility(View.VISIBLE);
             tv29.setText(idDocumentStringS);
             circleButton29.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1964,16 +2289,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton29.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton29.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton29.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton29.setVisibility(View.GONE);
+                                tv29.setVisibility(View.GONE);
                             }
 
                         }
@@ -1982,13 +2309,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton30.getVisibility() == View.GONE && tv30.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton30", true).apply();
+        //    prefs.edit().putBoolean("tv30", true).apply();
+
             circleButton30.setVisibility(View.VISIBLE);
             tv30.setVisibility(View.VISIBLE);
             tv30.setText(idDocumentStringS);
             circleButton30.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1997,16 +2328,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton30.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton30.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton30.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton30.setVisibility(View.GONE);
+                                tv30.setVisibility(View.GONE);
                             }
 
                         }
@@ -2015,13 +2348,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton31.getVisibility() == View.GONE && tv31.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton31", true).apply();
+        //    prefs.edit().putBoolean("tv31", true).apply();
+
             circleButton31.setVisibility(View.VISIBLE);
             tv31.setVisibility(View.VISIBLE);
             tv31.setText(idDocumentStringS);
             circleButton31.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2030,16 +2367,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton31.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton31.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton31.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton31.setVisibility(View.GONE);
+                                tv31.setVisibility(View.GONE);
                             }
 
                         }
@@ -2048,13 +2387,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton32.getVisibility() == View.GONE && tv32.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton32", true).apply();
+        //    prefs.edit().putBoolean("tv32", true).apply();
+
             circleButton32.setVisibility(View.VISIBLE);
             tv32.setVisibility(View.VISIBLE);
             tv32.setText(idDocumentStringS);
             circleButton32.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2063,16 +2406,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton32.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton32.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton32.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton32.setVisibility(View.GONE);
+                                tv32.setVisibility(View.GONE);
                             }
 
                         }
@@ -2081,13 +2426,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton33.getVisibility() == View.GONE && tv33.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton33", true).apply();
+        //    prefs.edit().putBoolean("tv33", true).apply();
+
             circleButton33.setVisibility(View.VISIBLE);
             tv33.setVisibility(View.VISIBLE);
             tv33.setText(idDocumentStringS);
             circleButton33.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2096,16 +2445,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton33.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton33.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton33.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton33.setVisibility(View.GONE);
+                                tv33.setVisibility(View.GONE);
                             }
 
                         }
@@ -2114,13 +2465,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton34.getVisibility() == View.GONE && tv34.getVisibility() == View.GONE){
+
+         //   prefs.edit().putBoolean("boton34", true).apply();
+         //   prefs.edit().putBoolean("tv34", true).apply();
+
             circleButton34.setVisibility(View.VISIBLE);
             tv34.setVisibility(View.VISIBLE);
             tv34.setText(idDocumentStringS);
             circleButton34.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2129,16 +2484,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton34.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton34.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton34.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton34.setVisibility(View.GONE);
+                                tv34.setVisibility(View.GONE);
                             }
 
                         }
@@ -2147,13 +2504,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton35.getVisibility() == View.GONE && tv35.getVisibility() == View.GONE){
+
+        //    prefs.edit().putBoolean("boton35", true).apply();
+        //    prefs.edit().putBoolean("tv35", true).apply();
+
             circleButton35.setVisibility(View.VISIBLE);
             tv35.setVisibility(View.VISIBLE);
             tv35.setText(idDocumentStringS);
             circleButton35.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2162,16 +2523,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton35.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton35.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton35.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton35.setVisibility(View.GONE);
+                                tv35.setVisibility(View.GONE);
                             }
 
                         }
@@ -2180,13 +2543,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }else if(circleButton36.getVisibility() == View.GONE && tv36.getVisibility() == View.GONE){
+
+         //   prefs.edit().putBoolean("boton36", true).apply();
+         //   prefs.edit().putBoolean("tv36", true).apply();
+
             circleButton36.setVisibility(View.VISIBLE);
             tv36.setVisibility(View.VISIBLE);
             tv36.setText(idDocumentStringS);
             circleButton36.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2195,16 +2562,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton36.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton36.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton36.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton36.setVisibility(View.GONE);
+                                tv36.setVisibility(View.GONE);
                             }
 
                         }
@@ -2219,7 +2588,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton37.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2228,21 +2597,24 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton37.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton37.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton37.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton37.setVisibility(View.GONE);
+                                tv37.setVisibility(View.GONE);
                             }
 
                         }
                     });
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
+
                 }
             });
         }else if(circleButton38.getVisibility() == View.GONE && tv38.getVisibility() == View.GONE){
@@ -2252,7 +2624,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton38.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2261,16 +2633,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton38.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton38.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton38.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton38.setVisibility(View.GONE);
+                                tv38.setVisibility(View.GONE);
                             }
 
                         }
@@ -2285,7 +2659,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton39.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2294,16 +2668,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton39.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton39.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton39.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton39.setVisibility(View.GONE);
+                                tv39.setVisibility(View.GONE);
                             }
 
                         }
@@ -2318,7 +2694,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton40.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2327,16 +2703,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton40.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton40.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton40.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton40.setVisibility(View.GONE);
+                                tv40.setVisibility(View.GONE);
                             }
 
                         }
@@ -2351,7 +2729,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton41.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2360,17 +2738,19 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton41.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton41.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton41.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
-                            }
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton41.setVisibility(View.GONE);
+                                tv41.setVisibility(View.GONE);
+                        }
 
                         }
                     });
@@ -2384,7 +2764,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton42.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2393,16 +2773,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton42.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton42.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton42.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton42.setVisibility(View.GONE);
+                                tv42.setVisibility(View.GONE);
                             }
 
                         }
@@ -2417,7 +2799,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton43.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2426,16 +2808,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton43.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton43.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton43.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton43.setVisibility(View.GONE);
+                                tv43.setVisibility(View.GONE);
                             }
 
                         }
@@ -2450,7 +2834,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton44.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2459,16 +2843,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton44.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton44.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton44.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton44.setVisibility(View.GONE);
+                                tv44.setVisibility(View.GONE);
                             }
 
                         }
@@ -2483,7 +2869,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton45.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2492,16 +2878,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton45.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton45.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton45.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton45.setVisibility(View.GONE);
+                                tv45.setVisibility(View.GONE);
                             }
 
                         }
@@ -2516,7 +2904,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton46.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2525,16 +2913,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton46.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton46.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton46.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton46.setVisibility(View.GONE);
+                                tv46.setVisibility(View.GONE);
                             }
 
                         }
@@ -2549,7 +2939,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton47.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2558,16 +2948,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton47.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton47.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton47.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton47.setVisibility(View.GONE);
+                                tv47.setVisibility(View.GONE);
                             }
 
                         }
@@ -2582,7 +2974,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton48.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2591,16 +2983,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton48.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton48.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton48.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton48.setVisibility(View.GONE);
+                                tv48.setVisibility(View.GONE);
                             }
 
                         }
@@ -2615,7 +3009,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton49.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2624,16 +3018,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton49.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton49.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton49.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton49.setVisibility(View.GONE);
+                                tv49.setVisibility(View.GONE);
                             }
 
                         }
@@ -2648,7 +3044,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton50.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2657,16 +3053,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton50.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton50.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton50.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton50.setVisibility(View.GONE);
+                                tv50.setVisibility(View.GONE);
                             }
 
                         }
@@ -2681,7 +3079,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton51.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2690,16 +3088,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton51.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton51.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton51.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton51.setVisibility(View.GONE);
+                                tv51.setVisibility(View.GONE);
                             }
 
                         }
@@ -2714,7 +3114,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton52.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2723,16 +3123,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton52.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton52.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton52.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton52.setVisibility(View.GONE);
+                                tv52.setVisibility(View.GONE);
                             }
 
                         }
@@ -2747,7 +3149,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton53.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2756,16 +3158,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton53.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton53.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton53.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton53.setVisibility(View.GONE);
+                                tv53.setVisibility(View.GONE);
                             }
 
                         }
@@ -2780,7 +3184,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton54.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2789,16 +3193,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton54.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton54.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton54.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton54.setVisibility(View.GONE);
+                                tv54.setVisibility(View.GONE);
                             }
 
                         }
@@ -2813,7 +3219,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton55.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2822,16 +3228,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton55.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton55.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton55.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton55.setVisibility(View.GONE);
+                                tv55.setVisibility(View.GONE);
                             }
 
                         }
@@ -2846,7 +3254,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton56.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2855,16 +3263,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton56.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton56.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton56.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton56.setVisibility(View.GONE);
+                                tv56.setVisibility(View.GONE);
                             }
 
                         }
@@ -2879,7 +3289,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton57.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2888,16 +3298,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton57.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton57.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton57.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton57.setVisibility(View.GONE);
+                                tv57.setVisibility(View.GONE);
                             }
 
                         }
@@ -2912,7 +3324,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton58.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2921,16 +3333,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton58.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton58.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton58.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton58.setVisibility(View.GONE);
+                                tv58.setVisibility(View.GONE);
                             }
 
                         }
@@ -2945,7 +3359,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton59.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2954,16 +3368,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton59.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton59.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton59.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton59.setVisibility(View.GONE);
+                                tv59.setVisibility(View.GONE);
                             }
 
                         }
@@ -2978,7 +3394,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton60.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2987,16 +3403,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton60.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton60.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton60.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton60.setVisibility(View.GONE);
+                                tv60.setVisibility(View.GONE);
                             }
 
                         }
@@ -3011,7 +3429,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton61.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3020,16 +3438,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton61.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton61.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton61.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton61.setVisibility(View.GONE);
+                                tv61.setVisibility(View.GONE);
                             }
 
                         }
@@ -3044,7 +3464,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton62.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3053,16 +3473,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton62.setVisibility(View.GONE);
+                                tv62.setVisibility(View.GONE);
                             }
 
                         }
@@ -3077,7 +3499,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton63.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3086,16 +3508,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton63.setVisibility(View.GONE);
+                                tv63.setVisibility(View.GONE);
                             }
 
                         }
@@ -3110,7 +3534,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton64.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3119,16 +3543,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton64.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton64.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton64.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton64.setVisibility(View.GONE);
+                                tv64.setVisibility(View.GONE);
                             }
 
                         }
@@ -3143,7 +3569,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton65.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3152,16 +3578,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton65.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton65.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton65.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton65.setVisibility(View.GONE);
+                                tv65.setVisibility(View.GONE);
                             }
 
                         }
@@ -3176,7 +3604,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton66.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3185,16 +3613,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton66.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton66.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton66.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton66.setVisibility(View.GONE);
+                                tv66.setVisibility(View.GONE);
                             }
 
                         }
@@ -3209,7 +3639,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton67.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3218,16 +3648,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton67.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton67.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton67.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton67.setVisibility(View.GONE);
+                                tv67.setVisibility(View.GONE);
                             }
 
                         }
@@ -3242,7 +3674,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton68.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3251,16 +3683,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton68.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton68.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton68.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton68.setVisibility(View.GONE);
+                                tv68.setVisibility(View.GONE);
                             }
 
                         }
@@ -3275,7 +3709,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton69.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3284,16 +3718,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton69.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton69.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton69.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton69.setVisibility(View.GONE);
+                                tv69.setVisibility(View.GONE);
                             }
 
                         }
@@ -3308,7 +3744,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton70.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3317,16 +3753,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton70.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton70.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton70.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton70.setVisibility(View.GONE);
+                                tv70.setVisibility(View.GONE);
                             }
 
                         }
@@ -3341,7 +3779,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton71.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3350,16 +3788,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton71.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton71.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton71.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton71.setVisibility(View.GONE);
+                                tv71.setVisibility(View.GONE);
                             }
 
                         }
@@ -3374,7 +3814,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton72.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+                    final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3383,16 +3823,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                anestesiaDialog();
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton72.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                cirugiaDialog();
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton72.setColor(Color.YELLOW);
                             } else if (which == 2) {
-                                recuperacionDialog();
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton72.setColor(Color.BLUE);
                             } else if (which == 3) {
-                                //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                                compraMedicamentoDialog(idDocumentStringS);
+                                circleButton72.setVisibility(View.GONE);
+                                tv72.setVisibility(View.GONE);
                             }
 
                         }
@@ -3401,8 +3843,392 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }
+
+
+
     }
 
-}
+    private void askPermissionAndWriteFile() {
+        boolean canWrite = this.askPermission(REQUEST_ID_WRITE_PERMISSION,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        boolean canRead = this.askPermission(REQUEST_ID_READ_PERMISSION,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+        //
+        if (canWrite && canRead) {
+            this.writeFile();
+
+        }
+    }
+
+    // With Android Level >= 23, you have to ask the user
+    // for permission with device (For example read/write data on the device).
+    private boolean askPermission(int requestId, String permissionName) {
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+
+            // Check if we have permission
+            int permission = ActivityCompat.checkSelfPermission(this, permissionName);
+
+
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                // If don't have permission so prompt the user.
+                this.requestPermissions(
+                        new String[]{permissionName},
+                        requestId
+                );
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // When you have the request results
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //
+        // Note: If request is cancelled, the result arrays are empty.
+        if (grantResults.length > 0) {
+            switch (requestCode) {
+                case REQUEST_ID_WRITE_PERMISSION: {
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        writeFile();
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(getApplicationContext(), "Permission Cancelled!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void writeFile() {
+
+        //Comprobamos el estado de la memoria externa (tarjeta SD)
+        String estado = Environment.getExternalStorageState();
+
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+
+        final Font BLACK_BOLD1 = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, BaseColor.BLACK);
+        final Font BLACK_BOLD2 = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
+        final Font BLACK_BOLD3 = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK);
+
+        final Chunk A = new Chunk("ABOGADOS DE LOS ANIMALES, A.C.", BLACK_BOLD1);
+        final Chunk B = new Chunk("CAMPAÑA DE ESTERILIZACIÓN", BLACK_BOLD2);
+        final Chunk C = new Chunk("SOLICITUD Y RESPONSIVA" + "Ciudad: Querétaro " +  "Fecha: ", BLACK_BOLD2);
+        final Chunk D = new Chunk("ABOGADOS DE LOS ANIMALES, A.C.", BLACK_BOLD3);
+        final Chunk E = new Chunk("El curso post operatorio es responsabilidad del propietario de la mascota esterilizada y deberá ser supervisada por un médico veterinario competente, siguiendo las recomendaciones del médico veterinario que efectúe la cirugía. \n \n", BLACK_BOLD3);
+        final Chunk F = new Chunk("REQUISITOS: \n ", BLACK_BOLD3);
+
+     /*   String idDocumentStringS = getIntent().getExtras().getString("numero_folio");
+        String nombre = getIntent().getExtras().getString("nombre");
+        String numero = getIntent().getExtras().getString("numero");
+        String mascota = getIntent().getExtras().getString("mascota");
+        String tmascota = getIntent().getExtras().getString("tmascota");
+        String telefono = getIntent().getExtras().getString("telefono");
+        String direccion = getIntent().getExtras().getString("direccion");
+        String edad = getIntent().getExtras().getString("edad");
+        String raza = getIntent().getExtras().getString("raza");*/
+
+
+        if (estado.equals(Environment.MEDIA_MOUNTED)) {
+            sdDisponible = true;
+            sdAccesoEscritura = true;
+
+            //create document object
+            com.itextpdf.text.Document doc = new com.itextpdf.text.Document();
+            //output file path
+
+            try {
+                String file = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ Cartas Responsivas";
+
+                File dir = new File(file);
+                if(!dir.exists())
+                    dir.mkdirs();
+                Log.d("PDFCreator", "PDF Path:" + file);
+
+                File nfile = new File(dir, /*idDocumentS + */".pdf");
+                FileOutputStream fOut = new FileOutputStream(nfile);
+                PdfWriter.getInstance(doc, fOut);
+                //create pdf writer instance
+                // PdfWriter.getInstance(doc, new FileOutputStream(file));
+                //open the document for writing
+                doc.open();
+
+                Drawable d = getResources().getDrawable(R.drawable.logo);
+
+                BitmapDrawable bitDw = ((BitmapDrawable) d);
+
+                Bitmap bmp = bitDw.getBitmap();
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+                Image image = Image.getInstance(stream.toByteArray());
+
+                image.scaleAbsolute(50f, 50f);
+
+                doc.add(image);
+
+                doc.add(new Paragraph(A));
+                doc.add(new Paragraph(B));
+
+                LineSeparator ls = new LineSeparator();
+                doc.add(new Chunk(ls));
+
+                //add paragraph to the document
+                doc.add(new Paragraph(C + dateFormat.format(date)));
+
+                doc.add(new Paragraph(D + "no se hace responsable por muerte, pérdida o algún otro contratiempo que ocurra durante la cirugía o post operatorio. \n"));
+
+                doc.add(new Paragraph(E));
+
+                doc.add(new Paragraph(F));
+
+                doc.add(new Paragraph("1. La persona que presente la mascota para su esterilización debe de ser mayor de edad. \n " +
+                        "2. La mascota deberá tener por lo menos 2 meses de edad o 1 kg de peso. \n" +
+                        "3. La mascota deberá estar sin comer ni beber agua por lo menos 12 horas antes de la cirugía. De lo contrario \n" +
+                        "4. La mascota NO deberá estar lactando, gestando o en celo. \n" +
+                        "5. La mascota deberá estar sana y o más limpa posible.\n" +
+                        "6. Acepta que se marque la oreja de su mascota con un pequeño tatuaje. \n" +
+                        "7. RESCATADOS: " + "Más de 25 días de haberlos rescatados. \n " +
+                        "8. No se le debe de haber aplicado ninguna vacuna 2 semanas antes de la cirugía ni deben de aplicarse vacunas \n" +
+                        "mínimo en los siguientes 20 días después de la cirugía."));
+
+                doc.add(new Paragraph("DATOS DEL PROPIETARIO: \n"));
+
+                doc.add(new Paragraph("Nombre: " /* + nombreString*/));
+                doc.add(new Paragraph("Dirección: " /* + direccionString*/));
+                doc.add(new Paragraph("Cel / Tel: " /*+ telefonoString*/));
+
+                doc.add(new Paragraph("DATOS DE LA MASCOTA: \n"));
+
+                doc.add(new Paragraph("Nombre: " + mascota));
+                doc.add(new Paragraph("Edad: " /*+ edadString*/));
+                doc.add(new Paragraph("Raza: " /*+ razaString*/));
+                doc.add(new Paragraph("Color:___________________ " + "¿Tiene vacuna antirrabica?    Si       No   "));
+                doc.add(new Paragraph("Tamaño:     Ch     Med     Gde    Gigante     Peso:__________________(nosotros l@s pesamos)"));
+                doc.add(new Paragraph("OBSERVACIONES(condición médica, alergías, algunos problemas con el uso de anestesia)_________" +
+                        "___________________________________________________________________________________________________________ \n\n\n"));
+
+
+                doc.add(new Paragraph("Acepto las condiciones y confirmo que recibí el volante de cuidados post operatorio: \n"));
+
+
+                doc.add(new Paragraph("Nombre y Firma:"));
+
+                //close the document
+                doc.close();
+
+                Toast.makeText(getApplicationContext(), "PDF creado correctamente", Toast.LENGTH_SHORT).show();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public void buscaDesocupadoAlternativa(final String idDocumentStringS){
+
+        final SharedPreferences prefs = getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE);
+
+        circleButton1.setVisibility(prefs.getBoolean("boton1", false) ? View.VISIBLE : View.GONE);
+        tv1.setVisibility(prefs.getBoolean("tv1", false)  ? View.VISIBLE : View.GONE);
+
+        circleButton2.setVisibility(prefs.getBoolean("boton2", false) ? View.VISIBLE : View.GONE);
+        tv2.setVisibility(prefs.getBoolean("tv2", false)  ? View.VISIBLE : View.GONE);
+
+        circleButton3.setVisibility(prefs.getBoolean("boton3", false) ? View.VISIBLE : View.GONE);
+        tv3.setVisibility(prefs.getBoolean("tv3", false)  ? View.VISIBLE : View.GONE);
+
+        circleButton4.setVisibility(prefs.getBoolean("boton4", false) ? View.VISIBLE : View.GONE);
+        tv4.setVisibility(prefs.getBoolean("tv4", false) ? View.VISIBLE : View.GONE);
+
+        circleButton5.setVisibility(prefs.getBoolean("boton5", false) ? View.VISIBLE : View.GONE);
+        tv5.setVisibility(prefs.getBoolean("tv5", false) ? View.VISIBLE : View.GONE);
+
+        circleButton6.setVisibility(prefs.getBoolean("boton6", false) ? View.VISIBLE : View.GONE);
+        tv6.setVisibility(prefs.getBoolean("tv6", false) ? View.VISIBLE : View.GONE);
+
+        circleButton7.setVisibility(prefs.getBoolean("boton7", false) ? View.VISIBLE : View.GONE);
+        tv7.setVisibility(prefs.getBoolean("tv7", false) ? View.VISIBLE : View.GONE);
+
+        circleButton8.setVisibility(prefs.getBoolean("boton8", false) ? View.VISIBLE : View.GONE);
+        tv8.setVisibility(prefs.getBoolean("tv8", false) ? View.VISIBLE : View.GONE);
+
+        circleButton9.setVisibility(prefs.getBoolean("boton9", false) ? View.VISIBLE : View.GONE);
+        tv9.setVisibility(prefs.getBoolean("tv9", false) ? View.VISIBLE : View.GONE);
+
+        circleButton10.setVisibility(prefs.getBoolean("boton10", false) ? View.VISIBLE : View.GONE);
+        tv10.setVisibility(prefs.getBoolean("tv10", false) ? View.VISIBLE : View.GONE);
+
+        int botonvacio = 0;
+
+        switch (botonvacio){
+            case 0:
+               if(circleButton1.getVisibility() == View.GONE && tv1.getVisibility() == View.GONE){
+                circleButton1.setVisibility(View.VISIBLE);
+                tv1.setVisibility(View.VISIBLE);
+                tv1.setText(idDocumentStringS);
+
+                   prefs.edit().putBoolean("boton1", true).apply();
+                   prefs.edit().putBoolean("tv1", true).apply();
+               }
+                botonvacio++;
+               break;
+            case 1:
+                if(circleButton2.getVisibility() == View.GONE && tv2.getVisibility() == View.GONE){
+                circleButton2.setVisibility(View.VISIBLE);
+                tv2.setVisibility(View.VISIBLE);
+                tv2.setText(idDocumentStringS);
+
+                    prefs.edit().putBoolean("boton2", true).apply();
+                    prefs.edit().putBoolean("tv2", true).apply();
+                }
+                botonvacio++;
+                break;
+            case 2:
+                if(circleButton3.getVisibility() == View.GONE && tv3.getVisibility() == View.GONE){
+                    circleButton3.setVisibility(View.VISIBLE);
+                    circleButton3.setVisibility(View.VISIBLE);
+                    tv3.setText(idDocumentStringS);
+
+                    prefs.edit().putBoolean("boton3", true).apply();
+                    prefs.edit().putBoolean("tv3", true).apply();
+                }
+                botonvacio++;
+                break;
+            case 3:
+                if(circleButton4.getVisibility() == View.GONE && tv4.getVisibility() == View.GONE){
+                  circleButton4.setVisibility(View.VISIBLE);
+                  tv4.setVisibility(View.VISIBLE);
+                  tv4.setText(idDocumentStringS);
+
+                    prefs.edit().putBoolean("boton4", true).apply();
+                    prefs.edit().putBoolean("tv4", true).apply();
+                }
+                botonvacio++;
+                break;
+            case 4:
+                if(circleButton5.getVisibility() == View.GONE && tv5.getVisibility() == View.GONE){
+                    circleButton5.setVisibility(View.VISIBLE);
+                    tv5.setVisibility(View.VISIBLE);
+                    tv5.setText(idDocumentStringS);
+
+                    prefs.edit().putBoolean("boton5", true).apply();
+                    prefs.edit().putBoolean("tv5", true).apply();
+                }
+                botonvacio++;
+                break;
+            case 5:
+               if(circleButton6.getVisibility() == View.GONE && tv6.getVisibility() == View.GONE){
+                   circleButton6.setVisibility(View.VISIBLE);
+                   tv6.setVisibility(View.VISIBLE);
+                   tv6.setText(idDocumentStringS);
+
+                   prefs.edit().putBoolean("boton6", true).apply();
+                   prefs.edit().putBoolean("tv6", true).apply();
+               }
+               botonvacio++;
+               break;
+            case 6:
+                if(circleButton7.getVisibility() == View.GONE && tv7.getVisibility() == View.GONE){
+                    circleButton7.setVisibility(View.VISIBLE);
+                    tv7.setVisibility(View.VISIBLE);
+                    tv7.setText(idDocumentStringS);
+
+                    prefs.edit().putBoolean("boton7", true).apply();
+                    prefs.edit().putBoolean("tv7", true).apply();
+                }
+               botonvacio++;
+                break;
+            case 7:
+                if(circleButton8.getVisibility() == View.GONE && tv8.getVisibility() == View.GONE){
+                 circleButton8.setVisibility(View.VISIBLE);
+                 tv8.setVisibility(View.VISIBLE);
+                 tv8.setText(idDocumentStringS);
+
+                    prefs.edit().putBoolean("boton8", true).apply();
+                    prefs.edit().putBoolean("tv8", true).apply();
+                }
+                botonvacio++;
+                break;
+
+            case 8:
+                if(circleButton9.getVisibility() == View.GONE && tv9.getVisibility() == View.GONE){
+                    circleButton9.setVisibility(View.VISIBLE);
+                    circleButton9.setVisibility(View.VISIBLE);
+                    tv9.setText(idDocumentStringS);
+
+                    prefs.edit().putBoolean("boton9", true).apply();
+                    prefs.edit().putBoolean("tv9", true).apply();
+                }
+                botonvacio++;
+                break;
+
+            case 9:
+                if(circleButton10.getVisibility() == View.GONE && tv10.getVisibility() == View.GONE){
+                   circleButton10.setVisibility(View.VISIBLE);
+                   circleButton10.setVisibility(View.VISIBLE);
+                   tv10.setText(idDocumentStringS);
+
+                    prefs.edit().putBoolean("boton10", true).apply();
+                    prefs.edit().putBoolean("tv10", true).apply();
+                }
+                botonvacio++;
+                break;
+        }
+
+    }
+
+
+    public void buttonOnClick(View view, final String idDocumentStringS) {
+
+        final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
+        builder.setTitle("Selecciona Módulo");
+        builder.setItems(modulos, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                if (which == 0) {
+                    anestesiaDialog(idDocumentStringS);
+                    circleButton72.setColor(Color.GREEN);
+                } else if (which == 1) {
+                    cirugiaDialog(idDocumentStringS);
+                    circleButton72.setColor(Color.YELLOW);
+                } else if (which == 2) {
+                    recuperacionDialog(idDocumentStringS);
+                    circleButton72.setColor(Color.BLUE);
+                } else if (which == 3) {
+                    //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+        builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+
+        }
+    }
+
 
 

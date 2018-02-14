@@ -2,6 +2,7 @@ package com.example.dev.saludmock.activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -126,10 +127,11 @@ public class CreatePdfActivity extends Activity {
          final Chunk E = new Chunk("El curso post operatorio es responsabilidad del propietario de la mascota esterilizada y deberá ser supervisada por un médico veterinario competente, siguiendo las recomendaciones del médico veterinario que efectúe la cirugía. \n \n", BLACK_BOLD3);
          final Chunk F = new Chunk("REQUISITOS: \n ", BLACK_BOLD3);
 
-        String numero_folio = getIntent().getExtras().getString("numero_folio");
+        String idDocumentStringS = getIntent().getExtras().getString("numero_folio");
         String nombre = getIntent().getExtras().getString("nombre");
         String numero = getIntent().getExtras().getString("numero");
         String mascota = getIntent().getExtras().getString("mascota");
+        String tmascota = getIntent().getExtras().getString("tmascota");
         String telefono = getIntent().getExtras().getString("telefono");
         String direccion = getIntent().getExtras().getString("direccion");
         String edad = getIntent().getExtras().getString("edad");
@@ -226,7 +228,13 @@ public class CreatePdfActivity extends Activity {
                 //close the document
                 doc.close();
 
-                Toast.makeText(getApplicationContext(), "Su PDF ha sido creado y guardado en la memoria externa. " + numero_folio, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Su PDF ha sido creado y guardado en la memoria externa. " + idDocumentStringS, Toast.LENGTH_SHORT).show();
+              //  ContentPanelActivity contentPanelActivity = new ContentPanelActivity();
+               // contentPanelActivity.buscaDesocupado(idDocumentStringS);
+                Intent intent = new Intent(CreatePdfActivity.this, ContentPanelActivity.class);
+                intent.putExtra("idDocumentStringS",idDocumentStringS);
+                intent.putExtra("tmascota", tmascota);
+                startActivity(intent);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -2,6 +2,7 @@ package com.example.dev.saludmock.activities;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -14,16 +15,30 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Manager;
+import com.couchbase.lite.Query;
+import com.couchbase.lite.QueryEnumerator;
+import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.android.AndroidContext;
+import com.couchbase.lite.internal.database.util.DatabaseUtils;
+import com.couchbase.lite.util.Log;
 import com.example.dev.saludmock.R;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class ReporteActivity extends AppCompatActivity {
 
   TextView tv, tv2, tv3;
   Button btn;
+
+  String fecha = "";
+  String nombre = "";
+  String mascota = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +49,11 @@ public class ReporteActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendEmail();
+                sendEmail(fecha, nombre, mascota);
+
+
+
+
             }
         });
 
@@ -60,28 +79,29 @@ public class ReporteActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        //Create or open the database named app
         Database database = null;
-        try{
+        try {
             database = manager.getDatabase("adla");
-        }catch (CouchbaseLiteException e){
+        } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }
 
-        Document doc = database.getDocument("tapes");
-        Map<String, Object> properties = doc.getProperties();
-        String fecha = (String) properties.get("fecha");
+        //   Toast.makeText(getApplicationContext(), "si hay ejemplos", Toast.LENGTH_SHORT).show();
 
-        if(fecha == date){
+        Document doc = database.getDocument("1");
+
+        doc.getProperty("creat_at");
+
+         Map<String, Object> properties = doc.getProperties();
+          fecha = (String) properties.get("creat_at");
+          nombre = (String) properties.get("nombreDueno");
+          mascota = (String) properties.get("nombreMascota");
+        
+
             tv.setText(fecha);
-        }else {
-            Toast.makeText(getApplicationContext(), "No se encuentra registros esa fecha", Toast.LENGTH_LONG).show();
-        }
+            tv2.setText(nombre);
+            tv3.setText(mascota);
 
-
-
-       // String anestesia2 = (String) properties.get("dosis2");
-       // String anestesia3 = (String) properties.get("dosis3");
 
 
   /*      if(doc!=null){
@@ -96,8 +116,8 @@ public class ReporteActivity extends AppCompatActivity {
 
     }
 
-    protected void sendEmail() {
-        String[] TO = {"qro.abogadosdelosanimales@gmail.com"}; //aquí pon tu correo
+    protected void sendEmail(String fecha, String nombre, String mascota) {
+        String[] TO = {"kenm.riv@gmail.com"}; //aquí pon tu correo
         String[] CC = {"kenm.riv@gmail.com"};
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
         emailIntent.setData(Uri.parse("mailto:"));
@@ -106,7 +126,7 @@ public class ReporteActivity extends AppCompatActivity {
         emailIntent.putExtra(Intent.EXTRA_CC, CC);
 // Esto podrás modificarlo si quieres, el asunto y el cuerpo del mensaje
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reporte de registros de campaña");
-        emailIntent.putExtra(Intent.EXTRA_TEXT, "Este es un correo de prueba...");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, fecha + nombre + mascota);
 
         try {
             startActivity(Intent.createChooser(emailIntent, "Enviar email..."));

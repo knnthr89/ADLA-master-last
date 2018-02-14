@@ -65,6 +65,8 @@
             android:label="@string/title_activity_reporte" />
         <activity android:name=".activities.AddUrlSheet"
             android:label="@string/title_activity_addurlsheet"/>
+        <activity android:name=".activities.CreatePdfFromNewActivity"
+            android:label="@string/title_createpdf_activity"/>
     </application>
 
 </manifest>

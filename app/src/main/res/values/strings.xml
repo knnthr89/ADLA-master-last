@@ -9,8 +9,8 @@
     <string name="prompt_password">Contraseña (Debe contener 6 o más caracteres)</string>
     <string name="prompt_password2">Confirme Contraseña (Debe coincidir con la primera)</string>
     <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="action_sign_up_short">Sign Up</string>
+    <string name="action_sign_in_short">Entrar</string>
+    <string name="action_sign_up_short">Registrar</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_invalid_username">This username is too short</string>
@@ -148,4 +148,13 @@
     <string name="title_notifications">Reporte</string>
     <string name="title_search">Buscar Preregistro</string>
 
+    <string name="title_antibiotico">Antibiótico</string>
+    <string name="title_tatuaje">Tatuaje</string>
+    <string name="title_analgesico">Analgésico</string>
+    <string name="title_suero">Suero</string>
+    <string name="title_cicatrizante">Cicatrizante</string>
+    <string name="title_otro">Otro</string>
+    <string name="title_comentario">Comentario</string>
+
+    <string name="title_compramedicamento">¿El cliente lleva medicamento para la mascota?</string>
 </resources>
