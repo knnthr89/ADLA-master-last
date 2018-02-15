@@ -277,7 +277,8 @@ public class ContentPanelActivity extends AppCompatActivity {
     String [] medida = {"Tamaño de la mascota","Chico", "Mediano", "Grande", "Gigante"};
     String [] medio = {"¿Cómo te enteraste de la campaña?","Facebook","Volante","Vi una lona en la campaña", "Ya he ido a otra campaña de Abogados de los Animales", "Recomendación de otra persona", "Otro"};
    // String [] tamano_mascota = {"Detalles de las Mascotas", "Perro", "Perra", "Gato", "Gata"};
-   String [] pet_size = {"Detalles de las Mascotas", "Perro", "Perra", "Gato", "Gata"};
+   String [] pet_size = {"Detalle de la Mascota", "Perro", "Perra", "Gato", "Gata"};
+    String [] pet = {"Desea cambiar el sexo de la mascota?", "Perro", "Perra", "Gato", "Gata"};
 
    private String PREFS_KEY = "mispreferencias";
 
@@ -468,8 +469,9 @@ public class ContentPanelActivity extends AppCompatActivity {
         String idDocumentStringS = datos.getString("idDocumentStringS");
         String tmascota = datos.getString("tmascota");
 
+       //falta editar si escogen perro o perra, para cambiar de método
         if(idDocumentStringS != null){
-            buscaDesocupado(idDocumentStringS);
+            buscaDesocupadoGato(idDocumentStringS);
         }
 
 
@@ -542,10 +544,10 @@ public class ContentPanelActivity extends AppCompatActivity {
         final AutoCompleteTextView telefono = view.findViewById(R.id.telefono);
         final AutoCompleteTextView email = view.findViewById(R.id.email);
         final AutoCompleteTextView nmascota = view.findViewById(R.id.mascota);
-        final Spinner tmascota =view.findViewById(R.id.tmascota);
+        final Spinner msocial =view.findViewById(R.id.tmascota);
         final AutoCompleteTextView raza = view.findViewById(R.id.raza);
         final AutoCompleteTextView edad = view.findViewById(R.id.edad);
-        final Spinner msocial = view.findViewById(R.id.msocial);
+        final Spinner tmascota = view.findViewById(R.id.msocial);
         final AutoCompleteTextView comentarios = view.findViewById(R.id.comentarios);
         final AutoCompleteTextView tratamiento = view.findViewById(R.id.tratamiento);
         final AutoCompleteTextView rescatado = view.findViewById(R.id.rescatado);
@@ -553,21 +555,24 @@ public class ContentPanelActivity extends AppCompatActivity {
         final AutoCompleteTextView desparacitacion = view.findViewById(R.id.desparacitacion);
         final AutoCompleteTextView celo = view.findViewById(R.id.celo);
         final AutoCompleteTextView lactar = view.findViewById(R.id.lactar);
-        final Spinner tamano_mascota = view.findViewById(R.id.tamano_mascota);
+        final Spinner tipo_mascota = view.findViewById(R.id.tamano_mascota);
         final AutoCompleteTextView peso = view.findViewById(R.id.peso);
 
 
+        //medio social
         final ArrayAdapter<String> adp = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, medio);
-        tmascota.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        tmascota.setAdapter(adp);
-
-        final ArrayAdapter<String> adp1 = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, medida);
         msocial.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        msocial.setAdapter(adp1);
+        msocial.setAdapter(adp);
 
+        //tamaño de mascota
+        final ArrayAdapter<String> adp1 = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, medida);
+        tmascota.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        tmascota.setAdapter(adp1);
+
+        //tipo mascota
         final ArrayAdapter<String> adp2 = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, pet_size);
-        tamano_mascota.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        tamano_mascota.setAdapter(adp2);
+        tipo_mascota.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        tipo_mascota.setAdapter(adp2);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Registra nueva mascota");
@@ -584,10 +589,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                             String telefonoString = telefono.getText().toString(); //
                             String emailString = email.getText().toString();//
                             String mascota = nmascota.getText().toString();//
-                            String tmascotaString = tmascota.getSelectedItem().toString(); //
+                            String msocialString = msocial.getSelectedItem().toString(); //
                             String razaString = raza.getText().toString();//
                             String edadString = edad.getText().toString();//
-                            String msocialString = msocial.getSelectedItem().toString(); //
+                            String tamanoMascotaString = msocial.getSelectedItem().toString(); //
                             String comentarioString = comentarios.getText().toString(); //
                             String tratamientoString = tratamiento.getText().toString(); //
                             String rescatadoString = rescatado.getText().toString(); //
@@ -595,7 +600,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                             String desparacitacionString = desparacitacion.getText().toString(); //
                             String celoString = celo.getText().toString();//
                             String lactarString = lactar.getText().toString();//
-                            String tamanoMascotaString = tamano_mascota.getSelectedItem().toString();
+                            String tipoMascotaString = tipo_mascota.getSelectedItem().toString();
                             String pesoString = peso.getText().toString();
 
                           //create manager
@@ -622,10 +627,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         properties.put("telefono", telefonoString);
                         properties.put("correo", emailString);
                         properties.put("nombreMascota", mascota);
-                        properties.put("tipoMascota", tmascotaString);
+                        properties.put("mediosocial", msocialString);
                         properties.put("raza", razaString);
                         properties.put("edad", edadString);
-                        properties.put("msocial", msocialString);
+                        properties.put("tamanoMascota", tamanoMascotaString);
                         properties.put("comentarioRegistro", comentarioString);
                         properties.put("tratamiento", tratamientoString);
                         properties.put("rescatado", rescatadoString);
@@ -633,7 +638,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         properties.put("desparacitacion", desparacitacionString);
                         properties.put("celo", celoString);
                         properties.put("lactar", lactarString);
-                        properties.put("tamanoMascota", tamanoMascotaString);
+                        properties.put("tipoMascota", tipoMascotaString);
                         properties.put("peso", pesoString);
                         properties.put("creat_at", fecha);
 
@@ -660,9 +665,22 @@ public class ContentPanelActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
 
-                        Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
-                        askPermissionAndWriteFile();
-                        buscaDesocupado(idDocumentS);
+                        if(tipoMascotaString != "Detalle de la Mascota") {
+                            if (tipoMascotaString == "Gato" || tipoMascotaString == "Gata") {
+                                buscaDesocupadoGato(idDocumentS);
+                                Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
+                                askPermissionAndWriteFile();
+
+                            } else if (tipoMascotaString == "Perro" || tipoMascotaString == "Perra") {
+                                buscaDesocupadoPerro(idDocumentS);
+                                Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
+                                askPermissionAndWriteFile();
+
+                            }
+                        }else{
+                            Toast.makeText(getApplicationContext(), "Debe de seleccionar alguna opcion de Detelles de la mascota", Toast.LENGTH_SHORT).show();
+                        }
+
                       //  buscaDesocupadoAlternativa(idDocumentS);
                     }
                 });
@@ -747,6 +765,8 @@ public class ContentPanelActivity extends AppCompatActivity {
 
 
                         Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
+
+                       int color = Color.GREEN;
                     }
                 });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -759,30 +779,66 @@ public class ContentPanelActivity extends AppCompatActivity {
     }
 
     public void cirugiaDialog(final String idDocumentStringS){
+
+        final String tipoMascotaString;
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.cirugiaalert_main, null);
+
+        final AutoCompleteTextView cirujano = view.findViewById(R.id.nombre_cirujano);
+        final AutoCompleteTextView comentario = view.findViewById(R.id.comentario);
+
+      //  final TextView tvtexto = view.findViewById(R.id.texto);
+        final TextView tv = view.findViewById(R.id.tipomascotaseleccionada);
+
+        final Spinner tipo_mascota =view.findViewById(R.id.tmascota);
+
+        //tipo_mascota
+        final ArrayAdapter<String> adp = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, pet);
+        tipo_mascota.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        tipo_mascota.setAdapter(adp);
+
+        //Create a manager
+        Manager manager = null;
+        try{
+            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        Database database = null;
+        try {
+            database = manager.getDatabase("adla");
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+
+        Document doc = database.getDocument(idDocumentStringS);
+
+        doc.getProperty("tipoMascota");
+
+        Map<String, Object> properties = doc.getProperties();
+        tipoMascotaString = (String) properties.get("tipoMascota");
+
+
+        tv.setText(tipoMascotaString);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Cirugía");
-        LinearLayout layout = new LinearLayout(getApplicationContext());
-        layout.setOrientation(LinearLayout.VERTICAL);
 
-        final EditText cirujano = new EditText(this);
-        cirujano.setHint("¿Quién operó?");
-        layout.addView(cirujano);
-        cirujano.setInputType(InputType.TYPE_CLASS_TEXT);
-
-        final EditText comentario = new EditText(this);
-        comentario.setHint("Comentario");
-        layout.addView(comentario);
-        comentario.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(layout);
+        builder.setView(view);
         builder.setPositiveButton("Guardar",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                    String ncirujano = cirujano.getText().toString();
-                    String ncomentario = comentario.getText().toString();
+                    final String ncirujano = cirujano.getText().toString();
+                    final String ncomentario = comentario.getText().toString();
+                    final String tipomascotaString = tipo_mascota.getSelectedItem().toString();
 
-                    //Create a manager
+                    if (tipomascotaString == "Desea cambiar el sexo de la mascota?" || tipomascotaString.equals(tipoMascotaString)){
+
+                        //Create a manager
                         Manager manager = null;
                         try{
                             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
@@ -815,6 +871,46 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                         Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_SHORT).show();
 
+                    }else {
+
+                        //Create a manager
+                        Manager manager = null;
+                        try {
+                            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        //Create or open the database named app
+                        Database database = null;
+                        try {
+                            database = manager.getDatabase("adla");
+                        } catch (CouchbaseLiteException e) {
+                            e.printStackTrace();
+                        }
+
+                        //create a new document
+                        Document document = database.getDocument(idDocumentStringS);
+
+                        try{
+                            document.update(new Document.DocumentUpdater() {
+                                @Override
+                                public boolean update(UnsavedRevision newRevision) {
+                                    Map<String, Object> properties = newRevision.getProperties();
+                                    properties.put("cirujano",ncirujano);
+                                    properties.put("comentario", ncomentario);
+                                    properties.put("tipoMascota", tipomascotaString);
+                                    properties.put("fecha_cirugia", fecha);
+
+                                    return true;
+                                }
+                            });
+                            Toast.makeText(getApplicationContext(), "Se cambió de sexo la mascota", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
+                        }catch (CouchbaseLiteException e){
+                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
+                        }
+                    }
                     }
                 });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -854,6 +950,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         final String sueroString;
                         final String cicatrizanteString;
                         final String otroString;
+                        final String comentarioString = comentario.getText().toString();
 
                         if(antibiotico.isChecked()){
                        antibioticoString = "si";
@@ -939,7 +1036,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                                     properties.put("cicatrizante", cicatrizanteString);
                                     properties.put("otro", otroString);
                                     properties.put("recuperacion_fecha", fecha);
-                                    properties.put("comentario_recuperacion", comentario);
+                                    properties.put("comentario_recuperacion", comentarioString);
                                     return true;
                                 }
                             });
@@ -1067,7 +1164,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             }
 
 
-    public void buscaDesocupado(final String idDocumentStringS){
+    public void buscaDesocupadoGato(final String idDocumentStringS){
 
 
       /*  final SharedPreferences prefs = getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE);
@@ -1212,8 +1309,8 @@ public class ContentPanelActivity extends AppCompatActivity {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton1.setVisibility(View.GONE);
                                 tv1.setVisibility(View.GONE);
-                            }
 
+                            }
                         }
                     });
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
@@ -2581,7 +2678,14 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton37.getVisibility() == View.GONE && tv37.getVisibility() == View.GONE){
+        }
+
+
+    }
+
+    private void buscaDesocupadoPerro(final String idDocumentStringS){
+
+         if(circleButton37.getVisibility() == View.GONE && tv37.getVisibility() == View.GONE){
             circleButton37.setVisibility(View.VISIBLE);
             tv37.setVisibility(View.VISIBLE);
             tv37.setText(idDocumentStringS);
@@ -2750,7 +2854,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton41.setVisibility(View.GONE);
                                 tv41.setVisibility(View.GONE);
-                        }
+                            }
 
                         }
                     });
@@ -3843,8 +3947,6 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
         }
-
-
 
     }
 
