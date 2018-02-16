@@ -20,6 +20,49 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="right"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:layout_marginTop="30dp">
+
+
+        <TextView
+            android:id="@+id/pregunta_isabelino"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_compraisabelino" />
+
+        <Switch
+            android:id="@+id/isabelino_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:layout_marginTop="60dp">
+
+
+        <TextView
+            android:id="@+id/pregunta_isodine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_compraisodine" />
+
+        <Switch
+            android:id="@+id/isodine_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"/>
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

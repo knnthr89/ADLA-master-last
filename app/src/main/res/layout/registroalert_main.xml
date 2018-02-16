@@ -225,6 +225,19 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/alergia"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="¿Tiene alguna alergía?, (Mencione cual)"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
         </LinearLayout>
     </ScrollView>
 

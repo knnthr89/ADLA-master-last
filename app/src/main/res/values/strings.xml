@@ -157,4 +157,6 @@
     <string name="title_comentario">Comentario</string>
 
     <string name="title_compramedicamento">¿El cliente lleva medicamento para la mascota?</string>
+    <string name="title_compraisabelino">¿El cliente lleva isabelino para la mascota?</string>
+    <string name="title_compraisodine">¿El cliente lleva isodine para la mascota?</string>
 </resources>

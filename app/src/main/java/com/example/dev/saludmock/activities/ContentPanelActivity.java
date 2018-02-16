@@ -25,6 +25,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -281,6 +282,35 @@ public class ContentPanelActivity extends AppCompatActivity {
     String [] pet = {"Desea cambiar el sexo de la mascota?", "Perro", "Perra", "Gato", "Gata"};
 
    private String PREFS_KEY = "mispreferencias";
+
+    private AutoCompleteTextView nombre;
+    private AutoCompleteTextView direccion;
+    private AutoCompleteTextView telefono;
+    private AutoCompleteTextView nmascota;
+    private AutoCompleteTextView raza;
+    private AutoCompleteTextView edad;
+    private AutoCompleteTextView tratamiento;
+    private AutoCompleteTextView rescatado;
+    private AutoCompleteTextView vacuna;
+    private AutoCompleteTextView desparacitacion;
+    private AutoCompleteTextView celo;
+    private AutoCompleteTextView lactar;
+    private AutoCompleteTextView peso;
+
+    String nombreString = "";
+    String direccionString = "";
+    String telefonoString = "";
+    String mascotaString = "";
+    String razaString = "";
+    String edadString = "";
+    String tratamientoString = "";
+    String rescatadoString = "";
+    String vacunaString = "";
+    String desparacitacionString = "";
+    String celoString = "";
+    String lactarString = "";
+    String pesoString = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -539,25 +569,25 @@ public class ContentPanelActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.registroalert_main, null);
 
-        final AutoCompleteTextView nombre = view.findViewById(R.id.nombre_dueño);
-        final AutoCompleteTextView direccion = view.findViewById(R.id.direccion);
-        final AutoCompleteTextView telefono = view.findViewById(R.id.telefono);
+         nombre = view.findViewById(R.id.nombre_dueño);
+         direccion = view.findViewById(R.id.direccion);
+         telefono = view.findViewById(R.id.telefono);
         final AutoCompleteTextView email = view.findViewById(R.id.email);
-        final AutoCompleteTextView nmascota = view.findViewById(R.id.mascota);
+         nmascota = view.findViewById(R.id.mascota);
         final Spinner msocial =view.findViewById(R.id.tmascota);
-        final AutoCompleteTextView raza = view.findViewById(R.id.raza);
-        final AutoCompleteTextView edad = view.findViewById(R.id.edad);
+         raza = view.findViewById(R.id.raza);
+         edad = view.findViewById(R.id.edad);
         final Spinner tmascota = view.findViewById(R.id.msocial);
         final AutoCompleteTextView comentarios = view.findViewById(R.id.comentarios);
-        final AutoCompleteTextView tratamiento = view.findViewById(R.id.tratamiento);
-        final AutoCompleteTextView rescatado = view.findViewById(R.id.rescatado);
-        final AutoCompleteTextView vacuna = view.findViewById(R.id.vacuna);
-        final AutoCompleteTextView desparacitacion = view.findViewById(R.id.desparacitacion);
-        final AutoCompleteTextView celo = view.findViewById(R.id.celo);
-        final AutoCompleteTextView lactar = view.findViewById(R.id.lactar);
+        tratamiento = view.findViewById(R.id.tratamiento);
+        rescatado = view.findViewById(R.id.rescatado);
+        vacuna = view.findViewById(R.id.vacuna);
+        desparacitacion = view.findViewById(R.id.desparacitacion);
+        celo = view.findViewById(R.id.celo);
+        lactar = view.findViewById(R.id.lactar);
         final Spinner tipo_mascota = view.findViewById(R.id.tamano_mascota);
-        final AutoCompleteTextView peso = view.findViewById(R.id.peso);
-
+        peso = view.findViewById(R.id.peso);
+        final AutoCompleteTextView alergia = view.findViewById(R.id.alergia);
 
         //medio social
         final ArrayAdapter<String> adp = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, medio);
@@ -584,24 +614,27 @@ public class ContentPanelActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                            String nombreString = nombre.getText().toString(); //
-                            String direccionString = direccion.getText().toString();//
-                            String telefonoString = telefono.getText().toString(); //
+                             nombreString = nombre.getText().toString(); //
+                             direccionString = direccion.getText().toString();//
+                             telefonoString = telefono.getText().toString(); //
                             String emailString = email.getText().toString();//
-                            String mascota = nmascota.getText().toString();//
+                             mascotaString = nmascota.getText().toString();//
                             String msocialString = msocial.getSelectedItem().toString(); //
-                            String razaString = raza.getText().toString();//
-                            String edadString = edad.getText().toString();//
+                             razaString = raza.getText().toString();//
+                             edadString = edad.getText().toString();//
                             String tamanoMascotaString = msocial.getSelectedItem().toString(); //
                             String comentarioString = comentarios.getText().toString(); //
-                            String tratamientoString = tratamiento.getText().toString(); //
-                            String rescatadoString = rescatado.getText().toString(); //
-                            String vacunaString = vacuna.getText().toString();  //
-                            String desparacitacionString = desparacitacion.getText().toString(); //
-                            String celoString = celo.getText().toString();//
-                            String lactarString = lactar.getText().toString();//
+                            tratamientoString = tratamiento.getText().toString(); //
+                            rescatadoString = rescatado.getText().toString(); //
+                             vacunaString = vacuna.getText().toString();  //
+                             desparacitacionString = desparacitacion.getText().toString(); //
+                            celoString = celo.getText().toString();//
+                            lactarString = lactar.getText().toString();//
                             String tipoMascotaString = tipo_mascota.getSelectedItem().toString();
-                            String pesoString = peso.getText().toString();
+                             pesoString = peso.getText().toString();
+                            String alergiaString = alergia.getText().toString();
+
+                            //validaRegistro();
 
                           //create manager
                              Manager manager = null;
@@ -640,6 +673,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         properties.put("lactar", lactarString);
                         properties.put("tipoMascota", tipoMascotaString);
                         properties.put("peso", pesoString);
+                        properties.put("alergia", alergiaString);
                         properties.put("creat_at", fecha);
 
                         SharedPreferences preferences = getSharedPreferences("values", MODE_PRIVATE);
@@ -1066,6 +1100,10 @@ public class ContentPanelActivity extends AppCompatActivity {
 
         final Switch pregunta = view.findViewById(R.id.antibiotico_switch);
 
+        final Switch isabelino = view.findViewById(R.id.isabelino_switch);
+
+        final Switch isodine = view.findViewById(R.id.isodine_switch);
+
         builder.setView(view);
 
         builder.setPositiveButton("Guardar",
@@ -1075,11 +1113,25 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                         String idDocumentStringS1 = idDocumentStringS;
                         final String preguntaString;
+                        final String isabelinoString;
+                        final String isodineString;
 
                         if (pregunta.isChecked()) {
                             preguntaString = "Si";
                         } else {
                             preguntaString = "No";
+                        }
+
+                        if(isabelino.isChecked()){
+                            isabelinoString = "Si";
+                        }else{
+                            isabelinoString = "No";
+                        }
+
+                        if(isodine.isChecked()){
+                            isodineString = "Si";
+                        }else {
+                            isodineString = "No";
                         }
 
                         //Create manager
@@ -1108,6 +1160,8 @@ public class ContentPanelActivity extends AppCompatActivity {
                                 public boolean update(UnsavedRevision newRevision) {
                                     Map<String, Object> properties = newRevision.getProperties();
                                     properties.put("pregunta_medicamento", preguntaString);
+                                    properties.put("isabelino", isabelinoString);
+                                    properties.put("isodine", isodineString);
                                     properties.put("recuperacion_fecha", fecha);
                                     return true;
                                 }
@@ -4316,6 +4370,43 @@ public class ContentPanelActivity extends AppCompatActivity {
         });
         builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
     }
+
+    public void validaRegistro(){
+
+        nombre.setError(null);
+
+        boolean cancel = false;
+        View focusView = null;
+
+        // Check for a valid name.
+        if(TextUtils.isEmpty(nombreString)){
+            nombre.setError(getString(R.string.error_field_required));
+            focusView = nombre;
+            cancel = true;
+        }
+
+        if(TextUtils.isEmpty(direccionString)){
+            direccion.setError(getString(R.string.error_field_required));
+            focusView = direccion;
+            cancel = true;
+        }
+
+        if(TextUtils.isEmpty(telefonoString)){
+            telefono.setError(getString(R.string.error_field_required));
+            focusView = telefono;
+            cancel = true;
+        }
+
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        }else{
+            Toast.makeText(getApplicationContext(), "Los datos estan llenos", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
