@@ -20,6 +20,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -634,86 +635,88 @@ public class ContentPanelActivity extends AppCompatActivity {
                              pesoString = peso.getText().toString();
                             String alergiaString = alergia.getText().toString();
 
-                            //validaRegistro();
-
-                          //create manager
-                             Manager manager = null;
-                            try {
-                                manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                            //Create or open the database named app
-                            Database database = null;
-                            try {
-                                database = manager.getDatabase("adla");
-                            } catch (CouchbaseLiteException d) {
-                                d.printStackTrace();
-                            }
 
 
-                        //The properties that will be saved on the document
-                        Map<String, Object> properties = new HashMap<String, Object>();
-                        properties.put("nombreDueno", nombreString);
-                        properties.put("direccion", direccionString);
-                        properties.put("telefono", telefonoString);
-                        properties.put("correo", emailString);
-                        properties.put("nombreMascota", mascota);
-                        properties.put("mediosocial", msocialString);
-                        properties.put("raza", razaString);
-                        properties.put("edad", edadString);
-                        properties.put("tamanoMascota", tamanoMascotaString);
-                        properties.put("comentarioRegistro", comentarioString);
-                        properties.put("tratamiento", tratamientoString);
-                        properties.put("rescatado", rescatadoString);
-                        properties.put("vacuna", vacunaString);
-                        properties.put("desparacitacion", desparacitacionString);
-                        properties.put("celo", celoString);
-                        properties.put("lactar", lactarString);
-                        properties.put("tipoMascota", tipoMascotaString);
-                        properties.put("peso", pesoString);
-                        properties.put("alergia", alergiaString);
-                        properties.put("creat_at", fecha);
+                             //validaRegistro();
 
-                        SharedPreferences preferences = getSharedPreferences("values", MODE_PRIVATE);
-                        idDocument = preferences.getInt("idDocument", 0);
+                                //create manager
+                                Manager manager = null;
+                                try {
+                                    manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
 
-                        idDocument++;
-
-                        SharedPreferences prefs = getSharedPreferences("values", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putInt("idDocument", idDocument);
-                        editor.commit();
-
-                        String idDocumentS = Integer.toString(idDocument);
-
-                        //Create a new document
-                        Document document = database.getDocument(idDocumentS);
+                                //Create or open the database named app
+                                Database database = null;
+                                try {
+                                    database = manager.getDatabase("adla");
+                                } catch (CouchbaseLiteException d) {
+                                    d.printStackTrace();
+                                }
 
 
-                        //Save the document to the database
-                        try{
-                            document.putProperties(properties);
-                        }catch (CouchbaseLiteException e){
-                            e.printStackTrace();
-                        }
+                                //The properties that will be saved on the document
+                                Map<String, Object> properties = new HashMap<String, Object>();
+                                properties.put("nombreDueno", nombreString);
+                                properties.put("direccion", direccionString);
+                                properties.put("telefono", telefonoString);
+                                properties.put("correo", emailString);
+                                properties.put("nombreMascota", mascota);
+                                properties.put("mediosocial", msocialString);
+                                properties.put("raza", razaString);
+                                properties.put("edad", edadString);
+                                properties.put("tamanoMascota", tamanoMascotaString);
+                                properties.put("comentarioRegistro", comentarioString);
+                                properties.put("tratamiento", tratamientoString);
+                                properties.put("rescatado", rescatadoString);
+                                properties.put("vacuna", vacunaString);
+                                properties.put("desparacitacion", desparacitacionString);
+                                properties.put("celo", celoString);
+                                properties.put("lactar", lactarString);
+                                properties.put("tipoMascota", tipoMascotaString);
+                                properties.put("peso", pesoString);
+                                properties.put("alergia", alergiaString);
+                                properties.put("creat_at", fecha);
 
-                        if(tipoMascotaString != "Detalle de la Mascota") {
-                            if (tipoMascotaString == "Gato" || tipoMascotaString == "Gata") {
-                                buscaDesocupadoGato(idDocumentS);
-                                Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
-                                askPermissionAndWriteFile();
+                                SharedPreferences preferences = getSharedPreferences("values", MODE_PRIVATE);
+                                idDocument = preferences.getInt("idDocument", 0);
 
-                            } else if (tipoMascotaString == "Perro" || tipoMascotaString == "Perra") {
-                                buscaDesocupadoPerro(idDocumentS);
-                                Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
-                                askPermissionAndWriteFile();
+                                idDocument++;
 
-                            }
-                        }else{
-                            Toast.makeText(getApplicationContext(), "Debe de seleccionar alguna opcion de Detelles de la mascota", Toast.LENGTH_SHORT).show();
-                        }
+                                SharedPreferences prefs = getSharedPreferences("values", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putInt("idDocument", idDocument);
+                                editor.commit();
+
+                                String idDocumentS = Integer.toString(idDocument);
+
+                                //Create a new document
+                                Document document = database.getDocument(idDocumentS);
+
+
+                                //Save the document to the database
+                                try{
+                                    document.putProperties(properties);
+                                }catch (CouchbaseLiteException e){
+                                    e.printStackTrace();
+                                }
+
+                                if(tipoMascotaString != "Detalle de la Mascota") {
+                                    if (tipoMascotaString == "Gato" || tipoMascotaString == "Gata") {
+                                        buscaDesocupadoGato(idDocumentS);
+                                        Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
+                                        askPermissionAndWriteFile();
+
+
+                                    } else if (tipoMascotaString == "Perro" || tipoMascotaString == "Perra") {
+                                        buscaDesocupadoPerro(idDocumentS);
+                                        Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
+                                        askPermissionAndWriteFile();
+
+                                    }
+
+                                }
 
                       //  buscaDesocupadoAlternativa(idDocumentS);
                     }
