@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,7 +15,10 @@ import android.widget.Toast;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.Emitter;
+import com.couchbase.lite.LiveQuery;
 import com.couchbase.lite.Manager;
+import com.couchbase.lite.Mapper;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryEnumerator;
 import com.couchbase.lite.QueryRow;
@@ -22,6 +26,9 @@ import com.couchbase.lite.android.AndroidContext;
 import com.couchbase.lite.internal.database.util.DatabaseUtils;
 import com.couchbase.lite.util.Log;
 import com.example.dev.saludmock.R;
+
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -39,6 +46,10 @@ public class ReporteActivity extends AppCompatActivity {
   String fecha = "";
   String nombre = "";
   String mascota = "";
+
+  Object date;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,9 +80,9 @@ public class ReporteActivity extends AppCompatActivity {
 
         Toast.makeText(getApplicationContext(), anio + "/" + mes + "/" + dia , Toast.LENGTH_LONG).show();
 
-        Object date = anio + "/" + mes + "/" + dia;
+        date = anio + "/" + mes + "/" + dia;
 
-        //Create a manager
+      /*  //Create a manager
         Manager manager = null;
         try{
             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
@@ -102,7 +113,12 @@ public class ReporteActivity extends AppCompatActivity {
             tv2.setText(nombre);
             tv3.setText(mascota);
 
-
+*/
+        try {
+            initializeQuery();
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
 
   /*      if(doc!=null){
             tv.setText(fecha);
@@ -136,4 +152,85 @@ public class ReporteActivity extends AppCompatActivity {
                     "No tienes clientes de email instalados.", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void initializeQuery() throws CouchbaseLiteException {
+
+        //Create a manager
+        Manager manager = null;
+        try{
+            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        Database database = null;
+        try {
+            database = manager.getDatabase("adla");
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+
+        com.couchbase.lite.View membersView = database.getView("creat_at");
+        //if (membersView == null) {
+            membersView.setMap(
+                    new Mapper(){
+                       @Override
+                        public void map(Map<String, Object> document, Emitter emitter) {
+                            Log.e("inside map", "map");
+                            Object date = document.get("creat_at");
+                            if (date != null)
+                                emitter.emit((String) document.get("creat_at"), document);
+                        }
+                    }, "1" /* The version number of the mapper... */
+            );
+
+        Query query = database.getView("creat_at").createQuery();
+        query.setStartKey(date);
+        QueryEnumerator result = query.run();
+     /*   for (Iterator<QueryRow> it = result; it.hasNext(); ) {
+            QueryRow row = it.next();
+           // Log.w("ADLA", "REPORT", row.getKey(), ((Double)row.getValue()).toString());
+
+        }*/
+     getRowsFromQueryEnumerator(result);
+
+   // displayRows(result);
+
+    }
+
+    private List<QueryRow> getRowsFromQueryEnumerator(QueryEnumerator queryEnumerator) {
+        List<QueryRow> rows = new ArrayList<QueryRow>();
+        for (Iterator<QueryRow> it = queryEnumerator; it.hasNext();) {
+            QueryRow row = it.next();
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    private void displayRows(Object rows) {
+
+        //final List<QueryRow> rows = getRowsFromQueryEnumerator(queryEnumerator);
+
+
+
+      //  tv.setText(rows);
+
+     /*   runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                Adapter itemListViewAdapter = new RegistersSyncListAdapter(
+                        getApplicationContext(),
+                        R.layout.text_view,
+                        R.id.label,
+                        rows
+                );
+                itemListView.setAdapter(itemListViewAdapter);
+                itemListView.setOnItemClickListener(ReporteActivity.this);
+                itemListView.setOnItemLongClickListener(ReporteActivity.this);
+
+            }
+        });*/
+    }
+
 }
