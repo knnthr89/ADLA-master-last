@@ -1,57 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        tools:layout_editor_absoluteX="292dp"
-        tools:layout_editor_absoluteY="16dp">
+        android:id="@+id/scrollView2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
 
 
-            <TextView
-                android:id="@+id/antibiotico"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_antibiotico" />
+                <TextView
+                    android:id="@+id/antibiotico"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_antibiotico" />
 
-            <Switch
-                android:id="@+id/antibiotico_switch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                <Switch
+                    android:id="@+id/antibiotico_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
 
 
-            <TextView
-                android:id="@+id/tatuaje"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_tatuaje" />
+                <TextView
+                    android:id="@+id/tatuaje"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_tatuaje" />
 
-            <Switch
-                android:id="@+id/tatuaje_switch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"/>
-        </LinearLayout>
+                <Switch
+                    android:id="@+id/tatuaje_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -69,7 +72,7 @@
                     android:id="@+id/analgesico_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"/>
+                    android:layout_gravity="right" />
             </LinearLayout>
 
             <LinearLayout
@@ -88,7 +91,7 @@
                     android:id="@+id/suero_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"/>
+                    android:layout_gravity="right" />
             </LinearLayout>
 
             <LinearLayout
@@ -107,7 +110,42 @@
                     android:id="@+id/cicatrizante_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"/>
+                    android:layout_gravity="right" />
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/tallaisabelino"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Talla del isabelino" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/chico"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="Chico" />
+
+                <CheckBox
+                    android:id="@+id/mediano"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="135dp"
+                    android:text="Mediano" />
+
+                <CheckBox
+                    android:id="@+id/grande"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="150dp"
+                    android:text="Grande" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -117,13 +155,32 @@
 
 
                 <TextView
-                    android:id="@+id/otro"
+                    android:id="@+id/llevaisabelino"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/title_otro" />
+                    android:text="Se llevó el isabelino la mascota?" />
 
                 <Switch
-                    android:id="@+id/otro_switch"
+                    android:id="@+id/isabelino_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:id="@+id/llevamedicamento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lleva medicamento la mascota? " />
+
+                <Switch
+                    android:id="@+id/medicamento_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right" />
@@ -138,11 +195,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                <AutoCompleteTextView
-                    android:id="@+id/comentario"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/title_comentario" />
+                    <AutoCompleteTextView
+                        android:id="@+id/comentario"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/title_comentario" />
 
                 </android.support.design.widget.TextInputLayout>
 

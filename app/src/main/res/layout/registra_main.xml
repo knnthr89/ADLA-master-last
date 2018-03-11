@@ -86,11 +86,92 @@
         </android.support.design.widget.TextInputLayout>
 
 
+        <!-- <TextView
+             android:id="@+id/tvCheckbox"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="¿Cómo te enteraste de la campaña?"/>
+
+
+           <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+               android:layout_width="wrap_content"
+               android:layout_height="37dp"
+               android:orientation="horizontal">
+
+               <RadioButton
+                   android:id="@+id/facebook"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content" />
+
+               <TextView
+                   android:id="@+id/tvFacebook"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Facebook" />
+
+               <RadioButton
+                   android:id="@+id/volante"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" />
+
+               <TextView
+                   android:id="@+id/tvVolante"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Volante" />
+
+               <RadioButton
+                   android:id="@+id/lona"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" />
+
+               <TextView
+                   android:id="@+id/tvLona"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Vi una lona en la campaña" />
+
+               <RadioButton
+                   android:id="@+id/campana"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" />
+
+               <TextView
+                   android:id="@+id/tvCampana"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Ya he ido a otra campaña de Abogados de los Animales" />
+
+               <RadioButton
+                   android:id="@+id/recomendacion"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" />
+
+               <TextView
+                   android:id="@+id/tvRecomendacion"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Recomendación de otra persona" />
+
+               <RadioButton
+                   android:id="@+id/otro"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" />
+
+               <TextView
+                   android:id="@+id/tvOtro"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Otro" />
+
+           </LinearLayout>-->
+
+
         <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="382dp"
-        android:layout_height="34dp"
-        />
+            android:id="@+id/spinner1"
+            android:layout_width="382dp"
+            android:layout_height="34dp"
+            />
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"

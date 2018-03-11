@@ -1,14 +1,22 @@
 package com.example.dev.saludmock.activities;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,10 +34,12 @@ import com.couchbase.lite.android.AndroidContext;
 import com.couchbase.lite.internal.database.util.DatabaseUtils;
 import com.couchbase.lite.util.Log;
 import com.example.dev.saludmock.R;
+import com.example.dev.saludmock.adapters.NewRegistersArrayAdapter;
 
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -38,98 +48,70 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class ReporteActivity extends AppCompatActivity {
+public class ReporteActivity  extends Activity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, View.OnKeyListener {
 
-  TextView tv, tv2, tv3;
-  Button btn;
+    TextView tv, tv2, tv3;
+    Button btn;
 
-  String fecha = "";
-  String nombre = "";
-  String mascota = "";
+    String fecha = "";
+    String nombre = "";
+    String mascota = "";
 
-  Object date;
+    Object date;
 
+    ListView itemListView;
 
+    protected NewRegistersArrayAdapter newRegistersArrayAdapter;
+
+    QueryEnumerator result;
+
+    Manager manager;
+    Database database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reporte);
 
+        itemListView = findViewById(R.id.itemListView);
+
         btn = findViewById(R.id.btn);
+
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendEmail(fecha, nombre, mascota);
 
-
-
-
             }
         });
 
 
+        //  tv = findViewById(R.id.tv);
+        //  tv2 = findViewById(R.id.tv2);
+        //  tv3 = findViewById(R.id.tv3);
 
-        tv = findViewById(R.id.tv);
-        tv2 = findViewById(R.id.tv2);
-        tv3 = findViewById(R.id.tv3);
+        String dia = getIntent().getExtras().getString("dia");
+        String mes = getIntent().getExtras().getString("mes");
+        String anio = getIntent().getExtras().getString("anio");
 
-      String dia =  getIntent().getExtras().getString("dia");
-      String mes =  getIntent().getExtras().getString("mes");
-      String anio =getIntent().getExtras().getString("anio");
-
-        Toast.makeText(getApplicationContext(), anio + "/" + mes + "/" + dia , Toast.LENGTH_LONG).show();
+        //  Toast.makeText(getApplicationContext(), anio + "/" + mes + "/" + dia , Toast.LENGTH_LONG).show();
 
         date = anio + "/" + mes + "/" + dia;
 
-      /*  //Create a manager
-        Manager manager = null;
-        try{
-            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-
-        Database database = null;
-        try {
-            database = manager.getDatabase("adla");
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-
-        //   Toast.makeText(getApplicationContext(), "si hay ejemplos", Toast.LENGTH_SHORT).show();
-
-        Document doc = database.getDocument("1");
-
-        doc.getProperty("creat_at");
-
-         Map<String, Object> properties = doc.getProperties();
-          fecha = (String) properties.get("creat_at");
-          nombre = (String) properties.get("nombreDueno");
-          mascota = (String) properties.get("nombreMascota");
-        
-
-            tv.setText(fecha);
-            tv2.setText(nombre);
-            tv3.setText(mascota);
-
-*/
         try {
             initializeQuery();
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-  /*      if(doc!=null){
-            tv.setText(fecha);
-          //  tv2.setText(anestesia2);
-          //  tv3.setText(anestesia3);
-        }else {
-            Toast.makeText(getApplicationContext(), "No se encuentra el documento", Toast.LENGTH_LONG).show();
-        }*/
+    }
 
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        finish();
     }
 
     protected void sendEmail(String fecha, String nombre, String mascota) {
@@ -142,7 +124,7 @@ public class ReporteActivity extends AppCompatActivity {
         emailIntent.putExtra(Intent.EXTRA_CC, CC);
 // Esto podrás modificarlo si quieres, el asunto y el cuerpo del mensaje
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reporte de registros de campaña");
-        emailIntent.putExtra(Intent.EXTRA_TEXT, fecha + nombre + mascota);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "");
 
         try {
             startActivity(Intent.createChooser(emailIntent, "Enviar email..."));
@@ -153,17 +135,17 @@ public class ReporteActivity extends AppCompatActivity {
         }
     }
 
-    private void initializeQuery() throws CouchbaseLiteException {
+    private void initializeQuery() throws Exception {
 
         //Create a manager
-        Manager manager = null;
-        try{
+        manager = null;
+        try {
             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Database database = null;
+        database = null;
         try {
             database = manager.getDatabase("adla");
         } catch (CouchbaseLiteException e) {
@@ -171,66 +153,281 @@ public class ReporteActivity extends AppCompatActivity {
         }
 
         com.couchbase.lite.View membersView = database.getView("creat_at");
-        //if (membersView == null) {
-            membersView.setMap(
-                    new Mapper(){
-                       @Override
-                        public void map(Map<String, Object> document, Emitter emitter) {
-                            Log.e("inside map", "map");
-                            Object date = document.get("creat_at");
-                            if (date != null)
-                                emitter.emit((String) document.get("creat_at"), document);
-                        }
-                    }, "1" /* The version number of the mapper... */
-            );
-
+        // if (membersView == null) {
+        membersView.setMap(
+                new Mapper() {
+                    @Override
+                    public void map(Map<String, Object> document, Emitter emitter) {
+                        Log.e("inside map", "map");
+                        Object date = document.get("creat_at");
+                        if (date != null)
+                            emitter.emit((String) document.get("creat_at"), document);
+                    }
+                }, "1" /* The version number of the mapper... */
+        );
+        // }
         Query query = database.getView("creat_at").createQuery();
         query.setStartKey(date);
-        QueryEnumerator result = query.run();
+        result = query.run();
      /*   for (Iterator<QueryRow> it = result; it.hasNext(); ) {
             QueryRow row = it.next();
            // Log.w("ADLA", "REPORT", row.getKey(), ((Double)row.getValue()).toString());
 
         }*/
-     getRowsFromQueryEnumerator(result);
 
-   // displayRows(result);
+        displayRows(result);
+
+        getRowsFromQueryEnumerator(result);
 
     }
 
     private List<QueryRow> getRowsFromQueryEnumerator(QueryEnumerator queryEnumerator) {
         List<QueryRow> rows = new ArrayList<QueryRow>();
-        for (Iterator<QueryRow> it = queryEnumerator; it.hasNext();) {
+        for (Iterator<QueryRow> it = queryEnumerator; it.hasNext(); ) {
             QueryRow row = it.next();
             rows.add(row);
         }
         return rows;
     }
 
-    private void displayRows(Object rows) {
+    private void displayRows(QueryEnumerator queryEnumerator) {
 
-        //final List<QueryRow> rows = getRowsFromQueryEnumerator(queryEnumerator);
+        final List<QueryRow> rows = getRowsFromQueryEnumerator(queryEnumerator);
 
+        //  tv.setText(rows);
 
-
-      //  tv.setText(rows);
-
-     /*   runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
-                Adapter itemListViewAdapter = new RegistersSyncListAdapter(
+                newRegistersArrayAdapter = new NewRegistersArrayAdapter(
                         getApplicationContext(),
-                        R.layout.text_view,
-                        R.id.label,
+                        R.layout.register_list_item,
+                        R.id.txt_numero,
                         rows
                 );
-                itemListView.setAdapter(itemListViewAdapter);
+
+                itemListView.setAdapter(newRegistersArrayAdapter);
                 itemListView.setOnItemClickListener(ReporteActivity.this);
                 itemListView.setOnItemLongClickListener(ReporteActivity.this);
 
             }
-        });*/
+        });
     }
 
-}
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        return false;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, final long id) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ReporteActivity.this);
+        builder.setTitle("Informacion Completa");
+        LayoutInflater inflater = LayoutInflater.from(this);
+         view = inflater.inflate(R.layout.datoscompletosdialog, null);
+
+           TextView folio = view.findViewById(R.id.folio);
+           TextView tdueno = view.findViewById(R.id.dueno_guardado);
+           TextView tdireccion = view.findViewById(R.id.direccion_guardado);
+          // TextView ttelefono = view.findViewById(R.id.telefono);
+          // TextView tcorreo = view.findViewById(R.id.correo);
+          // TextView tnmascota = view.findViewById(R.id.nmascota);
+          // TextView tmsocial = view.findViewById(R.id.msocial);
+          // TextView traza = view.findViewById(R.id.raza);
+          // TextView tedad = view.findViewById(R.id.edad);
+          // TextView ttmascota = view.findViewById(R.id.tmascota);
+
+        muestraDatos((int) id, folio, tdueno, tdireccion);
+
+        builder.setView(view);
+
+        builder.setPositiveButton("Aceptar",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+
+
+                    }
+                });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+        return false;
+    }
+
+    public void muestraDatos(int id, TextView folio, TextView tdueno, TextView tdireccion){
+        id = id + 1;
+        String idString = Integer.toString((int) id);
+
+        Toast.makeText(ReporteActivity.this, idString, Toast.LENGTH_SHORT).show();
+
+        //Create manager
+        Manager manager = null;
+
+        try {
+            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Create or open the database named app
+        Database database = null;
+
+        try {
+            database = manager.getDatabase("adla");
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+
+        Document doc = database.getDocument(idString);
+
+        doc.getProperty("folio");
+
+        Map<String, Object> properties = doc.getProperties();
+
+        //registro
+        String folioString = (String) properties.get("folio");
+        String duenoString = (String) properties.get("nombreDueno");
+        String direccionString = (String) properties.get("direccion");
+        String telefono = (String) properties.get("telefono");
+        String correo = (String) properties.get("correo");
+        String nmascota = (String) properties.get("nombreMascota");
+        String msocial = (String) properties.get("mediosocial");
+        String raza = (String) properties.get("raza");
+        String edad = (String) properties.get("edad");
+        String tmascota = (String) properties.get("tamanoMascota");
+        String comentarioregistro = (String) properties.get("comentarioRegistro");
+        String tratamiento = (String) properties.get("tratamiento");
+        String rescatado = (String) properties.get("rescatado");
+        String vacuna = (String) properties.get("vacuna");
+        String desparacitacion = (String) properties.get("desparacitacion");
+        String celo = (String) properties.get("celo");
+        String lactar = (String) properties.get("lactar");
+        String tipomascota = (String) properties.get("tipoMascota");
+        String peso = (String) properties.get("peso");
+        String alergia = (String) properties.get("alergia");
+        String fecharegistro = (String) properties.get("creat_at");
+
+        //pago
+        String precio_anestesia = (String) properties.get("precio_anestesia");
+        String cantidad_tarjeta = (String) properties.get("cantidadTarjeta");
+        String catidad_efectivo = (String) properties.get("cantidadEfectivo");
+
+        //anestesia
+        String dosis1 = (String) properties.get("dosis1");
+        String dosis2 = (String) properties.get("dosis2");
+        String dosis3 = (String) properties.get("dosis3");
+        String horaanestesia = (String) properties.get("fecha_anestesia");
+
+        //cirugia
+        String cirujano = (String) properties.get("cirujano");
+        String comentario_cirujano = (String) properties.get("comentario");
+        String prenada = (String) properties.get("preñada");
+        String celo_cirugia = (String) properties.get("celo_cirugia");
+        String lactante_cirugia = (String) properties.get("lactante_cirugia");
+        String hemorragia = (String) properties.get("hemorragia");
+        String parorespiratorio = (String) properties.get("parorespiratorio");
+        String parocardiaco = (String) properties.get("parocardiaco");
+        String testiculoinguinal = (String) properties.get("testiculoinguinal");
+        String finado = (String) properties.get("finado");
+        String alergico_cirugia = (String) properties.get("alergico_cirugia");
+        String fecha_cirugia = (String) properties.get("fecha_cirugia");
+
+        //recuperacion
+        String antibioticoString = (String) properties.get("antibiotico");
+        String tatuajeString = (String) properties.get("tatuaje");
+        String analgesicoString = (String) properties.get("analgesico");
+        String sueroString = (String) properties.get("suero");
+        String cicatrizanteString = (String)properties.get("cicatrizante");
+        String comentarioString = (String) properties.get("comentario_recuperacion");
+        String tallaIsabelinoString = (String) properties.get("tallaIsabelino");
+        String llevaIsabelinoString = (String) properties.get("llevaIsabelino");
+        String llevaMedicamentoString = (String) properties.get("llevaMedicamento");
+        String recuperacion_fecha = (String) properties.get("recuperacion_fecha");
+
+        //medicamento
+        String pregunta_medicamento = (String) properties.get("pregunta_medicamento");
+        String isabelino = (String) properties.get("isabelino");
+        String isodine = (String) properties.get("isodine");
+        String mascota_entregada = (String) properties.get("mascota_entregada");
+        String medicamento_fecha = (String) properties.get("medicamento_fecha");
+
+
+
+       // final TextView tfolio = findViewById(R.id.antibiotico_pregunta);
+        //  final  TextView tdueno = view.findViewById(R.id.dueno);
+        //  final  TextView tdireccion = view.findViewById(R.id.direccion);
+        //  final TextView ttelefono = view.findViewById(R.id.telefono);
+        //  final  TextView tcorreo = view.findViewById(R.id.correo);
+        //  final TextView tnmascota = view.findViewById(R.id.nmascota);
+        //  final TextView tmsocial = view.findViewById(R.id.msocial);
+        //  final TextView traza = view.findViewById(R.id.raza);
+        //  final TextView tedad = view.findViewById(R.id.edad);
+        //  final  TextView ttmascota = view.findViewById(R.id.tmascota);
+
+        if(folioString != null){
+          //  Toast.makeText(getApplicationContext(), folio,Toast.LENGTH_SHORT).show();
+            folio.setText(folioString);
+        }
+
+          if(duenoString != null){
+          //  Toast.makeText(getApplicationContext(), dueno,Toast.LENGTH_SHORT).show();
+         tdueno.setText(duenoString);
+        }
+
+        if(direccionString != null){
+         //   Toast.makeText(getApplicationContext(), direccion,Toast.LENGTH_SHORT).show();
+         tdireccion.setText(direccionString);
+        }
+
+    /*    if(telefono != null){
+            Toast.makeText(getApplicationContext(), telefono,Toast.LENGTH_SHORT).show();
+           // ttelefono.setText(telefono);
+        }
+
+        if(correo != null){
+            Toast.makeText(getApplicationContext(), correo,Toast.LENGTH_SHORT).show();
+          // tcorreo.setText(correo);
+        }
+
+        if(nmascota != null){
+            Toast.makeText(getApplicationContext(), nmascota,Toast.LENGTH_SHORT).show();
+        // tnmascota.setText(nmascota);
+        }
+
+        if(msocial != null){
+            Toast.makeText(getApplicationContext(), msocial,Toast.LENGTH_SHORT).show();
+         // tmsocial.setText(msocial);
+        }
+
+        if(raza != null){
+            Toast.makeText(getApplicationContext(), raza,Toast.LENGTH_SHORT).show();
+        // traza.setText(raza);
+        }
+
+        if(edad != null){
+            Toast.makeText(getApplicationContext(), edad,Toast.LENGTH_SHORT).show();
+         //tedad.setText(edad);
+        }
+
+        if(tmascota != null){
+            Toast.makeText(getApplicationContext(), tmascota,Toast.LENGTH_SHORT).show();
+         //  ttmascota.setText(tmascota);
+        }*/
+
+    }
+
+    }

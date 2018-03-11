@@ -73,17 +73,124 @@
                     android:id="@+id/mascota"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:hint="Mascota"
+                    android:hint="Nombre de la mascota"
                     android:singleLine="true"/>
 
             </android.support.design.widget.TextInputLayout>
 
-            <Spinner
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tipom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Detalle de la mascota"
+                    android:layout_marginStart="10dp"
+                    android:textStyle="bold"
+                    />
+
+            <CheckBox
+                android:id="@+id/perro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Perro"
+                android:layout_marginStart="130dp"/>
+
+                <CheckBox
+                    android:id="@+id/perra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Perra"
+                    android:layout_marginStart="130dp"/>
+
+                <CheckBox
+                    android:id="@+id/gato"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gato"
+                    android:layout_marginStart="130dp"/>
+
+                <CheckBox
+                    android:id="@+id/gata"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gata"
+                    android:layout_marginStart="130dp"/>
+
+            </LinearLayout>
+
+        <!--    <Spinner
+                android:id="@+id/tamano_mascota"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"></Spinner> -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/titulosocial"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Como te enteraste de la campaña?"
+                    android:layout_marginStart="10dp"
+                    android:textStyle="bold"
+                    />
+
+                <CheckBox
+                    android:id="@+id/fb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FB"
+                   />
+
+                <CheckBox
+                    android:id="@+id/volante"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Volante"
+                    />
+
+                <CheckBox
+                    android:id="@+id/lona"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vi una lona en la campaña"
+                   />
+
+                <CheckBox
+                    android:id="@+id/campana"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="He ido a otra campaña de Abogados de los Animales"
+                    />
+
+                <CheckBox
+                    android:id="@+id/recomendacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recomendación de otra persona"
+                    />
+
+                <CheckBox
+                    android:id="@+id/otro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Otro"
+                    />
+
+            </LinearLayout>
+
+         <!--   <Spinner
                 android:id="@+id/tmascota"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
-            </Spinner>
+            </Spinner>-->
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -111,10 +218,54 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <Spinner
+         <!--   <Spinner
                 android:id="@+id/msocial"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"></Spinner>
+                android:layout_height="wrap_content"></Spinner>-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tamano"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tamaño de la mascota"
+                    android:layout_marginStart="10dp"
+                    android:textStyle="bold"
+                    />
+
+                <CheckBox
+                    android:id="@+id/chico"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chico"
+                    android:layout_marginStart="130dp"/>
+
+                <CheckBox
+                    android:id="@+id/mediano"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mediano"
+                    android:layout_marginStart="130dp"/>
+
+                <CheckBox
+                    android:id="@+id/grande"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Grande"
+                    android:layout_marginStart="130dp"/>
+
+                <CheckBox
+                    android:id="@+id/gigante"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gigante"
+                    android:layout_marginStart="130dp"/>
+
+            </LinearLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -207,10 +358,7 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <Spinner
-                android:id="@+id/tamano_mascota"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"></Spinner>
+
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"

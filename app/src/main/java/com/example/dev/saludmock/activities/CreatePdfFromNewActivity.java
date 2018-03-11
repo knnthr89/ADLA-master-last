@@ -227,9 +227,14 @@ public class CreatePdfFromNewActivity extends Activity {
                 //close the document
                 doc.close();
 
-                Toast.makeText(getApplicationContext(), "Su PDF ha sido creado y guardado en la memoria externa. " + idDocumentStringS, Toast.LENGTH_SHORT).show();
+                if(tmascota == null){
+                    tmascota = "Perro";
+                }
+
+                Toast.makeText(getApplicationContext(), "Su PDF ha sido creado y guardado en la memoria externa. " + idDocumentStringS + tmascota, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(CreatePdfFromNewActivity.this, ContentPanelActivity.class);
                 intent.putExtra("idDocumentStringS", idDocumentStringS);
+                intent.putExtra("tmascota", tmascota);
                 startActivity(intent);
             } catch (Exception e) {
                 e.printStackTrace();

@@ -39,7 +39,7 @@
                 android:layout_marginStart="35dp"
                 android:layout_marginTop="2dp"
                 android:adjustViewBounds="true"
-                android:src="@drawable/ic_gato"
+
                 app:cb_color="#BDBDBD"
                 app:cb_pressedRingWidth="8dip"
                 android:visibility="gone" />

@@ -5,34 +5,11 @@
     android:layout_height="match_parent"
     tools:context="com.example.dev.saludmock.activities.ReporteActivity">
 
-    <TextView
-        android:id="@+id/tv2"
+    <ListView
+        android:id="@+id/itemListView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/tv3"
-        android:layout_alignBottom="@+id/tv3"
-        android:layout_centerHorizontal="true"
-        android:text="anestesia 2" />
+        android:layout_height="wrap_content"></ListView>
 
-    <TextView
-        android:id="@+id/tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/tv2"
-        android:layout_alignBottom="@+id/tv2"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="26dp"
-        android:text="anestesia 1" />
-
-    <TextView
-        android:id="@+id/tv3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginEnd="23dp"
-        android:layout_marginTop="34dp"
-        android:text="anestesia 3" />
 
     <Button
         android:id="@+id/btn"
@@ -42,4 +19,5 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="23dp"
         android:text="Enviar reporte a correo" />
+
 </RelativeLayout>
