@@ -38,6 +38,7 @@ import com.example.dev.saludmock.adapters.NewRegistersArrayAdapter;
 
 
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -231,15 +232,29 @@ public class ReporteActivity  extends Activity implements AdapterView.OnItemClic
            TextView folio = view.findViewById(R.id.folio);
            TextView tdueno = view.findViewById(R.id.dueno_guardado);
            TextView tdireccion = view.findViewById(R.id.direccion_guardado);
-          // TextView ttelefono = view.findViewById(R.id.telefono);
-          // TextView tcorreo = view.findViewById(R.id.correo);
-          // TextView tnmascota = view.findViewById(R.id.nmascota);
-          // TextView tmsocial = view.findViewById(R.id.msocial);
-          // TextView traza = view.findViewById(R.id.raza);
-          // TextView tedad = view.findViewById(R.id.edad);
-          // TextView ttmascota = view.findViewById(R.id.tmascota);
+           TextView ttelefono = view.findViewById(R.id.telefono_guardado);
+           TextView tcorreo = view.findViewById(R.id.correo_guardado);
+           TextView tnmascota = view.findViewById(R.id.nmascota);
+           TextView tmsocial = view.findViewById(R.id.msocial_respuesta);
+           TextView traza = view.findViewById(R.id.raza_respuesta);
+           TextView tedad = view.findViewById(R.id.edad_respuesta);
+           TextView ttmascota = view.findViewById(R.id.tamanomascota_respuesta);
 
-        muestraDatos((int) id, folio, tdueno, tdireccion);
+           TextView comentarioregistrotv = view.findViewById(R.id.comentarioregistro_respuesta);
+           TextView tratamientotv = view.findViewById(R.id.tratamiento_respuesta);
+           TextView rescatadotv = view.findViewById(R.id.rescatado_respuesta);
+           TextView vacunatv = view.findViewById(R.id.vacuna_respuesta);
+           TextView desparacitaciontv = view.findViewById(R.id.desparacitacion_respuesta);
+           TextView celotv = view.findViewById(R.id.celo_respuesta);
+           TextView lactartv = view.findViewById(R.id.lactante_respuesta);
+           TextView tipomascotatv = view.findViewById(R.id.tipomascota_respuesta);
+           TextView pesotv = view.findViewById(R.id.peso_respuesta);
+           TextView alergiatv = view.findViewById(R.id.alergia_respuesta);
+           TextView fecharegistrotv = view.findViewById(R.id.fecharegistro_respuesta);
+
+
+        muestraDatos((int) id,folio, tdueno, tdireccion, ttelefono, tcorreo, tnmascota, tmsocial, traza, tedad, ttmascota, comentarioregistrotv, tratamientotv, rescatadotv,
+        vacunatv, desparacitaciontv, celotv, lactartv, tipomascotatv, pesotv, alergiatv, fecharegistrotv);
 
         builder.setView(view);
 
@@ -268,11 +283,10 @@ public class ReporteActivity  extends Activity implements AdapterView.OnItemClic
         return false;
     }
 
-    public void muestraDatos(int id, TextView folio, TextView tdueno, TextView tdireccion){
-        id = id + 1;
-        String idString = Integer.toString((int) id);
+    public void muestraDatos(int id,TextView folio, TextView tdueno, TextView tdireccion, TextView ttelefono, TextView tcorreo, TextView tnmascota, TextView tmsocial, TextView traza, TextView tedad, TextView ttmascota,
+    TextView comentarioregistrotv, TextView tratamientotv, TextView rescatadotv, TextView vacunatv, TextView desparacitaciontv, TextView celotv, TextView lactartv, TextView tipomascotatv, TextView pesotv, TextView alergiatv, TextView fecharegistrotv){
 
-        Toast.makeText(ReporteActivity.this, idString, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(ReporteActivity.this, idString, Toast.LENGTH_SHORT).show();
 
         //Create manager
         Manager manager = null;
@@ -292,7 +306,7 @@ public class ReporteActivity  extends Activity implements AdapterView.OnItemClic
             e.printStackTrace();
         }
 
-        Document doc = database.getDocument(idString);
+        Document doc = database.getDocument(String.valueOf(id));
 
         doc.getProperty("folio");
 
@@ -393,41 +407,84 @@ public class ReporteActivity  extends Activity implements AdapterView.OnItemClic
          tdireccion.setText(direccionString);
         }
 
-    /*    if(telefono != null){
-            Toast.makeText(getApplicationContext(), telefono,Toast.LENGTH_SHORT).show();
-           // ttelefono.setText(telefono);
+       if(telefono != null){
+          //  Toast.makeText(getApplicationContext(), telefono,Toast.LENGTH_SHORT).show();
+            ttelefono.setText(telefono);
         }
 
         if(correo != null){
-            Toast.makeText(getApplicationContext(), correo,Toast.LENGTH_SHORT).show();
-          // tcorreo.setText(correo);
+           // Toast.makeText(getApplicationContext(), correo,Toast.LENGTH_SHORT).show();
+           tcorreo.setText(correo);
         }
 
         if(nmascota != null){
-            Toast.makeText(getApplicationContext(), nmascota,Toast.LENGTH_SHORT).show();
-        // tnmascota.setText(nmascota);
+           // Toast.makeText(getApplicationContext(), nmascota,Toast.LENGTH_SHORT).show();
+         tnmascota.setText(nmascota);
         }
 
         if(msocial != null){
-            Toast.makeText(getApplicationContext(), msocial,Toast.LENGTH_SHORT).show();
-         // tmsocial.setText(msocial);
+          //  Toast.makeText(getApplicationContext(), msocial,Toast.LENGTH_SHORT).show();
+          tmsocial.setText(msocial);
         }
 
         if(raza != null){
-            Toast.makeText(getApplicationContext(), raza,Toast.LENGTH_SHORT).show();
-        // traza.setText(raza);
+          //  Toast.makeText(getApplicationContext(), raza,Toast.LENGTH_SHORT).show();
+         traza.setText(raza);
         }
 
         if(edad != null){
-            Toast.makeText(getApplicationContext(), edad,Toast.LENGTH_SHORT).show();
-         //tedad.setText(edad);
+           // Toast.makeText(getApplicationContext(), edad,Toast.LENGTH_SHORT).show();
+         tedad.setText(edad);
         }
 
         if(tmascota != null){
-            Toast.makeText(getApplicationContext(), tmascota,Toast.LENGTH_SHORT).show();
-         //  ttmascota.setText(tmascota);
-        }*/
+          //  Toast.makeText(getApplicationContext(), tmascota,Toast.LENGTH_SHORT).show();
+           ttmascota.setText(tmascota);
+        }
 
+        if(comentarioregistro != null){
+            comentarioregistrotv.setText(comentarioregistro);
+        }
+
+        if(tratamiento != null){
+            tratamientotv.setText(tratamiento);
+        }
+
+        if(rescatado != null){
+            rescatadotv.setText(rescatado);
+        }
+
+        if(vacuna != null){
+           vacunatv.setText(vacuna);
+        }
+
+        if(desparacitacion != null){
+           desparacitaciontv.setText(desparacitacion);
+        }
+
+        if(celo != null){
+           celotv.setText(celo);
+        }
+
+        if(lactar != null){
+            lactartv.setText(lactar);
+        }
+
+        if(tipomascota != null){
+            tipomascotatv.setText(tipomascota);
+        }
+
+        if(peso != null){
+            pesotv.setText(peso);
+        }
+
+        if(alergia != null){
+            alergiatv.setText(alergia);
+        }
+
+        if(fecharegistro != null){
+            fecharegistrotv.setText(fecharegistro);
+        }
     }
 
     }
