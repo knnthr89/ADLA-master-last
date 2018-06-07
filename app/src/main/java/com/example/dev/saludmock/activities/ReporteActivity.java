@@ -87,10 +87,6 @@ public class ReporteActivity  extends Activity implements AdapterView.OnItemClic
         });
 
 
-        //  tv = findViewById(R.id.tv);
-        //  tv2 = findViewById(R.id.tv2);
-        //  tv3 = findViewById(R.id.tv3);
-
         String dia = getIntent().getExtras().getString("dia");
         String mes = getIntent().getExtras().getString("mes");
         String anio = getIntent().getExtras().getString("anio");
@@ -252,9 +248,13 @@ public class ReporteActivity  extends Activity implements AdapterView.OnItemClic
            TextView alergiatv = view.findViewById(R.id.alergia_respuesta);
            TextView fecharegistrotv = view.findViewById(R.id.fecharegistro_respuesta);
 
+           TextView precioanestesia = view.findViewById(R.id.precioanestesia_respuesta);
+           TextView cantidadtarjeta = view.findViewById(R.id.cantidadtarjeta_respuesta);
+           TextView cantidadefectivo = view.findViewById(R.id.cantidadefectivo_respuesta);
+
 
         muestraDatos((int) id,folio, tdueno, tdireccion, ttelefono, tcorreo, tnmascota, tmsocial, traza, tedad, ttmascota, comentarioregistrotv, tratamientotv, rescatadotv,
-        vacunatv, desparacitaciontv, celotv, lactartv, tipomascotatv, pesotv, alergiatv, fecharegistrotv);
+        vacunatv, desparacitaciontv, celotv, lactartv, tipomascotatv, pesotv, alergiatv, fecharegistrotv, precioanestesia, cantidadtarjeta, cantidadefectivo);
 
         builder.setView(view);
 
@@ -284,7 +284,8 @@ public class ReporteActivity  extends Activity implements AdapterView.OnItemClic
     }
 
     public void muestraDatos(int id,TextView folio, TextView tdueno, TextView tdireccion, TextView ttelefono, TextView tcorreo, TextView tnmascota, TextView tmsocial, TextView traza, TextView tedad, TextView ttmascota,
-    TextView comentarioregistrotv, TextView tratamientotv, TextView rescatadotv, TextView vacunatv, TextView desparacitaciontv, TextView celotv, TextView lactartv, TextView tipomascotatv, TextView pesotv, TextView alergiatv, TextView fecharegistrotv){
+    TextView comentarioregistrotv, TextView tratamientotv, TextView rescatadotv, TextView vacunatv, TextView desparacitaciontv, TextView celotv, TextView lactartv, TextView tipomascotatv, TextView pesotv, TextView alergiatv,
+                             TextView fecharegistrotv, TextView precioanestesia, TextView cantidadtarjeta, TextView cantidadefectivo){
 
         // Toast.makeText(ReporteActivity.this, idString, Toast.LENGTH_SHORT).show();
 
@@ -336,9 +337,9 @@ public class ReporteActivity  extends Activity implements AdapterView.OnItemClic
         String fecharegistro = (String) properties.get("creat_at");
 
         //pago
-        String precio_anestesia = (String) properties.get("precio_anestesia");
-        String cantidad_tarjeta = (String) properties.get("cantidadTarjeta");
-        String catidad_efectivo = (String) properties.get("cantidadEfectivo");
+        String precio_anestesiaString = (String) properties.get("precio_anestesia");
+        String cantidad_tarjetaString = (String) properties.get("cantidadTarjeta");
+        String cantidad_efectivoString = (String) properties.get("cantidadEfectivo");
 
         //anestesia
         String dosis1 = (String) properties.get("dosis1");
@@ -484,6 +485,18 @@ public class ReporteActivity  extends Activity implements AdapterView.OnItemClic
 
         if(fecharegistro != null){
             fecharegistrotv.setText(fecharegistro);
+        }
+
+        if(precio_anestesiaString != null){
+            precioanestesia.setText(precio_anestesiaString);
+        }
+
+        if(cantidad_tarjetaString != null){
+            cantidadtarjeta.setText(cantidad_tarjetaString);
+        }
+
+        if(cantidad_efectivoString != null){
+            cantidadefectivo.setText(cantidad_efectivoString);
         }
     }
 

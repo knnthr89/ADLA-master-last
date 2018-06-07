@@ -96,29 +96,30 @@
                     android:id="@+id/perro"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:text="Perro" />
+                    android:layout_marginStart="120dp"
+                    android:text="Perro"
+                   />
 
                 <CheckBox
                     android:id="@+id/perra"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Perra"
-                    android:layout_marginStart="20dp"/>
+                    android:layout_marginStart="120dp"/>
 
                 <CheckBox
                     android:id="@+id/gato"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Gato"
-                    android:layout_marginStart="20dp"/>
+                    android:layout_marginStart="120dp"/>
 
                 <CheckBox
                     android:id="@+id/gata"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Gata"
-                    android:layout_marginStart="20dp"/>
+                    android:layout_marginStart="120dp"/>
 
             </LinearLayout>
 
@@ -146,6 +147,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="FB"
+                    android:layout_marginTop="10dp"
                    />
 
                 <CheckBox
@@ -153,6 +155,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Volante"
+                    android:layout_marginTop="10dp"
                     />
 
                 <CheckBox
@@ -160,6 +163,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Vi una lona en la campaña"
+                    android:layout_marginTop="10dp"
                    />
 
                 <CheckBox
@@ -167,6 +171,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="He ido a otra campaña de Abogados de los Animales"
+                    android:layout_marginTop="10dp"
                     />
 
                 <CheckBox
@@ -174,6 +179,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Recomendación de otra persona"
+                    android:layout_marginTop="10dp"
                     />
 
                 <CheckBox
@@ -181,6 +187,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Otro"
+                    android:layout_marginTop="10dp"
                     />
 
             </LinearLayout>
@@ -241,25 +248,29 @@
                     android:id="@+id/chico"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chico" />
+                    android:text="Chico"
+                    android:layout_marginStart="90dp"/>
 
                 <CheckBox
                     android:id="@+id/mediano"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mediano" />
+                    android:text="Mediano"
+                    android:layout_marginStart="90dp"/>
 
                 <CheckBox
                     android:id="@+id/grande"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Grande" />
+                    android:text="Grande"
+                    android:layout_marginStart="90dp"/>
 
                 <CheckBox
                     android:id="@+id/gigante"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Gigante" />
+                    android:text="Gigante"
+                    android:layout_marginStart="90dp"/>
 
             </LinearLayout>
 
@@ -383,7 +394,6 @@
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
-
     </ScrollView>
 
 </android.support.constraint.ConstraintLayout>

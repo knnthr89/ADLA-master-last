@@ -1767,29 +1767,4 @@
         android:datePickerMode="spinner"
         android:visibility="gone"/>
 
-    <Spinner
-        android:id="@+id/modulos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-
-    <Spinner
-        android:id="@+id/medida"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-
-    <Spinner
-        android:id="@+id/medio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-
-    <Spinner
-        android:id="@+id/tmascota"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-
-
 </android.support.constraint.ConstraintLayout>

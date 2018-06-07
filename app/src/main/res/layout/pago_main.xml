@@ -24,15 +24,15 @@
         tools:ignore="MissingConstraints">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:orientation="horizontal">
 
             <CheckBox
                 android:id="@+id/btn4"
                 android:layout_width="wrap_content"
                 android:layout_height="70dip"
-                android:layout_marginStart="45dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="2dp"
                 android:adjustViewBounds="true"
                 android:text="Gratuito"
@@ -42,7 +42,7 @@
                 android:id="@+id/btn5"
                 android:layout_width="70dip"
                 android:layout_height="70dip"
-                android:layout_marginStart="70dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="2dp"
                 android:adjustViewBounds="true"
                 android:text="150"
@@ -52,7 +52,7 @@
             android:id="@+id/btn1"
             android:layout_width="70dip"
             android:layout_height="70dip"
-            android:layout_marginStart="70dp"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="2dp"
             android:adjustViewBounds="true"
             android:text="200"
@@ -62,7 +62,7 @@
             android:id="@+id/btn2"
             android:layout_width="70dip"
             android:layout_height="70dip"
-            android:layout_marginStart="70dp"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="2dp"
             android:adjustViewBounds="false"
             android:text="250"
@@ -73,7 +73,7 @@
             android:layout_width="70dip"
             android:layout_height="70dip"
             android:layout_gravity="right"
-            android:layout_marginStart="70dp"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="2dp"
             android:adjustViewBounds="false"
             android:text="300"
@@ -83,8 +83,8 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
+            android:layout_height="323dp"
+            android:layout_marginTop="80dp"
             android:orientation="horizontal">
 
 
@@ -114,7 +114,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="250dp"
+            android:layout_marginTop="150dp"
             android:orientation="horizontal">
 
         <TextView
@@ -129,7 +129,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="280dp"
+            android:layout_marginTop="190dp"
             android:orientation="vertical">
 
 
@@ -155,7 +155,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="280dp"
+            android:layout_marginTop="190dp"
             android:orientation="vertical"
             android:layout_marginStart="70dp">
 
@@ -168,14 +168,14 @@
                 android:id="@+id/sefectivo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="55dp"/>
+                android:layout_marginTop="70dp"/>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="280dp"
+            android:layout_marginTop="190dp"
             android:orientation="vertical"
             android:layout_marginStart="350dp">
 
@@ -202,9 +202,9 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="260dp"
+            android:layout_marginTop="180dp"
             android:orientation="vertical"
-            android:layout_marginStart="450dp">
+            android:layout_marginStart="420dp">
 
             <EditText
                 android:id="@+id/editTarjeta"
@@ -222,22 +222,23 @@
         <LinearLayout
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="400dp"
+            android:layout_marginTop="350dp"
             android:orientation="horizontal"
-            android:layout_marginStart="540dp">
+            android:layout_marginStart="290dp">
 
 
             <TextView
                 android:id="@+id/tvregresardinero"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Se regreso el dinero?"/>
+                android:text="Se regreso el dinero?" />
 
             <Switch
                 android:id="@+id/regresardinero_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"/>
+                android:layout_marginStart="0dp"
+                />
 
         </LinearLayout>
 

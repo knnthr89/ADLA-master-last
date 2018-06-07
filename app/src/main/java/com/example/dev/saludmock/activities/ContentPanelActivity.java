@@ -31,6 +31,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,10 +55,16 @@ import android.widget.Toast;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.Emitter;
 import com.couchbase.lite.Manager;
+import com.couchbase.lite.Mapper;
+import com.couchbase.lite.Query;
+import com.couchbase.lite.QueryEnumerator;
+import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
 import com.example.dev.saludmock.R;
+import com.example.dev.saludmock.adapters.NewRegistersArrayAdapter;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Font;
@@ -72,9 +79,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -111,165 +120,160 @@ public class ContentPanelActivity extends AppCompatActivity {
 
     EditText et;
 
+    Object saved;
+    QueryEnumerator result;
+
     String mascota = null;
     //  String tmascota = "perro";
     //  String t2mascota = "gato";
 
-    //botones de gatos
-    CircleButton circleButton1,
-            circleButton2,
-            circleButton3,
-            circleButton4,
-            circleButton5,
-            circleButton6,
-            circleButton7,
-            circleButton8,
-            circleButton9,
-            circleButton10,
-            circleButton11,
-            circleButton12,
-            circleButton13,
-            circleButton14,
-            circleButton15,
-            circleButton16,
-            circleButton17,
-            circleButton18,
-            circleButton19,
-            circleButton20,
-            circleButton21,
-            circleButton22,
-            circleButton23,
-            circleButton24,
-            circleButton25,
-            circleButton26,
-            circleButton27,
-            circleButton28,
-            circleButton29,
-            circleButton30,
-            circleButton31,
-            circleButton32,
-            circleButton33,
-            circleButton34,
-            circleButton35,
-            circleButton36;
+    //botones de perros y gatos
+    @BindView(R.id.btn1) CircleButton circleButton1;
+    @BindView(R.id.btn2) CircleButton circleButton2;
+    @BindView(R.id.btn3) CircleButton circleButton3;
+    @BindView(R.id.btn4) CircleButton circleButton4;
+    @BindView(R.id.btn5) CircleButton circleButton5;
+    @BindView(R.id.btn6) CircleButton circleButton6;
+    @BindView(R.id.btn7) CircleButton circleButton7;
+    @BindView(R.id.btn8) CircleButton circleButton8;
+    @BindView(R.id.btn9) CircleButton circleButton9;
+    @BindView(R.id.btn10) CircleButton circleButton10;
+    @BindView(R.id.btn11) CircleButton circleButton11;
+    @BindView(R.id.btn12) CircleButton circleButton12;
+    @BindView(R.id.btn13) CircleButton circleButton13;
+    @BindView(R.id.btn14) CircleButton circleButton14;
+    @BindView(R.id.btn15) CircleButton circleButton15;
+    @BindView(R.id.btn16) CircleButton circleButton16;
+    @BindView(R.id.btn17) CircleButton circleButton17;
+    @BindView(R.id.btn18) CircleButton circleButton18;
+    @BindView(R.id.btn19) CircleButton circleButton19;
+    @BindView(R.id.btn20) CircleButton circleButton20;
+    @BindView(R.id.btn21) CircleButton circleButton21;
+    @BindView(R.id.btn22) CircleButton circleButton22;
+    @BindView(R.id.btn23) CircleButton circleButton23;
+    @BindView(R.id.btn24) CircleButton circleButton24;
+    @BindView(R.id.btn25) CircleButton circleButton25;
+    @BindView(R.id.btn26) CircleButton circleButton26;
+    @BindView(R.id.btn27) CircleButton circleButton27;
+    @BindView(R.id.btn28) CircleButton circleButton28;
+    @BindView(R.id.btn29) CircleButton circleButton29;
+    @BindView(R.id.btn30) CircleButton circleButton30;
+    @BindView(R.id.btn31) CircleButton circleButton31;
+    @BindView(R.id.btn32) CircleButton circleButton32;
+    @BindView(R.id.btn33) CircleButton circleButton33;
+    @BindView(R.id.btn34) CircleButton circleButton34;
+    @BindView(R.id.btn35) CircleButton circleButton35;
+    @BindView(R.id.btn36) CircleButton circleButton36;
+    @BindView(R.id.btn37) CircleButton circleButton37;
+    @BindView(R.id.btn38) CircleButton circleButton38;
+    @BindView(R.id.btn39) CircleButton circleButton39;
+    @BindView(R.id.btn40) CircleButton circleButton40;
+    @BindView(R.id.btn41) CircleButton circleButton41;
+    @BindView(R.id.btn42) CircleButton circleButton42;
+    @BindView(R.id.btn43) CircleButton circleButton43;
+    @BindView(R.id.btn44) CircleButton circleButton44;
+    @BindView(R.id.btn45) CircleButton circleButton45;
+    @BindView(R.id.btn46) CircleButton circleButton46;
+    @BindView(R.id.btn47) CircleButton circleButton47;
+    @BindView(R.id.btn48) CircleButton circleButton48;
+    @BindView(R.id.btn49) CircleButton circleButton49;
+    @BindView(R.id.btn50) CircleButton circleButton50;
+    @BindView(R.id.btn51) CircleButton circleButton51;
+    @BindView(R.id.btn52) CircleButton circleButton52;
+    @BindView(R.id.btn53) CircleButton circleButton53;
+    @BindView(R.id.btn54) CircleButton circleButton54;
+    @BindView(R.id.btn55) CircleButton circleButton55;
+    @BindView(R.id.btn56) CircleButton circleButton56;
+    @BindView(R.id.btn57) CircleButton circleButton57;
+    @BindView(R.id.btn58) CircleButton circleButton58;
+    @BindView(R.id.btn59) CircleButton circleButton59;
+    @BindView(R.id.btn60) CircleButton circleButton60;
+    @BindView(R.id.btn61) CircleButton circleButton61;
+    @BindView(R.id.btn62) CircleButton circleButton62;
+    @BindView(R.id.btn63) CircleButton circleButton63;
+    @BindView(R.id.btn64) CircleButton circleButton64;
+    @BindView(R.id.btn65) CircleButton circleButton65;
+    @BindView(R.id.btn66) CircleButton circleButton66;
+    @BindView(R.id.btn67) CircleButton circleButton67;
+    @BindView(R.id.btn68) CircleButton circleButton68;
+    @BindView(R.id.btn69) CircleButton circleButton69;
+    @BindView(R.id.btn70) CircleButton circleButton70;
+    @BindView(R.id.btn71) CircleButton circleButton71;
+    @BindView(R.id.btn72) CircleButton circleButton72;
 
-    //botones deperros
-    CircleButton circleButton37,
-    circleButton38,
-    circleButton39,
-    circleButton40,
-    circleButton41,
-    circleButton42,
-    circleButton43,
-    circleButton44,
-    circleButton45,
-    circleButton46,
-    circleButton47,
-    circleButton48,
-    circleButton49,
-    circleButton50,
-    circleButton51,
-    circleButton52,
-    circleButton53,
-    circleButton54,
-    circleButton55,
-    circleButton56,
-    circleButton57,
-    circleButton58,
-    circleButton59,
-    circleButton60,
-    circleButton61,
-    circleButton62,
-    circleButton63,
-    circleButton64,
-    circleButton65,
-    circleButton66,
-    circleButton67,
-    circleButton68,
-    circleButton69,
-    circleButton70,
-    circleButton71,
-    circleButton72;
-
-    //textview de gatos
-    TextView tv1,
-             tv2,
-             tv3,
-             tv4,
-             tv5,
-             tv6,
-             tv7,
-             tv8,
-             tv9,
-            tv10,
-            tv11,
-            tv12,
-            tv13,
-            tv14,
-            tv15,
-            tv16,
-            tv17,
-            tv18,
-            tv19,
-            tv20,
-            tv21,
-            tv22,
-            tv23,
-            tv24,
-            tv25,
-            tv26,
-            tv27,
-            tv28,
-            tv29,
-            tv30,
-            tv31,
-            tv32,
-            tv33,
-            tv34,
-            tv35,
-            tv36;
-
-    //textview de perros
-
-    TextView tv37,
-    tv38,
-    tv39,
-    tv40,
-    tv41,
-    tv42,
-    tv43,
-    tv44,
-    tv45,
-    tv46,
-    tv47,
-    tv48,
-    tv49,
-    tv50,
-    tv51,
-    tv52,
-    tv53,
-    tv54,
-    tv55,
-    tv56,
-    tv57,
-    tv58,
-    tv59,
-    tv60,
-    tv61,
-    tv62,
-    tv63,
-    tv64,
-    tv65,
-    tv66,
-    tv67,
-    tv68,
-    tv69,
-    tv70,
-    tv71,
-    tv72;
-
-  //  Spinner smedida, smedio, stmascota;
-
+    //folio
+    @BindView(R.id.message) TextView tv1;
+    @BindView(R.id.message2) TextView tv2;
+    @BindView(R.id.message3) TextView tv3;
+    @BindView(R.id.message4) TextView tv4;
+    @BindView(R.id.message5) TextView tv5;
+    @BindView(R.id.message6) TextView tv6;
+    @BindView(R.id.message7) TextView tv7;
+    @BindView(R.id.message8) TextView tv8;
+    @BindView(R.id.message9) TextView tv9;
+    @BindView(R.id.message10) TextView tv10;
+    @BindView(R.id.message11) TextView tv11;
+    @BindView(R.id.message12) TextView tv12;
+    @BindView(R.id.message13) TextView tv13;
+    @BindView(R.id.message14) TextView tv14;
+    @BindView(R.id.message15) TextView tv15;
+    @BindView(R.id.message16) TextView tv16;
+    @BindView(R.id.message17) TextView tv17;
+    @BindView(R.id.message18) TextView tv18;
+    @BindView(R.id.message19) TextView tv19;
+    @BindView(R.id.message20) TextView tv20;
+    @BindView(R.id.message21) TextView tv21;
+    @BindView(R.id.message22) TextView tv22;
+    @BindView(R.id.message23) TextView tv23;
+    @BindView(R.id.message24) TextView tv24;
+    @BindView(R.id.message25) TextView tv25;
+    @BindView(R.id.message26) TextView tv26;
+    @BindView(R.id.message27) TextView tv27;
+    @BindView(R.id.message28) TextView tv28;
+    @BindView(R.id.message29) TextView tv29;
+    @BindView(R.id.message30) TextView tv30;
+    @BindView(R.id.message31) TextView tv31;
+    @BindView(R.id.message32) TextView tv32;
+    @BindView(R.id.message33) TextView tv33;
+    @BindView(R.id.message34) TextView tv34;
+    @BindView(R.id.message35) TextView tv35;
+    @BindView(R.id.message36) TextView tv36;
+    @BindView(R.id.message37) TextView tv37;
+    @BindView(R.id.message38) TextView tv38;
+    @BindView(R.id.message39) TextView tv39;
+    @BindView(R.id.message40) TextView tv40;
+    @BindView(R.id.message41) TextView tv41;
+    @BindView(R.id.message42) TextView tv42;
+    @BindView(R.id.message43) TextView tv43;
+    @BindView(R.id.message44) TextView tv44;
+    @BindView(R.id.message45) TextView tv45;
+    @BindView(R.id.message46) TextView tv46;
+    @BindView(R.id.message47) TextView tv47;
+    @BindView(R.id.message48) TextView tv48;
+    @BindView(R.id.message49) TextView tv49;
+    @BindView(R.id.message50) TextView tv50;
+    @BindView(R.id.message51) TextView tv51;
+    @BindView(R.id.message52) TextView tv52;
+    @BindView(R.id.message53) TextView tv53;
+    @BindView(R.id.message54) TextView tv54;
+    @BindView(R.id.message55) TextView tv55;
+    @BindView(R.id.message56) TextView tv56;
+    @BindView(R.id.message57) TextView tv57;
+    @BindView(R.id.message58) TextView tv58;
+    @BindView(R.id.message59) TextView tv59;
+    @BindView(R.id.message60) TextView tv60;
+    @BindView(R.id.message61) TextView tv61;
+    @BindView(R.id.message62) TextView tv62;
+    @BindView(R.id.message63) TextView tv63;
+    @BindView(R.id.message64) TextView tv64;
+    @BindView(R.id.message65) TextView tv65;
+    @BindView(R.id.message66) TextView tv66;
+    @BindView(R.id.message67) TextView tv67;
+    @BindView(R.id.message68) TextView tv68;
+    @BindView(R.id.message69) TextView tv69;
+    @BindView(R.id.message70) TextView tv70;
+    @BindView(R.id.message71) TextView tv71;
+    @BindView(R.id.message72) TextView tv72;
 
     Locale l = new Locale("es", "MX");
    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"),l);
@@ -277,15 +281,7 @@ public class ContentPanelActivity extends AppCompatActivity {
 
     int idDocument;
 
-
-  //  String [] modulos = {"Anestesia", "Cirugía", "Recuperación"};
-  //  String [] medida = {"Tamaño de la mascota","Chico", "Mediano", "Grande", "Gigante"};
-  //  String [] medio = {"¿Cómo te enteraste de la campaña?","Facebook","Volante","Vi una lona en la campaña", "Ya he ido a otra campaña de Abogados de los Animales", "Recomendación de otra persona", "Otro"};
-   // String [] tamano_mascota = {"Detalles de las Mascotas", "Perro", "Perra", "Gato", "Gata"};
-  // String [] pet_size = {"Detalle de la Mascota", "Perro", "Perra", "Gato", "Gata"};
-  //  String [] pet = {"Desea cambiar el sexo de la mascota?", "Perro", "Perra", "Gato", "Gata"};
-
-   private String PREFS_KEY = "mispreferencias";
+    private String PREFS_KEY = "mispreferencias";
 
     private AutoCompleteTextView nombre;
     private AutoCompleteTextView direccion;
@@ -301,6 +297,8 @@ public class ContentPanelActivity extends AppCompatActivity {
     private AutoCompleteTextView lactar;
     private AutoCompleteTextView peso;
 
+    AutoCompleteTextView email;
+
     String nombreString;
     String direccionString;
     String telefonoString;
@@ -315,12 +313,37 @@ public class ContentPanelActivity extends AppCompatActivity {
     String lactarString;
     String pesoString;
 
-    private CheckBox facebook;
-    private CheckBox Volante;
-    private CheckBox lona;
-    private CheckBox campana;
-    private CheckBox recomendacion;
-    private CheckBox otro;
+
+    CheckBox facebook;
+    CheckBox volante;
+    CheckBox lona;
+    CheckBox campana;
+    CheckBox recomendacion;
+    CheckBox otro;
+
+    CheckBox perro, perra, gato, gata;
+
+    CheckBox chico, mediano, grande, gigante;
+
+    AutoCompleteTextView comentarios, alergia;
+
+    CheckBox button4, button5, button1, button2, button3;
+
+    AutoCompleteTextView acprecio;
+
+    Switch sTarjeta, sEfectivo;
+
+    EditText editTarjeta, editEfectivo;
+
+    Switch devolucion;
+
+    EditText dosis1;
+
+    AutoCompleteTextView comentario;
+
+    CheckBox cirujano1, cirujano2, cirujano3, cirujano4;
+
+    CheckBox uno, dos, tres, cuatro, cinco, seis, siete;
 
 
     @Override
@@ -342,177 +365,27 @@ public class ContentPanelActivity extends AppCompatActivity {
 
         et = findViewById(R.id.et);
 
-        //botones y textview de gatos
-        circleButton1 = findViewById(R.id.btn1);
-        tv1 = findViewById(R.id.message);
-        circleButton2 = findViewById(R.id.btn2);
-        tv2 = findViewById(R.id.message2);
-        circleButton3 = findViewById(R.id.btn3);
-        tv3 = findViewById(R.id.message3);
-        circleButton4 = findViewById(R.id.btn4);
-        tv4 = findViewById(R.id.message4);
-        circleButton5 = findViewById(R.id.btn5);
-        tv5 = findViewById(R.id.message5);
-        circleButton6 = findViewById(R.id.btn6);
-        tv6 = findViewById(R.id.message6);
-        circleButton7 = findViewById(R.id.btn7);
-        tv7 = findViewById(R.id.message7);
-        circleButton8 = findViewById(R.id.btn8);
-        tv8 = findViewById(R.id.message8);
-        circleButton9 = findViewById(R.id.btn9);
-        tv9 = findViewById(R.id.message9);
-        circleButton10 = findViewById(R.id.btn10);
-        tv10 = findViewById(R.id.message10);
-        circleButton11 = findViewById(R.id.btn11);
-        tv11 = findViewById(R.id.message11);
-        circleButton12 = findViewById(R.id.btn12);
-        tv12 = findViewById(R.id.message12);
-        circleButton13 = findViewById(R.id.btn13);
-        tv13 = findViewById(R.id.message13);
-        circleButton14 = findViewById(R.id.btn14);
-        tv14 = findViewById(R.id.message14);
-        circleButton15 = findViewById(R.id.btn15);
-        tv15 = findViewById(R.id.message15);
-        circleButton16 = findViewById(R.id.btn16);
-        tv16 = findViewById(R.id.message16);
-        circleButton17 = findViewById(R.id.btn17);
-        tv17 = findViewById(R.id.message17);
-        circleButton18 = findViewById(R.id.btn18);
-        tv18 = findViewById(R.id.message18);
-        circleButton19 = findViewById(R.id.btn19);
-        tv19 = findViewById(R.id.message19);
-        circleButton20 = findViewById(R.id.btn20);
-        tv20 = findViewById(R.id.message20);
-        circleButton21 = findViewById(R.id.btn21);
-        tv21 = findViewById(R.id.message21);
-        circleButton22 = findViewById(R.id.btn22);
-        tv22 = findViewById(R.id.message22);
-        circleButton23 = findViewById(R.id.btn23);
-        tv23 = findViewById(R.id.message23);
-        circleButton24 = findViewById(R.id.btn24);
-        tv24 = findViewById(R.id.message24);
-        circleButton25 = findViewById(R.id.btn25);
-        tv25 = findViewById(R.id.message25);
-        circleButton26 = findViewById(R.id.btn26);
-        tv26 = findViewById(R.id.message26);
-        circleButton27 = findViewById(R.id.btn27);
-        tv27 = findViewById(R.id.message27);
-        circleButton28 = findViewById(R.id.btn28);
-        tv28 = findViewById(R.id.message28);
-        circleButton29 = findViewById(R.id.btn29);
-        tv29 = findViewById(R.id.message29);
-        circleButton30 = findViewById(R.id.btn30);
-        tv30 = findViewById(R.id.message30);
-        circleButton31 = findViewById(R.id.btn31);
-        tv31 = findViewById(R.id.message31);
-        circleButton32 = findViewById(R.id.btn32);
-        tv32 = findViewById(R.id.message32);
-        circleButton33 = findViewById(R.id.btn33);
-        tv33 = findViewById(R.id.message33);
-        circleButton34 = findViewById(R.id.btn34);
-        tv34 = findViewById(R.id.message34);
-        circleButton35 = findViewById(R.id.btn35);
-        tv35 = findViewById(R.id.message35);
-        circleButton36 = findViewById(R.id.btn36);
-        tv36 = findViewById(R.id.message36);
 
-        //botones y textview de perros
-        circleButton37 = findViewById(R.id.btn37);
-        tv37 = findViewById(R.id.message37);
-        circleButton38 = findViewById(R.id.btn38);
-        tv38 = findViewById(R.id.message38);
-        circleButton39 = findViewById(R.id.btn39);
-        tv39 = findViewById(R.id.message39);
-        circleButton40 = findViewById(R.id.btn40);
-        tv40 = findViewById(R.id.message40);
-        circleButton41 = findViewById(R.id.btn41);
-        tv41 = findViewById(R.id.message41);
-        circleButton42 = findViewById(R.id.btn42);
-        tv42 = findViewById(R.id.message42);
-        circleButton43 = findViewById(R.id.btn43);
-        tv43 = findViewById(R.id.message43);
-        circleButton44 = findViewById(R.id.btn44);
-        tv44 = findViewById(R.id.message44);
-        circleButton45 = findViewById(R.id.btn45);
-        tv45 = findViewById(R.id.message45);
-        circleButton46 = findViewById(R.id.btn46);
-        tv46 = findViewById(R.id.message46);
-        circleButton47 = findViewById(R.id.btn47);
-        tv47 = findViewById(R.id.message47);
-        circleButton48 = findViewById(R.id.btn48);
-        tv48 = findViewById(R.id.message48);
-        circleButton49 = findViewById(R.id.btn49);
-        tv49 = findViewById(R.id.message49);
-        circleButton50 = findViewById(R.id.btn50);
-        tv50 = findViewById(R.id.message50);
-        circleButton51 = findViewById(R.id.btn51);
-        tv51 = findViewById(R.id.message51);
-        circleButton52 = findViewById(R.id.btn52);
-        tv52 = findViewById(R.id.message52);
-        circleButton53 = findViewById(R.id.btn53);
-        tv53 = findViewById(R.id.message53);
-        circleButton54 = findViewById(R.id.btn54);
-        tv54 = findViewById(R.id.message54);
-        circleButton55 = findViewById(R.id.btn55);
-        tv55 = findViewById(R.id.message55);
-        circleButton56 = findViewById(R.id.btn56);
-        tv56 = findViewById(R.id.message56);
-        circleButton57 = findViewById(R.id.btn57);
-        tv57 = findViewById(R.id.message57);
-        circleButton58 = findViewById(R.id.btn58);
-        tv58 = findViewById(R.id.message58);
-        circleButton59 = findViewById(R.id.btn59);
-        tv59 = findViewById(R.id.message59);
-        circleButton60 = findViewById(R.id.btn60);
-        tv60 = findViewById(R.id.message60);
-        circleButton61 = findViewById(R.id.btn61);
-        tv61 = findViewById(R.id.message61);
-        circleButton62 = findViewById(R.id.btn62);
-        tv62 = findViewById(R.id.message62);
-        circleButton63 = findViewById(R.id.btn63);
-        tv63 = findViewById(R.id.message63);
-        circleButton64 = findViewById(R.id.btn64);
-        tv64 = findViewById(R.id.message64);
-        circleButton65 = findViewById(R.id.btn65);
-        tv65 = findViewById(R.id.message65);
-        circleButton66 = findViewById(R.id.btn66);
-        tv66 = findViewById(R.id.message66);
-        circleButton67 = findViewById(R.id.btn67);
-        tv67 = findViewById(R.id.message67);
-        circleButton68 = findViewById(R.id.btn68);
-        tv68 = findViewById(R.id.message68);
-        circleButton69 = findViewById(R.id.btn69);
-        tv69 = findViewById(R.id.message69);
-        circleButton70 = findViewById(R.id.btn70);
-        tv70 = findViewById(R.id.message70);
-        circleButton71 = findViewById(R.id.btn71);
-        tv71 = findViewById(R.id.message71);
-        circleButton72 = findViewById(R.id.btn72);
-        tv72 = findViewById(R.id.message72);
-
-      //  smedida = findViewById(R.id.medida);
-      //  smedio = findViewById(R.id.medio);
-      //  stmascota = findViewById(R.id.tmascota);
-
-
-
-//        smedida.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, medida));
-
-
-      //  String idDocumentS = Integer.toString(idDocument);
+        //  String idDocumentS = Integer.toString(idDocument);
 
       //  Toast.makeText(getApplicationContext(), idDocumentS, Toast.LENGTH_SHORT).show();
 
 
+        //TRAE NULO A TMASCOTA
+
+        //Recibe los datos de los preregistros que vienen de google sheets
         Bundle datos = this.getIntent().getExtras();
         if(datos != null) {
             String idDocumentStringS = datos.getString("idDocumentStringS");
-            String tmascota = datos.getString("tmascota");
+            String dmascota = datos.getString("dmascota");
             //falta editar si escogen perro o perra, para cambiar de método
             if (idDocumentStringS != null) {
-                buscaDesocupado(idDocumentStringS, tmascota);
-            }else{
-              //  Toast.makeText(getApplicationContext(), "Error para saber tipo de mascota", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplication(), dmascota, Toast.LENGTH_SHORT).show();
+                buscaDesocupado(idDocumentStringS, dmascota);
+            }else if (dmascota == null){
+             //  Toast.makeText(getApplicationContext(), "Viene nulo", Toast.LENGTH_SHORT).show();
+            }else if(!dmascota.equals("Perro") || !dmascota.equals("Perra") || !dmascota.equals("Gato") || !dmascota.equals("Gato")){
+                Toast.makeText(getApplicationContext(), "Error, no viene ninguna de las opciones mostradas", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -569,7 +442,15 @@ public class ContentPanelActivity extends AppCompatActivity {
                    // Intent tintent = new Intent(ContentPanelActivity.this, ReporteActivity.class);
                    // startActivity(tintent);
                     return true;
-            }
+                case R.id.load_deleted:
+                    try {
+                        loadDeletedRecords();
+                    } catch (CouchbaseLiteException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return true;}
             return false;
         }
     };
@@ -583,31 +464,31 @@ public class ContentPanelActivity extends AppCompatActivity {
          nombre = view.findViewById(R.id.nombre_dueño);
          direccion = view.findViewById(R.id.direccion);
          telefono = view.findViewById(R.id.telefono);
-        final AutoCompleteTextView email = view.findViewById(R.id.email);
+        email = view.findViewById(R.id.email);
          nmascota = view.findViewById(R.id.mascota);
        // final Spinner tipo_mascota = view.findViewById(R.id.tamano_mascota);
-        final CheckBox perro = view.findViewById(R.id.perro);
-        final CheckBox perra = view.findViewById(R.id.perra);
-        final CheckBox gato = view.findViewById(R.id.gato);
-        final CheckBox gata = view.findViewById(R.id.gata);
+         perro = view.findViewById(R.id.perro);
+         perra = view.findViewById(R.id.perra);
+         gato = view.findViewById(R.id.gato);
+         gata = view.findViewById(R.id.gata);
        //final Spinner msocial =view.findViewById(R.id.tmascota);
 
-        final CheckBox facebook = view.findViewById(R.id.fb);
-        final CheckBox volante = view.findViewById(R.id.volante);
-        final CheckBox lona = view.findViewById(R.id.lona);
-        final CheckBox campana = view.findViewById(R.id.campana);
-        final CheckBox recomendacion = view.findViewById(R.id.recomendacion);
-        final CheckBox otro = view.findViewById(R.id.otro);
+         facebook = view.findViewById(R.id.fb);
+         volante = view.findViewById(R.id.volante);
+         lona = view.findViewById(R.id.lona);
+         campana = view.findViewById(R.id.campana);
+         recomendacion = view.findViewById(R.id.recomendacion);
+         otro = view.findViewById(R.id.otro);
 
-        final CheckBox chico = view.findViewById(R.id.chico);
-        final CheckBox mediano = view.findViewById(R.id.mediano);
-        final CheckBox grande = view.findViewById(R.id.grande);
-        final CheckBox gigante = view.findViewById(R.id.gigante);
+         chico = view.findViewById(R.id.chico);
+         mediano = view.findViewById(R.id.mediano);
+         grande = view.findViewById(R.id.grande);
+         gigante = view.findViewById(R.id.gigante);
 
          raza = view.findViewById(R.id.raza);
          edad = view.findViewById(R.id.edad);
       //  final Spinner tmascota = view.findViewById(R.id.msocial);
-        final AutoCompleteTextView comentarios = view.findViewById(R.id.comentarios);
+         comentarios = view.findViewById(R.id.comentarios);
         tratamiento = view.findViewById(R.id.tratamiento);
         rescatado = view.findViewById(R.id.rescatado);
         vacuna = view.findViewById(R.id.vacuna);
@@ -615,22 +496,7 @@ public class ContentPanelActivity extends AppCompatActivity {
         celo = view.findViewById(R.id.celo);
         lactar = view.findViewById(R.id.lactar);
         peso = view.findViewById(R.id.peso);
-        final AutoCompleteTextView alergia = view.findViewById(R.id.alergia);
-
-        //tipo mascota
-   /*     final ArrayAdapter<String> adp2 = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, pet_size);
-        tipo_mascota.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        tipo_mascota.setAdapter(adp2);*/
-
-        //medio social
-/*        final ArrayAdapter<String> adp = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, medio);
-        msocial.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        msocial.setAdapter(adp);*/
-
-        //tamaño de mascota
-    /*    final ArrayAdapter<String> adp1 = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, medida);
-        tmascota.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        tmascota.setAdapter(adp1);*/
+        alergia = view.findViewById(R.id.alergia);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
 
@@ -638,76 +504,78 @@ public class ContentPanelActivity extends AppCompatActivity {
 
         builder.setView(view);
 
+        validaRegistro();
+
         builder.setPositiveButton("Guardar",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
 
-                        String tipoMascotaString = "";
-                        String msocialString = "";
-                        String tamanoMascotaString;
+                            String tipoMascotaString = "";
+                            String msocialString = "";
+                            String tamanoMascotaString;
 
-                        if(perro.isChecked()){
-                            tipoMascotaString = "Perro";
-                        } else if(perra.isChecked()){
-                            tipoMascotaString = "Perra";
-                        } else if(gato.isChecked()){
-                            tipoMascotaString = "Gato";
-                        } else if(gata.isChecked()){
-                            tipoMascotaString = "Gata";
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Error no se selecciono detalle de la mascota", Toast.LENGTH_SHORT).show();
-                        }
+                            if (perro.isChecked()) {
+                                tipoMascotaString = "Perro";
+                            } else if (perra.isChecked()) {
+                                tipoMascotaString = "Perra";
+                            } else if (gato.isChecked()) {
+                                tipoMascotaString = "Gato";
+                            } else if (gata.isChecked()) {
+                                tipoMascotaString = "Gata";
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Error no se selecciono detalle de la mascota", Toast.LENGTH_SHORT).show();
+                            }
 
-                        if(facebook.isChecked()){
-                            msocialString = "Facebook";
-                        }else if(volante.isChecked()){
-                            msocialString = "Volante";
-                        }else if(lona.isChecked()){
-                            msocialString = "Vi una lona en la Campaña";
-                        }else if(campana.isChecked()){
-                            msocialString = "He ido a otra campaña de Abogados de los Animales";
-                        }else if(recomendacion.isChecked()){
-                            msocialString = "Recomendación de otra persona";
-                        }else if(otro.isChecked()){
-                            msocialString = "Otro";
-                        }else{
-                            msocialString = "No se selecciono ninguna opción";
-                        }
+                            if (facebook.isChecked()) {
+                                msocialString = "Facebook";
+                            } else if (volante.isChecked()) {
+                                msocialString = "Volante";
+                            } else if (lona.isChecked()) {
+                                msocialString = "Vi una lona en la Campaña";
+                            } else if (campana.isChecked()) {
+                                msocialString = "He ido a otra campaña de Abogados de los Animales";
+                            } else if (recomendacion.isChecked()) {
+                                msocialString = "Recomendación de otra persona";
+                            } else if (otro.isChecked()) {
+                                msocialString = "Otro";
+                            } else {
+                                msocialString = "No se selecciono ninguna opción";
+                            }
 
-                        if(chico.isChecked()){
-                            tamanoMascotaString = "Chico";
-                        }else if(mediano.isChecked()){
-                            tamanoMascotaString = "Mediano";
-                        }else if(grande.isChecked()){
-                            tamanoMascotaString = "Grande";
-                        }else if(gigante.isChecked()){
-                            tamanoMascotaString = "Gigante";
-                        }else{
-                            tamanoMascotaString = "No se selecciono ninguna opción";
-                        }
+                            if (chico.isChecked()) {
+                                tamanoMascotaString = "Chico";
+                            } else if (mediano.isChecked()) {
+                                tamanoMascotaString = "Mediano";
+                            } else if (grande.isChecked()) {
+                                tamanoMascotaString = "Grande";
+                            } else if (gigante.isChecked()) {
+                                tamanoMascotaString = "Gigante";
+                            } else {
+                                tamanoMascotaString = "No se selecciono ninguna opción";
+                            }
 
-                        nombreString = nombre.getText().toString(); //
-                        direccionString = direccion.getText().toString();//
-                        telefonoString = telefono.getText().toString(); //
-                        String emailString = email.getText().toString();//
-                        mascotaString = nmascota.getText().toString();//
-                    //    String msocialString = msocial.getSelectedItem().toString(); //
-                        razaString = raza.getText().toString();//
-                        edadString = edad.getText().toString();//
-                       // String tamanoMascotaString = msocial.getSelectedItem().toString(); //
-                        String comentarioString = comentarios.getText().toString(); //
-                        tratamientoString = tratamiento.getText().toString(); //
-                        rescatadoString = rescatado.getText().toString(); //
-                        vacunaString = vacuna.getText().toString();  //
-                        desparacitacionString = desparacitacion.getText().toString(); //
-                        celoString = celo.getText().toString();//
-                        lactarString = lactar.getText().toString();//
-                        pesoString = peso.getText().toString();
-                        String alergiaString = alergia.getText().toString();
+                            nombreString = nombre.getText().toString(); //
+                            direccionString = direccion.getText().toString();//
+                            telefonoString = telefono.getText().toString(); //
+                            String emailString = email.getText().toString();//
+                            mascotaString = nmascota.getText().toString();//
+                            //    String msocialString = msocial.getSelectedItem().toString(); //
+                            razaString = raza.getText().toString();//
+                            edadString = edad.getText().toString();//
+                            // String tamanoMascotaString = msocial.getSelectedItem().toString(); //
+                            String comentarioString = comentarios.getText().toString(); //
+                            tratamientoString = tratamiento.getText().toString(); //
+                            rescatadoString = rescatado.getText().toString(); //
+                            vacunaString = vacuna.getText().toString();  //
+                            desparacitacionString = desparacitacion.getText().toString(); //
+                            celoString = celo.getText().toString();//
+                            lactarString = lactar.getText().toString();//
+                            pesoString = peso.getText().toString();
+                            String alergiaString = alergia.getText().toString();
 
 
-                        //create manager
+                            //create manager
                             Manager manager = null;
                             try {
                                 manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
@@ -723,17 +591,17 @@ public class ContentPanelActivity extends AppCompatActivity {
                                 d.printStackTrace();
                             }
 
-                        SharedPreferences preferences = getSharedPreferences("values", MODE_PRIVATE);
-                        idDocument = preferences.getInt("idDocument", 0);
+                            SharedPreferences preferences = getSharedPreferences("values", MODE_PRIVATE);
+                            idDocument = preferences.getInt("idDocument", 0);
 
-                        idDocument++;
+                            idDocument++;
 
-                        SharedPreferences prefs = getSharedPreferences("values", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putInt("idDocument", idDocument);
-                        editor.commit();
+                            SharedPreferences prefs = getSharedPreferences("values", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putInt("idDocument", idDocument);
+                            editor.commit();
 
-                        String idDocumentS = Integer.toString(idDocument);
+                            String idDocumentS = Integer.toString(idDocument);
 
 
                             //The properties that will be saved on the document
@@ -774,18 +642,20 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if (tipoMascotaString != "Detalle de la Mascota") {
 
-                                    buscaDesocupado(idDocumentS, tipoMascotaString);
-                                    Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
-                                    askPermissionAndWriteFile();
-                            }else{
+                                buscaDesocupado(idDocumentS, tipoMascotaString);
+
+                                Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
+                                askPermissionAndWriteFile();
+                            } else {
                                 Toast.makeText(getApplicationContext(), "Debe seleccionar alguna opción en Detalle de la mascota", Toast.LENGTH_SHORT).show();
                             }
 
-                            //  buscaDesocupadoAlternativa(idDocumentS);
+
                         }
 
 
-                });
+                    });
+
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -805,22 +675,24 @@ public class ContentPanelActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.pago_main, null);
 
-        final CheckBox button4 = view.findViewById(R.id.btn4);
-        final CheckBox button5 = view.findViewById(R.id.btn5);
-        final CheckBox button1 = view.findViewById(R.id.btn1);
-        final CheckBox button2 = view.findViewById(R.id.btn2);
-        final CheckBox button3 = view.findViewById(R.id.btn3);
-        final AutoCompleteTextView acprecio = view.findViewById(R.id.acprecio);
+        button4 = view.findViewById(R.id.btn4);
+        button5 = view.findViewById(R.id.btn5);
+        button1 = view.findViewById(R.id.btn1);
+        button2 = view.findViewById(R.id.btn2);
+        button3 = view.findViewById(R.id.btn3);
+        acprecio = view.findViewById(R.id.acprecio);
 
-        final Switch sTarjeta = view.findViewById(R.id.starjeta);
-        final Switch sEfectivo = view.findViewById(R.id.sefectivo);
+        sTarjeta = view.findViewById(R.id.starjeta);
+        sEfectivo = view.findViewById(R.id.sefectivo);
 
-        final EditText editTarjeta = view.findViewById(R.id.editTarjeta);
-        final EditText editEfectivo = view.findViewById(R.id.editEfectivo);
+        editTarjeta = view.findViewById(R.id.editTarjeta);
+        editEfectivo = view.findViewById(R.id.editEfectivo);
 
-        final Switch devolucion = view.findViewById(R.id.regresardinero_switch);
+        devolucion = view.findViewById(R.id.regresardinero_switch);
 
         builder.setView(view);
+
+        validaPago();
 
         builder.setPositiveButton("Guardar",
                 new DialogInterface.OnClickListener() {
@@ -833,7 +705,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         String aprecio = acprecio.getText().toString();
                        String cantidadTarjeta = editTarjeta.getText().toString();
                        String cantidadEfectivo = editEfectivo.getText().toString();
-                       String devolucionString = devolucion.getText().toString();
+                     //  String devolucionString = devolucion.getText().toString();
 
                         if(button1.isChecked()){
                             //button1.setBackgroundColor(Color.GREEN);
@@ -922,20 +794,20 @@ public class ContentPanelActivity extends AppCompatActivity {
                 dialogInterface.cancel();
             }
         });
-        builder.show();
+        builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
 
     }
 
     public void anestesiaDialog(final String idDocumentStringS){
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
-        builder.setTitle("Dosis de anestesia " + "Folio: " + idDocumentStringS);
+        builder.setTitle("Folio " + idDocumentStringS );
 
-       // Context context = builder.getContext();
+        // Context context = builder.getContext();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
 
-        final EditText dosis1 = new EditText(this);
+        dosis1 = new EditText(this);
         dosis1.setHint("Primer dosis");
         layout.addView(dosis1);
         dosis1.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -951,6 +823,8 @@ public class ContentPanelActivity extends AppCompatActivity {
         dosis3.setInputType(InputType.TYPE_CLASS_TEXT);
 
         builder.setView(layout);
+
+        validaAnestesia();
 
         builder.setPositiveButton("Guardar",
                 new DialogInterface.OnClickListener() {
@@ -1012,17 +886,23 @@ public class ContentPanelActivity extends AppCompatActivity {
     public void cirugiaDialog(final String idDocumentStringS){
 
         final String tipoMascotaString;
+        final String operacionAnteriorString;
 
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.cirugiaalert_main, null);
 
        // final AutoCompleteTextView cirujano = view.findViewById(R.id.nombre_cirujano);
-        final AutoCompleteTextView comentario = view.findViewById(R.id.comentario);
+        //final Button addsurgery = view.findViewById(R.id.addsurgery);
 
-        final CheckBox cirujano1 = view.findViewById(R.id.cirujano1);
-        final CheckBox cirujano2 = view.findViewById(R.id.cirujano2);
-        final CheckBox cirujano3 = view.findViewById(R.id.cirujano3);
-        final CheckBox cirujano4 = view.findViewById(R.id.cirujano4);
+        //2if
+        comentario = view.findViewById(R.id.comentario);
+
+        //1 if
+        cirujano1 = view.findViewById(R.id.cirujano1);
+        cirujano2 = view.findViewById(R.id.cirujano2);
+        cirujano3 = view.findViewById(R.id.cirujano3);
+        cirujano4 = view.findViewById(R.id.cirujano4);
+
 
         final CheckBox prenada = view.findViewById(R.id.prenada);
         final CheckBox celo = view.findViewById(R.id.celo);
@@ -1038,6 +918,8 @@ public class ContentPanelActivity extends AppCompatActivity {
         final CheckBox perra = view.findViewById(R.id.perra);
         final CheckBox gato = view.findViewById(R.id.gato);
         final CheckBox gata = view.findViewById(R.id.gata);
+
+        final Switch operacionanterior = view.findViewById(R.id.anteriormenteoperado_switch);
 
         //  final TextView tvtexto = view.findViewById(R.id.texto);
       //  final TextView tv = view.findViewById(R.id.tipomascotaseleccionada);
@@ -1124,6 +1006,21 @@ public class ContentPanelActivity extends AppCompatActivity {
     }else{
         Toast.makeText(getApplicationContext(), "No hay selecionado ningun tipo de mascota", Toast.LENGTH_SHORT).show();
     }
+
+        validaCirugia();
+
+    if(operacionanterior.isChecked()){
+        operacionAnteriorString = "Si";
+    }else{
+        operacionAnteriorString = " No";
+    }
+
+    /*addsurgery.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            newDoctor();
+        }
+    });*/
 
         //  tv.setText(tipoMascotaString);
 
@@ -1266,6 +1163,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                                 properties.put("testiculoinguinal", finalTesticuloInguinalString);
                                 properties.put("finado", finalFinadoString);
                                 properties.put("alergico_cirugia", finalAlergicoString);
+                                properties.put("operacion_anterior", operacionAnteriorString);
                                 properties.put("fecha_cirugia", fecha);
                                 return true;
                             }
@@ -1343,6 +1241,8 @@ public class ContentPanelActivity extends AppCompatActivity {
     }
 
     public void recuperacionDialog(final String idDocumentStringS){
+
+
         AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Recuperación");
 
@@ -1354,16 +1254,24 @@ public class ContentPanelActivity extends AppCompatActivity {
         final Switch analgesico = view.findViewById(R.id.analgesico_switch);
         final Switch suero = view.findViewById(R.id.suero_switch);
         final Switch cicatrizante = view.findViewById(R.id.cicatrizante_switch);
-        final AutoCompleteTextView comentario = view.findViewById(R.id.comentario);
+       // final AutoCompleteTextView comentario = view.findViewById(R.id.comentario);
 
-        final CheckBox chico = view.findViewById(R.id.chico);
-        final CheckBox mediano = view.findViewById(R.id.mediano);
-        final CheckBox grande = view.findViewById(R.id.grande);
+        //1 if
+         uno = view.findViewById(R.id.uno);
+        dos = view.findViewById(R.id.dos);
+        tres = view.findViewById(R.id.tres);
+        cuatro = view.findViewById(R.id.cuatro);
+        cinco = view.findViewById(R.id.cinco);
+        seis = view.findViewById(R.id.seis);
+        siete = view.findViewById(R.id.siete);
 
         final Switch llevaIsabelino = view.findViewById(R.id.isabelino_switch);
         final Switch llevaMedicamento = view.findViewById(R.id.medicamento_switch);
 
+
         builder.setView(view);
+
+        validaRecuperacion();
 
         builder.setPositiveButton("Guardar",
                 new DialogInterface.OnClickListener() {
@@ -1422,30 +1330,24 @@ public class ContentPanelActivity extends AppCompatActivity {
                            // Toast.makeText(getApplicationContext(), "Cicatrizante" + cicatrizanteString, Toast.LENGTH_SHORT).show();
                         }
 
-                        if(chico.isChecked()){
-                            tallaIsabelinoString = "Ch";
-                        }else if(mediano.isChecked()){
-                            tallaIsabelinoString = "Md";
-                        }else if(grande.isChecked()){
-                            tallaIsabelinoString = "Gd";
-                        }else{
+                       if(uno.isChecked()){
+                            tallaIsabelinoString = "1";
+                        }else if(dos.isChecked()){
+                            tallaIsabelinoString = "2";
+                        }else if(tres.isChecked()) {
+                           tallaIsabelinoString = "3";
+                       } else if(cuatro.isChecked()) {
+                           tallaIsabelinoString = "4";
+                       } else if(cinco.isChecked()) {
+                           tallaIsabelinoString = "5";
+                       } else if(seis.isChecked()) {
+                           tallaIsabelinoString = "6";
+                       }else if(tres.isChecked()){
+                           tallaIsabelinoString = "7";
+                       }else{
                             tallaIsabelinoString = "SN";
                         }
 
-                        if(chico.isChecked() && mediano.isChecked() && grande.isChecked()){
-                            Toast.makeText(ContentPanelActivity.this,
-                                    "please select one option", Toast.LENGTH_LONG).show();
-
-                        }else if(chico.isChecked() && mediano.isChecked()){
-                            Toast.makeText(ContentPanelActivity.this,
-                                    "please select one option", Toast.LENGTH_LONG).show();
-                        }else if(chico.isChecked() && grande.isChecked()){
-                            Toast.makeText(ContentPanelActivity.this,
-                                    "please select one option", Toast.LENGTH_LONG).show();
-                        }else if (mediano.isChecked() && grande.isChecked()){
-                            Toast.makeText(ContentPanelActivity.this,
-                                    "please select one option", Toast.LENGTH_LONG).show();
-                        }
 
                         if(llevaIsabelino.isChecked()){
                             llevaIsabelinoString = "Si";
@@ -1512,7 +1414,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                 dialogInterface.cancel();
             }
         });
-        builder.show();
+        builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
     public void compraMedicamentoDialog(final String idDocumentStringS){
@@ -1533,6 +1435,7 @@ public class ContentPanelActivity extends AppCompatActivity {
         final TextView llevaMedicamento = view.findViewById(R.id.medicamento_respuesta);
         final TextView comentario = view.findViewById(R.id.comentario_respuesta);
 
+        final Switch candidato = view.findViewById(R.id.candidato_switch);
         //Create manager
         Manager manager = null;
 
@@ -1620,6 +1523,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         final String isabelinoString;
                         final String isodineString;
                         final String entregaMascotaString;
+                        final String candidatoString;
 
 
                         if (pregunta.isChecked()) {
@@ -1644,6 +1548,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                             entregaMascotaString = "Si";
                         }else {
                             entregaMascotaString = "No";
+                        }
+
+                        if(candidato.isChecked()){
+                            candidatoString = "No";
+                        }else{
+                            candidatoString = "Si";
                         }
 
                         //Create manager
@@ -1675,6 +1585,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                                     properties.put("isabelino", isabelinoString);
                                     properties.put("isodine", isodineString);
                                     properties.put("mascota_entregada", entregaMascotaString);
+                                    properties.put("candidato", candidatoString);
                                     properties.put("medicamento_fecha", fecha);
                                     return true;
                                 }
@@ -1732,6 +1643,7 @@ public class ContentPanelActivity extends AppCompatActivity {
 
 
     public void buscaDesocupado(final String idDocumentStringS, final String tipoMascotaString ){
+
 
 
       /*  final SharedPreferences prefs = getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE);
@@ -1845,8 +1757,6 @@ public class ContentPanelActivity extends AppCompatActivity {
         circleButton36.setVisibility(prefs.getBoolean("boton36", false) ? View.VISIBLE : View.GONE);
         tv36.setVisibility(prefs.getBoolean("tv36", false) ? View.VISIBLE : View.GONE);*/
 
-
-
         if(circleButton1.getVisibility() == View.GONE && tv1.getVisibility() == View.GONE){
 
             final int sdk = Build.VERSION.SDK_INT;
@@ -1874,23 +1784,19 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if (which == 0) {
                                 pagoDialog(idDocumentStringS);
-                                circleButton1.setColor(Color.DKGRAY);
+                                circleButton1.setColor(Color.GREEN);
                             }else if(which == 1){
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton1.setColor(Color.GREEN);
+                                circleButton1.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton1.setColor(Color.YELLOW);
+                                circleButton1.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton1.setColor(Color.BLUE);
+                                circleButton1.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
-
-
-
-
-                                    circleButton1.setVisibility(View.GONE);
+                                circleButton1.setVisibility(View.GONE);
                                     tv1.setVisibility(View.GONE);
 
 
@@ -1931,16 +1837,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton2.setColor(Color.DKGRAY);
+                                circleButton2.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton2.setColor(Color.GREEN);
+                                circleButton2.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton2.setColor(Color.YELLOW);
+                                circleButton2.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton2.setColor(Color.BLUE);
+                                circleButton2.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton2.setVisibility(View.GONE);
@@ -1981,16 +1887,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton3.setColor(Color.DKGRAY);
+                                circleButton3.setColor(Color.GREEN);
                             }else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton3.setColor(Color.GREEN);
+                                circleButton3.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton3.setColor(Color.YELLOW);
+                                circleButton3.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton3.setColor(Color.BLUE);
+                                circleButton3.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton3.setVisibility(View.GONE);
@@ -2029,16 +1935,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton4.setColor(Color.DKGRAY);
+                                circleButton4.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton4.setColor(Color.GREEN);
+                                circleButton4.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton4.setColor(Color.YELLOW);
+                                circleButton4.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton4.setColor(Color.BLUE);
+                                circleButton4.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton4.setVisibility(View.GONE);
@@ -2077,16 +1983,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton5.setColor(Color.DKGRAY);
+                                circleButton5.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton5.setColor(Color.GREEN);
+                                circleButton5.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton5.setColor(Color.YELLOW);
+                                circleButton5.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton5.setColor(Color.BLUE);
+                                circleButton5.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton5.setVisibility(View.GONE);
@@ -2125,16 +2031,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton6.setColor(Color.DKGRAY);
+                                circleButton6.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton6.setColor(Color.GREEN);
+                                circleButton6.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton6.setColor(Color.YELLOW);
+                                circleButton6.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton6.setColor(Color.BLUE);
+                                circleButton6.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton6.setVisibility(View.GONE);
@@ -2172,16 +2078,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton7.setColor(Color.DKGRAY);
+                                circleButton7.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton7.setColor(Color.GREEN);
+                                circleButton7.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton7.setColor(Color.YELLOW);
+                                circleButton7.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton7.setColor(Color.BLUE);
+                                circleButton7.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton7.setVisibility(View.GONE);
@@ -2221,16 +2127,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                pagoDialog(idDocumentStringS);
-                                circleButton8.setColor(Color.DKGRAY);
+                                circleButton8.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton8.setColor(Color.GREEN);
+                                circleButton8.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton8.setColor(Color.YELLOW);
+                                circleButton8.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton8.setColor(Color.BLUE);
+                                circleButton8.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton8.setVisibility(View.GONE);
@@ -2268,16 +2174,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton9.setColor(Color.DKGRAY);
+                                circleButton9.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton9.setColor(Color.GREEN);
+                                circleButton9.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton9.setColor(Color.YELLOW);
+                                circleButton9.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton9.setColor(Color.BLUE);
+                                circleButton9.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton9.setVisibility(View.GONE);
@@ -2316,16 +2222,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton10.setColor(Color.DKGRAY);
+                                circleButton10.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton10.setColor(Color.GREEN);
+                                circleButton10.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton10.setColor(Color.YELLOW);
+                                circleButton10.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton10.setColor(Color.BLUE);
+                                circleButton10.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton10.setVisibility(View.GONE);
@@ -2368,16 +2274,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton11.setColor(Color.DKGRAY);
+                                circleButton11.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton11.setColor(Color.GREEN);
+                                circleButton11.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton11.setColor(Color.YELLOW);
+                                circleButton11.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton11.setColor(Color.BLUE);
+                                circleButton11.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton11.setVisibility(View.GONE);
@@ -2417,16 +2323,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton12.setColor(Color.DKGRAY);
+                                circleButton12.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton12.setColor(Color.GREEN);
+                                circleButton12.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton12.setColor(Color.YELLOW);
+                                circleButton12.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton12.setColor(Color.BLUE);
+                                circleButton12.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton12.setVisibility(View.GONE);
@@ -2466,16 +2372,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton13.setColor(Color.DKGRAY);
+                                circleButton13.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton13.setColor(Color.GREEN);
+                                circleButton13.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton13.setColor(Color.YELLOW);
+                                circleButton13.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton13.setColor(Color.BLUE);
+                                circleButton13.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton13.setVisibility(View.GONE);
@@ -2515,16 +2421,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                              pagoDialog(idDocumentStringS);
-                             circleButton14.setColor(Color.DKGRAY);
+                             circleButton14.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton14.setColor(Color.GREEN);
+                                circleButton14.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton14.setColor(Color.YELLOW);
+                                circleButton14.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton14.setColor(Color.BLUE);
+                                circleButton14.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton14.setVisibility(View.GONE);
@@ -2564,16 +2470,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton15.setColor(Color.DKGRAY);
+                                circleButton15.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton15.setColor(Color.GREEN);
+                                circleButton15.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton15.setColor(Color.YELLOW);
+                                circleButton15.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton15.setColor(Color.BLUE);
+                                circleButton15.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton15.setVisibility(View.GONE);
@@ -2613,16 +2519,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton16.setColor(Color.DKGRAY);
+                                circleButton16.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton16.setColor(Color.GREEN);
+                                circleButton16.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton16.setColor(Color.YELLOW);
+                                circleButton16.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton16.setColor(Color.BLUE);
+                                circleButton16.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton16.setVisibility(View.GONE);
@@ -2663,16 +2569,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                            if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                               circleButton17.setColor(Color.DKGRAY);
+                               circleButton17.setColor(Color.GREEN);
                             }else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton17.setColor(Color.GREEN);
+                                circleButton17.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton17.setColor(Color.YELLOW);
+                                circleButton17.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton17.setColor(Color.BLUE);
+                                circleButton17.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton17.setVisibility(View.GONE);
@@ -2712,16 +2618,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton18.setColor(Color.DKGRAY);
+                                circleButton18.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton18.setColor(Color.GREEN);
+                                circleButton18.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton18.setColor(Color.YELLOW);
+                                circleButton18.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton18.setColor(Color.BLUE);
+                                circleButton18.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton18.setVisibility(View.GONE);
@@ -2761,16 +2667,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton19.setColor(Color.DKGRAY);
+                                circleButton19.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton19.setColor(Color.GREEN);
+                                circleButton19.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton19.setColor(Color.YELLOW);
+                                circleButton19.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton19.setColor(Color.BLUE);
+                                circleButton19.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton19.setVisibility(View.GONE);
@@ -2810,16 +2716,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton20.setColor(Color.DKGRAY);
+                                circleButton20.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton20.setColor(Color.GREEN);
+                                circleButton20.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton20.setColor(Color.YELLOW);
+                                circleButton20.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton20.setColor(Color.BLUE);
+                                circleButton20.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton20.setVisibility(View.GONE);
@@ -2859,16 +2765,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton21.setColor(Color.DKGRAY);
+                                circleButton21.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton21.setColor(Color.GREEN);
+                                circleButton21.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton21.setColor(Color.YELLOW);
+                                circleButton21.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton21.setColor(Color.BLUE);
+                                circleButton21.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton21.setVisibility(View.GONE);
@@ -2908,16 +2814,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton22.setColor(Color.DKGRAY);
+                                circleButton22.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton22.setColor(Color.GREEN);
+                                circleButton22.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton22.setColor(Color.YELLOW);
+                                circleButton22.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton22.setColor(Color.BLUE);
+                                circleButton22.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton22.setVisibility(View.GONE);
@@ -2958,16 +2864,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton23.setColor(Color.DKGRAY);
+                                circleButton23.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton23.setColor(Color.GREEN);
+                                circleButton23.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton23.setColor(Color.YELLOW);
+                                circleButton23.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton23.setColor(Color.BLUE);
+                                circleButton23.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton23.setVisibility(View.GONE);
@@ -3007,16 +2913,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton24.setColor(Color.DKGRAY);
+                                circleButton24.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton24.setColor(Color.GREEN);
+                                circleButton24.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton24.setColor(Color.YELLOW);
+                                circleButton24.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton24.setColor(Color.BLUE);
+                                circleButton24.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton24.setVisibility(View.GONE);
@@ -3056,16 +2962,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                pagoDialog(idDocumentStringS);
-                                circleButton25.setColor(Color.DKGRAY);
+                                circleButton25.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton25.setColor(Color.GREEN);
+                                circleButton25.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton25.setColor(Color.YELLOW);
+                                circleButton25.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton25.setColor(Color.BLUE);
+                                circleButton25.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton25.setVisibility(View.GONE);
@@ -3105,16 +3011,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton26.setColor(Color.DKGRAY);
+                                circleButton26.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton26.setColor(Color.GREEN);
+                                circleButton26.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton26.setColor(Color.YELLOW);
+                                circleButton26.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton26.setColor(Color.BLUE);
+                                circleButton26.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton26.setVisibility(View.GONE);
@@ -3154,16 +3060,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton27.setColor(Color.DKGRAY);
+                                circleButton27.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton27.setColor(Color.GREEN);
+                                circleButton27.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton27.setColor(Color.YELLOW);
+                                circleButton27.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton27.setColor(Color.BLUE);
+                                circleButton27.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton27.setVisibility(View.GONE);
@@ -3203,16 +3109,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                pagoDialog(idDocumentStringS);
-                                circleButton28.setColor(Color.DKGRAY);
+                                circleButton28.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton28.setColor(Color.GREEN);
+                                circleButton28.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton28.setColor(Color.YELLOW);
+                                circleButton28.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton28.setColor(Color.BLUE);
+                                circleButton28.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton28.setVisibility(View.GONE);
@@ -3252,16 +3158,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton29.setColor(Color.DKGRAY);
+                                circleButton29.setColor(Color.GREEN);
                             } if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton29.setColor(Color.GREEN);
+                                circleButton29.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton29.setColor(Color.YELLOW);
+                                circleButton29.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton29.setColor(Color.BLUE);
+                                circleButton29.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton29.setVisibility(View.GONE);
@@ -3301,16 +3207,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton30.setColor(Color.DKGRAY);
+                                circleButton30.setColor(Color.GREEN);
                             } else if (which == 0) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton30.setColor(Color.GREEN);
+                                circleButton30.setColor(Color.BLUE);
                             } else if (which == 1) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton30.setColor(Color.YELLOW);
+                                circleButton30.setColor(Color.RED);
                             } else if (which == 2) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton30.setColor(Color.BLUE);
+                                circleButton30.setColor(Color.YELLOW);
                             } else if (which == 3) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton30.setVisibility(View.GONE);
@@ -3350,16 +3256,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton31.setColor(Color.DKGRAY);
+                                circleButton31.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton31.setColor(Color.GREEN);
+                                circleButton31.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton31.setColor(Color.YELLOW);
+                                circleButton31.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton31.setColor(Color.BLUE);
+                                circleButton31.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton31.setVisibility(View.GONE);
@@ -3398,16 +3304,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                            if(which == 0){
                                pagoDialog(idDocumentStringS);
-                               circleButton32.setColor(Color.DKGRAY);
+                               circleButton32.setColor(Color.GREEN);
                            } if (which == 0) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton32.setColor(Color.GREEN);
+                                circleButton32.setColor(Color.BLUE);
                             } else if (which == 1) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton32.setColor(Color.YELLOW);
+                                circleButton32.setColor(Color.RED);
                             } else if (which == 2) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton32.setColor(Color.BLUE);
+                                circleButton32.setColor(Color.YELLOW);
                             } else if (which == 3) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton32.setVisibility(View.GONE);
@@ -3447,16 +3353,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                               pagoDialog(idDocumentStringS);
-                                circleButton33.setColor(Color.DKGRAY);
+                                circleButton33.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton33.setColor(Color.GREEN);
+                                circleButton33.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton33.setColor(Color.YELLOW);
+                                circleButton33.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton33.setColor(Color.BLUE);
+                                circleButton33.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton33.setVisibility(View.GONE);
@@ -3496,16 +3402,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton34.setColor(Color.DKGRAY);
+                                circleButton34.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton34.setColor(Color.GREEN);
+                                circleButton34.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton34.setColor(Color.YELLOW);
+                                circleButton34.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton34.setColor(Color.BLUE);
+                                circleButton34.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton34.setVisibility(View.GONE);
@@ -3546,16 +3452,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton35.setColor(Color.DKGRAY);
+                                circleButton35.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton35.setColor(Color.GREEN);
+                                circleButton35.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton35.setColor(Color.YELLOW);
+                                circleButton35.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton35.setColor(Color.BLUE);
+                                circleButton35.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton35.setVisibility(View.GONE);
@@ -3595,16 +3501,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0) {
                                 pagoDialog(idDocumentStringS);
-                                circleButton36.setColor(Color.DKGRAY);
+                                circleButton36.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton36.setColor(Color.GREEN);
+                                circleButton36.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton36.setColor(Color.YELLOW);
+                                circleButton36.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton36.setColor(Color.BLUE);
+                                circleButton36.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton36.setVisibility(View.GONE);
@@ -3640,16 +3546,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton37.setColor(Color.DKGRAY);
+                                circleButton37.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton37.setColor(Color.GREEN);
+                                circleButton37.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton37.setColor(Color.YELLOW);
+                                circleButton37.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton37.setColor(Color.BLUE);
+                                circleButton37.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton37.setVisibility(View.GONE);
@@ -3686,16 +3592,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton38.setColor(Color.DKGRAY);
+                                circleButton38.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton38.setColor(Color.GREEN);
+                                circleButton38.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton38.setColor(Color.YELLOW);
+                                circleButton38.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton38.setColor(Color.BLUE);
+                                circleButton38.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton38.setVisibility(View.GONE);
@@ -3731,16 +3637,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton39.setColor(Color.DKGRAY);
+                                circleButton39.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton39.setColor(Color.GREEN);
+                                circleButton39.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton39.setColor(Color.YELLOW);
+                                circleButton39.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton39.setColor(Color.BLUE);
+                                circleButton39.setColor(Color.YELLOW);
                             } else if (which == 4
                                     ) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -3777,16 +3683,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                               pagoDialog(idDocumentStringS);
-                                circleButton40.setColor(Color.DKGRAY);
+                                circleButton40.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton40.setColor(Color.GREEN);
+                                circleButton40.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton40.setColor(Color.YELLOW);
+                                circleButton40.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton40.setColor(Color.BLUE);
+                                circleButton40.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton40.setVisibility(View.GONE);
@@ -3822,16 +3728,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                            if(which == 0){
                                pagoDialog(idDocumentStringS);
-                               circleButton41.setColor(Color.DKGRAY);
+                               circleButton41.setColor(Color.GREEN);
                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton41.setColor(Color.GREEN);
+                                circleButton41.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton41.setColor(Color.YELLOW);
+                                circleButton41.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton41.setColor(Color.BLUE);
+                                circleButton41.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton41.setVisibility(View.GONE);
@@ -3865,16 +3771,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton42.setColor(Color.DKGRAY);
+                                circleButton42.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton42.setColor(Color.GREEN);
+                                circleButton42.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton42.setColor(Color.YELLOW);
+                                circleButton42.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton42.setColor(Color.BLUE);
+                                circleButton42.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton42.setVisibility(View.GONE);
@@ -3909,16 +3815,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton43.setColor(Color.DKGRAY);
+                                circleButton43.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton43.setColor(Color.GREEN);
+                                circleButton43.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton43.setColor(Color.YELLOW);
+                                circleButton43.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton43.setColor(Color.BLUE);
+                                circleButton43.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton43.setVisibility(View.GONE);
@@ -3954,16 +3860,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton44.setColor(Color.DKGRAY);
+                                circleButton44.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton44.setColor(Color.GREEN);
+                                circleButton44.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton44.setColor(Color.YELLOW);
+                                circleButton44.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton44.setColor(Color.BLUE);
+                                circleButton44.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton44.setVisibility(View.GONE);
@@ -3999,16 +3905,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton45.setColor(Color.DKGRAY);
+                                circleButton45.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton45.setColor(Color.GREEN);
+                                circleButton45.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton45.setColor(Color.YELLOW);
+                                circleButton45.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton45.setColor(Color.BLUE);
+                                circleButton45.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton45.setVisibility(View.GONE);
@@ -4044,16 +3950,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                            if(which == 0){
                                pagoDialog(idDocumentStringS);
-                               circleButton46.setColor(Color.DKGRAY);
+                               circleButton46.setColor(Color.GREEN);
                            } else if(which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton46.setColor(Color.GREEN);
+                                circleButton46.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton46.setColor(Color.YELLOW);
+                                circleButton46.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton46.setColor(Color.BLUE);
+                                circleButton46.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton46.setVisibility(View.GONE);
@@ -4089,16 +3995,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton47.setColor(Color.DKGRAY);
+                                circleButton47.setColor(Color.GREEN);
                             }else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton47.setColor(Color.GREEN);
+                                circleButton47.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton47.setColor(Color.YELLOW);
+                                circleButton47.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton47.setColor(Color.BLUE);
+                                circleButton47.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton47.setVisibility(View.GONE);
@@ -4134,16 +4040,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton48.setColor(Color.DKGRAY);
+                                circleButton48.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton48.setColor(Color.GREEN);
+                                circleButton48.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton48.setColor(Color.YELLOW);
+                                circleButton48.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton48.setColor(Color.BLUE);
+                                circleButton48.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton48.setVisibility(View.GONE);
@@ -4179,16 +4085,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton49.setColor(Color.DKGRAY);
+                                circleButton49.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton49.setColor(Color.GREEN);
+                                circleButton49.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton49.setColor(Color.YELLOW);
+                                circleButton49.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton49.setColor(Color.BLUE);
+                                circleButton49.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton49.setVisibility(View.GONE);
@@ -4224,16 +4130,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton50.setColor(Color.DKGRAY);
+                                circleButton50.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton50.setColor(Color.GREEN);
+                                circleButton50.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton50.setColor(Color.YELLOW);
+                                circleButton50.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton50.setColor(Color.BLUE);
+                                circleButton50.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton50.setVisibility(View.GONE);
@@ -4269,16 +4175,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                               pagoDialog(idDocumentStringS);
-                                circleButton51.setColor(Color.DKGRAY);
+                                circleButton51.setColor(Color.GREEN);
                             } else if (which == 0) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton51.setColor(Color.GREEN);
+                                circleButton51.setColor(Color.BLUE);
                             } else if (which == 1) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton51.setColor(Color.YELLOW);
+                                circleButton51.setColor(Color.RED);
                             } else if (which == 2) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton51.setColor(Color.BLUE);
+                                circleButton51.setColor(Color.YELLOW);
                             } else if (which == 3) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton51.setVisibility(View.GONE);
@@ -4315,16 +4221,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton52.setColor(Color.DKGRAY);
+                                circleButton52.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton52.setColor(Color.GREEN);
+                                circleButton52.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton52.setColor(Color.YELLOW);
+                                circleButton52.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton52.setColor(Color.BLUE);
+                                circleButton52.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton52.setVisibility(View.GONE);
@@ -4360,16 +4266,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton53.setColor(Color.DKGRAY);
+                                circleButton53.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton53.setColor(Color.GREEN);
+                                circleButton53.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton53.setColor(Color.YELLOW);
+                                circleButton53.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton53.setColor(Color.BLUE);
+                                circleButton53.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton53.setVisibility(View.GONE);
@@ -4406,16 +4312,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton54.setColor(Color.DKGRAY);
+                                circleButton54.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton54.setColor(Color.GREEN);
+                                circleButton54.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton54.setColor(Color.YELLOW);
+                                circleButton54.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton54.setColor(Color.BLUE);
+                                circleButton54.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton54.setVisibility(View.GONE);
@@ -4451,16 +4357,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton55.setColor(Color.DKGRAY);
+                                circleButton55.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton55.setColor(Color.GREEN);
+                                circleButton55.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton55.setColor(Color.YELLOW);
+                                circleButton55.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton55.setColor(Color.BLUE);
+                                circleButton55.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton55.setVisibility(View.GONE);
@@ -4496,16 +4402,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                pagoDialog(idDocumentStringS);
-                                circleButton56.setColor(Color.DKGRAY);
+                                circleButton56.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton56.setColor(Color.GREEN);
+                                circleButton56.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton56.setColor(Color.YELLOW);
+                                circleButton56.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton56.setColor(Color.BLUE);
+                                circleButton56.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton56.setVisibility(View.GONE);
@@ -4541,16 +4447,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton57.setColor(Color.DKGRAY);
+                                circleButton57.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton57.setColor(Color.GREEN);
+                                circleButton57.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton57.setColor(Color.YELLOW);
+                                circleButton57.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton57.setColor(Color.BLUE);
+                                circleButton57.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton57.setVisibility(View.GONE);
@@ -4587,16 +4493,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton58.setColor(Color.DKGRAY);
+                                circleButton58.setColor(Color.GREEN);
                             } else if (which == 0) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton58.setColor(Color.GREEN);
+                                circleButton58.setColor(Color.BLUE);
                             } else if (which == 1) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton58.setColor(Color.YELLOW);
+                                circleButton58.setColor(Color.RED);
                             } else if (which == 2) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton58.setColor(Color.BLUE);
+                                circleButton58.setColor(Color.YELLOW);
                             } else if (which == 3) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton58.setVisibility(View.GONE);
@@ -4632,16 +4538,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                            if(which == 0){
                                pagoDialog(idDocumentStringS);
-                               circleButton59.setColor(Color.DKGRAY);
+                               circleButton59.setColor(Color.GREEN);
                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton59.setColor(Color.GREEN);
+                                circleButton59.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton59.setColor(Color.YELLOW);
+                                circleButton59.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton59.setColor(Color.BLUE);
+                                circleButton59.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton59.setVisibility(View.GONE);
@@ -4677,16 +4583,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                            if(which == 0){
                              pagoDialog(idDocumentStringS);
-                               circleButton60.setColor(Color.DKGRAY);
+                               circleButton60.setColor(Color.GREEN);
                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton60.setColor(Color.GREEN);
+                                circleButton60.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton60.setColor(Color.YELLOW);
+                                circleButton60.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton60.setColor(Color.BLUE);
+                                circleButton60.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton60.setVisibility(View.GONE);
@@ -4722,16 +4628,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                            if(which == 0){
                                pagoDialog(idDocumentStringS);
-                               circleButton61.setColor(Color.DKGRAY);
+                               circleButton61.setColor(Color.GREEN);
                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton61.setColor(Color.GREEN);
+                                circleButton61.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton61.setColor(Color.YELLOW);
+                                circleButton61.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton61.setColor(Color.BLUE);
+                                circleButton61.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton61.setVisibility(View.GONE);
@@ -4767,16 +4673,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton62.setColor(Color.DKGRAY);
+                                circleButton62.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton62.setColor(Color.GREEN);
+                                circleButton62.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton62.setColor(Color.YELLOW);
+                                circleButton62.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton62.setColor(Color.BLUE);
+                                circleButton62.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton62.setVisibility(View.GONE);
@@ -4812,16 +4718,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton63.setColor(Color.DKGRAY);
+                                circleButton63.setColor(Color.GREEN);
                             } if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton63.setColor(Color.GREEN);
+                                circleButton63.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton63.setColor(Color.YELLOW);
+                                circleButton63.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton63.setColor(Color.BLUE);
+                                circleButton63.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton63.setVisibility(View.GONE);
@@ -4858,16 +4764,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton64.setColor(Color.DKGRAY);
+                                circleButton64.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton64.setColor(Color.GREEN);
+                                circleButton64.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton64.setColor(Color.YELLOW);
+                                circleButton64.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton64.setColor(Color.BLUE);
+                                circleButton64.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton64.setVisibility(View.GONE);
@@ -4903,16 +4809,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton65.setColor(Color.DKGRAY);
+                                circleButton65.setColor(Color.GREEN);
                             }else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton65.setColor(Color.GREEN);
+                                circleButton65.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton65.setColor(Color.YELLOW);
+                                circleButton65.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton65.setColor(Color.BLUE);
+                                circleButton65.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton65.setVisibility(View.GONE);
@@ -4948,16 +4854,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton66.setColor(Color.DKGRAY);
+                                circleButton66.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton66.setColor(Color.GREEN);
+                                circleButton66.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton66.setColor(Color.YELLOW);
+                                circleButton66.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton66.setColor(Color.BLUE);
+                                circleButton66.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton66.setVisibility(View.GONE);
@@ -4994,16 +4900,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton67.setColor(Color.DKGRAY);
+                                circleButton67.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton67.setColor(Color.GREEN);
+                                circleButton67.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton67.setColor(Color.YELLOW);
+                                circleButton67.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton67.setColor(Color.BLUE);
+                                circleButton67.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton67.setVisibility(View.GONE);
@@ -5040,16 +4946,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton68.setColor(Color.DKGRAY);
+                                circleButton68.setColor(Color.GREEN);
                             }else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton68.setColor(Color.GREEN);
+                                circleButton68.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton68.setColor(Color.YELLOW);
+                                circleButton68.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton68.setColor(Color.BLUE);
+                                circleButton68.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton68.setVisibility(View.GONE);
@@ -5085,16 +4991,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton69.setColor(Color.DKGRAY);
+                                circleButton69.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton69.setColor(Color.GREEN);
+                                circleButton69.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton69.setColor(Color.YELLOW);
+                                circleButton69.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton69.setColor(Color.BLUE);
+                                circleButton69.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton69.setVisibility(View.GONE);
@@ -5130,16 +5036,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                            if(which == 0){
                              pagoDialog(idDocumentStringS);
-                               circleButton70.setColor(Color.DKGRAY);
+                               circleButton70.setColor(Color.GREEN);
                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton70.setColor(Color.GREEN);
+                                circleButton70.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton70.setColor(Color.YELLOW);
+                                circleButton70.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton70.setColor(Color.BLUE);
+                                circleButton70.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton70.setVisibility(View.GONE);
@@ -5175,16 +5081,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                             if(which == 0){
                                 pagoDialog(idDocumentStringS);
-                                circleButton71.setColor(Color.DKGRAY);
+                                circleButton71.setColor(Color.GREEN);
                             } if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton71.setColor(Color.GREEN);
+                                circleButton71.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton71.setColor(Color.YELLOW);
+                                circleButton71.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton71.setColor(Color.BLUE);
+                                circleButton71.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton71.setVisibility(View.GONE);
@@ -5221,16 +5127,16 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                            if(which == 0){
                                pagoDialog(idDocumentStringS);
-                               circleButton72.setColor(Color.DKGRAY);
+                               circleButton72.setColor(Color.GREEN);
                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
-                                circleButton72.setColor(Color.GREEN);
+                                circleButton72.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
-                                circleButton72.setColor(Color.YELLOW);
+                                circleButton72.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
-                                circleButton72.setColor(Color.BLUE);
+                                circleButton72.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton72.setVisibility(View.GONE);
@@ -5432,160 +5338,6 @@ public class ContentPanelActivity extends AppCompatActivity {
 
     }
 
-    public void buscaDesocupadoAlternativa(final String idDocumentStringS){
-
-        final SharedPreferences prefs = getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE);
-
-        circleButton1.setVisibility(prefs.getBoolean("boton1", false) ? View.VISIBLE : View.GONE);
-        tv1.setVisibility(prefs.getBoolean("tv1", false)  ? View.VISIBLE : View.GONE);
-
-        circleButton2.setVisibility(prefs.getBoolean("boton2", false) ? View.VISIBLE : View.GONE);
-        tv2.setVisibility(prefs.getBoolean("tv2", false)  ? View.VISIBLE : View.GONE);
-
-        circleButton3.setVisibility(prefs.getBoolean("boton3", false) ? View.VISIBLE : View.GONE);
-        tv3.setVisibility(prefs.getBoolean("tv3", false)  ? View.VISIBLE : View.GONE);
-
-        circleButton4.setVisibility(prefs.getBoolean("boton4", false) ? View.VISIBLE : View.GONE);
-        tv4.setVisibility(prefs.getBoolean("tv4", false) ? View.VISIBLE : View.GONE);
-
-        circleButton5.setVisibility(prefs.getBoolean("boton5", false) ? View.VISIBLE : View.GONE);
-        tv5.setVisibility(prefs.getBoolean("tv5", false) ? View.VISIBLE : View.GONE);
-
-        circleButton6.setVisibility(prefs.getBoolean("boton6", false) ? View.VISIBLE : View.GONE);
-        tv6.setVisibility(prefs.getBoolean("tv6", false) ? View.VISIBLE : View.GONE);
-
-        circleButton7.setVisibility(prefs.getBoolean("boton7", false) ? View.VISIBLE : View.GONE);
-        tv7.setVisibility(prefs.getBoolean("tv7", false) ? View.VISIBLE : View.GONE);
-
-        circleButton8.setVisibility(prefs.getBoolean("boton8", false) ? View.VISIBLE : View.GONE);
-        tv8.setVisibility(prefs.getBoolean("tv8", false) ? View.VISIBLE : View.GONE);
-
-        circleButton9.setVisibility(prefs.getBoolean("boton9", false) ? View.VISIBLE : View.GONE);
-        tv9.setVisibility(prefs.getBoolean("tv9", false) ? View.VISIBLE : View.GONE);
-
-        circleButton10.setVisibility(prefs.getBoolean("boton10", false) ? View.VISIBLE : View.GONE);
-        tv10.setVisibility(prefs.getBoolean("tv10", false) ? View.VISIBLE : View.GONE);
-
-        int botonvacio = 0;
-
-        switch (botonvacio){
-            case 0:
-               if(circleButton1.getVisibility() == View.GONE && tv1.getVisibility() == View.GONE){
-                circleButton1.setVisibility(View.VISIBLE);
-                tv1.setVisibility(View.VISIBLE);
-                tv1.setText(idDocumentStringS);
-
-                   prefs.edit().putBoolean("boton1", true).apply();
-                   prefs.edit().putBoolean("tv1", true).apply();
-               }
-                botonvacio++;
-               break;
-            case 1:
-                if(circleButton2.getVisibility() == View.GONE && tv2.getVisibility() == View.GONE){
-                circleButton2.setVisibility(View.VISIBLE);
-                tv2.setVisibility(View.VISIBLE);
-                tv2.setText(idDocumentStringS);
-
-                    prefs.edit().putBoolean("boton2", true).apply();
-                    prefs.edit().putBoolean("tv2", true).apply();
-                }
-                botonvacio++;
-                break;
-            case 2:
-                if(circleButton3.getVisibility() == View.GONE && tv3.getVisibility() == View.GONE){
-                    circleButton3.setVisibility(View.VISIBLE);
-                    circleButton3.setVisibility(View.VISIBLE);
-                    tv3.setText(idDocumentStringS);
-
-                    prefs.edit().putBoolean("boton3", true).apply();
-                    prefs.edit().putBoolean("tv3", true).apply();
-                }
-                botonvacio++;
-                break;
-            case 3:
-                if(circleButton4.getVisibility() == View.GONE && tv4.getVisibility() == View.GONE){
-                  circleButton4.setVisibility(View.VISIBLE);
-                  tv4.setVisibility(View.VISIBLE);
-                  tv4.setText(idDocumentStringS);
-
-                    prefs.edit().putBoolean("boton4", true).apply();
-                    prefs.edit().putBoolean("tv4", true).apply();
-                }
-                botonvacio++;
-                break;
-            case 4:
-                if(circleButton5.getVisibility() == View.GONE && tv5.getVisibility() == View.GONE){
-                    circleButton5.setVisibility(View.VISIBLE);
-                    tv5.setVisibility(View.VISIBLE);
-                    tv5.setText(idDocumentStringS);
-
-                    prefs.edit().putBoolean("boton5", true).apply();
-                    prefs.edit().putBoolean("tv5", true).apply();
-                }
-                botonvacio++;
-                break;
-            case 5:
-               if(circleButton6.getVisibility() == View.GONE && tv6.getVisibility() == View.GONE){
-                   circleButton6.setVisibility(View.VISIBLE);
-                   tv6.setVisibility(View.VISIBLE);
-                   tv6.setText(idDocumentStringS);
-
-                   prefs.edit().putBoolean("boton6", true).apply();
-                   prefs.edit().putBoolean("tv6", true).apply();
-               }
-               botonvacio++;
-               break;
-            case 6:
-                if(circleButton7.getVisibility() == View.GONE && tv7.getVisibility() == View.GONE){
-                    circleButton7.setVisibility(View.VISIBLE);
-                    tv7.setVisibility(View.VISIBLE);
-                    tv7.setText(idDocumentStringS);
-
-                    prefs.edit().putBoolean("boton7", true).apply();
-                    prefs.edit().putBoolean("tv7", true).apply();
-                }
-               botonvacio++;
-                break;
-            case 7:
-                if(circleButton8.getVisibility() == View.GONE && tv8.getVisibility() == View.GONE){
-                 circleButton8.setVisibility(View.VISIBLE);
-                 tv8.setVisibility(View.VISIBLE);
-                 tv8.setText(idDocumentStringS);
-
-                    prefs.edit().putBoolean("boton8", true).apply();
-                    prefs.edit().putBoolean("tv8", true).apply();
-                }
-                botonvacio++;
-                break;
-
-            case 8:
-                if(circleButton9.getVisibility() == View.GONE && tv9.getVisibility() == View.GONE){
-                    circleButton9.setVisibility(View.VISIBLE);
-                    circleButton9.setVisibility(View.VISIBLE);
-                    tv9.setText(idDocumentStringS);
-
-                    prefs.edit().putBoolean("boton9", true).apply();
-                    prefs.edit().putBoolean("tv9", true).apply();
-                }
-                botonvacio++;
-                break;
-
-            case 9:
-                if(circleButton10.getVisibility() == View.GONE && tv10.getVisibility() == View.GONE){
-                   circleButton10.setVisibility(View.VISIBLE);
-                   circleButton10.setVisibility(View.VISIBLE);
-                   tv10.setText(idDocumentStringS);
-
-                    prefs.edit().putBoolean("boton10", true).apply();
-                    prefs.edit().putBoolean("tv10", true).apply();
-                }
-                botonvacio++;
-                break;
-        }
-
-    }
-
-
     public void buttonOnClick(View view, final String idDocumentStringS) {
 
         final CharSequence modulos[] = new CharSequence[]{"Anestesia", "Cirugía", "Recuperación"};
@@ -5616,15 +5368,237 @@ public class ContentPanelActivity extends AppCompatActivity {
 
     public void validaRegistro(){
 
-        if(nombreString.length() == 0){
-            nombre.setError("Please enter a name");
+        if(nombre.length() == 0){
+            nombre.setError("No puede dejar el campo de Nombre vacío");
         }
 
+        if(direccion.length() == 0){
+            direccion.setError("No puede dejar el campo de Dirección vacío");
+        }
+
+        if(telefono.length() == 0){
+            telefono.setError("No puede dejar el campo de Teléfono vacío");
+        }
+
+        if(nmascota.length() == 0){
+            nmascota.setError("No puede dejar el campo de Nombre de la mascota vacío");
+        }
+
+        if(raza.length() == 0){
+            raza.setError("No puede dejar el campo de raza vacío");
+        }
+
+        if(edad.length() == 0) {
+            edad.setError("No puede dejar el campo de edad vacío");
+        }
+
+        if(tratamiento.length() == 0){
+            tratamiento.setError("No puede dejar el campo de tratamiento vacío");
+        }
+
+        if(rescatado.length() == 0) {
+            rescatado.setError("No puede dejar el campo rescatado vacío");
+        }
+
+        if(vacuna.length() == 0){
+            vacuna.setError("No puede dejar el campo de vacuna vacío");
+        }
+
+        if(desparacitacion.length() == 0){
+            desparacitacion.setError("No puede dejar el campo de desparacitacion vacío");
+        }
+
+        if(celo.length() == 0){
+            celo.setError("No puede dejar el campo de Celo vacío");
+        }
+
+        if(lactar.length() == 0){
+            lactar.setError("No puede dejar el campo de lactar vacío");
+        }
+
+        if(peso.length() == 0){
+            peso.setError("No puede dejar el campo de Peso vacío");
+        }
+
+        if(email.length() == 0){
+            email.setError("No puede dejar el campo de Email vacío");
+        }
+
+        if(comentarios.length() == 0){
+            comentarios.setError("No puede dejar el campo de Comentarios vacío");
+        }
+
+        if(alergia.length() == 0){
+            alergia.setError("No puede dejar el campo de Alergías vacío");
+        }
+
+        if(!facebook.isChecked()  || !volante.isChecked() || !lona.isChecked() || !campana.isChecked() || !recomendacion.isChecked() || !otro.isChecked()){
+            otro.setError("Debe de seleccionar una opción de la fila");
+        }else{
+
+        }
+
+        if(!chico.isChecked() || !mediano.isChecked() || !grande.isChecked() || !gigante.isChecked()){
+            gigante.setError("Debe de seleccionar una opción de la fila");
+        } else{
+        }
+
+        if(!perro.isChecked() || !perra.isChecked() || !gato.isChecked() || !gata.isChecked()){
+            gigante.setError("Debe de seleccionar una opción de la fila");
+        } else{
+
+        }
+    }
+
+    private void validaPago(){
+
+     if(!button1.isChecked() || !button2.isChecked() || !button3.isChecked() || !button4.isChecked() || !button5.isChecked()){
+         button4.setError("Debe de seleccionar una opción de la fila");
+     }
 
     }
 
-    private void setImageButton(){
+    private void validaAnestesia(){
+        if(dosis1.length() == 0){
+            dosis1.setError("Debe de aplicar al menos una dosis a la mascota");
+        }
+    }
 
+    private void validaCirugia(){
+
+        if (comentario.length() == 0){
+            comentario.setError("No puede dejar el campo de Comentario vacio");
+        }
+
+        if(!cirujano1.isChecked() || !cirujano2.isChecked() || !cirujano4.isChecked() || !cirujano3.isChecked()){
+            cirujano4.setError("Debe de seleccionar un cirujano");
+        }
+    }
+
+    private void validaRecuperacion(){
+    if(!uno.isChecked() || !dos.isChecked() || !tres.isChecked() || !cuatro.isChecked() || !cinco.isChecked() || !seis.isChecked() || !siete.isChecked()){
+       // cirujano4.setError("Debe de seleccionar una talla");
+    }
+
+    }
+
+
+
+
+    private void loadDeletedRecords() throws Exception{
+
+        String idDocumentS;
+
+        //Create a manager
+        Manager manager = null;
+        try {
+            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+       Database database = null;
+        try {
+            database = manager.getDatabase("adla");
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+
+        com.couchbase.lite.View membersView = database.getView("mascota_entregada");
+        // if (membersView == null) {
+        membersView.setMap(
+                new Mapper() {
+                    @Override
+                    public void map(Map<String, Object> document, Emitter emitter) {
+                        com.couchbase.lite.util.Log.e("inside map", "map");
+                        Object saved = document.get("mascota_entregada");
+                        Object id = document.get("folio");
+                        if (saved != null)
+                            emitter.emit((String) document.get("mascota_entregada"), document);
+                    }
+                }, "1" /* The version number of the mapper... */
+        );
+        // }
+        Query query = database.getView("mascota_entregada").createQuery();
+        query.setStartKey(saved);
+        result = query.run();
+
+      // String convert = saved.toString();
+
+
+        for (Iterator<QueryRow> it = result; it.hasNext(); ) {
+            QueryRow row = it.next();
+
+           // Log.w("ADLA", "REPORT", row.getKey(), ((Double)row.getValue()).toString());
+
+        }
+
+
+
+
+
+        //displayRows(result);
+
+       // getRowsFromQueryEnumerator(result);
+    }
+
+    private void displayRows(QueryEnumerator queryEnumerator) {
+
+        final List<QueryRow> rows = getRowsFromQueryEnumerator(queryEnumerator);
+
+        //  tv.setText(rows);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+              // buscaDesocupado();
+
+            }
+        });
+    }
+
+    private List<QueryRow> getRowsFromQueryEnumerator(QueryEnumerator queryEnumerator) {
+        List<QueryRow> rows = new ArrayList<QueryRow>();
+        for (Iterator<QueryRow> it = queryEnumerator; it.hasNext(); ) {
+            QueryRow row = it.next();
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    private String newDoctor(){
+
+        final String name = "";
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Agregar Médico");
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.agregarmedico_main, null);
+
+        final AutoCompleteTextView newdoctor = view.findViewById(R.id.newdoctor);
+
+        builder.setView(view);
+
+        builder.setPositiveButton("Guardar",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                   //    name = newdoctor.getText().toString();
+
+                    }
+
+                });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        builder.show();
+
+        return name;
     }
 
 

@@ -160,6 +160,8 @@ public class DownloadActivity extends Activity
                 String correo = listado.get(position).getCorreo();
                 String dmascota = listado.get(position).getDmascota();
 
+                Toast.makeText(getApplicationContext(), dmascota, Toast.LENGTH_SHORT).show();
+
                 //Toast.makeText(getApplicationContext(), "Click en la posición "  + listado.get(position).getNombre(), Toast.LENGTH_SHORT).show();
                 //Object listItem = list.getItemAtPosition(position);
                 Intent i = new Intent(DownloadActivity.this, DownloadSheetToCouchbase.class);

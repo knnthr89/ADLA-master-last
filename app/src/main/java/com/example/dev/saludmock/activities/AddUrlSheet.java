@@ -37,7 +37,7 @@ public class AddUrlSheet extends AppCompatActivity {
 
 
                 if(idSheet == null || idSheet.isEmpty()){
-                    Toast.makeText(getApplicationContext(), "Requiere ingresar un Id para avanzar", Toast.LENGTH_SHORT).show();
+                    addSheet.setError("Debe de ingresar in ID para continuar");
                 }else {
                     //Toast.makeText(getApplicationContext(), idSheet, Toast.LENGTH_SHORT).show();
 

@@ -137,7 +137,7 @@ public class DownloadSheetToCouchbase extends AppCompatActivity{
                 (String) document.getProperty("lactar")));
 
 
-        Toast.makeText(getApplicationContext(), idDocumentS, Toast.LENGTH_LONG).show();
+      //  Toast.makeText(getApplicationContext(), idDocumentS, Toast.LENGTH_LONG).show();
         Intent i = new Intent(DownloadSheetToCouchbase.this, CreatePdfActivity.class);
 
         i.putExtra("numero_folio", idDocumentS);

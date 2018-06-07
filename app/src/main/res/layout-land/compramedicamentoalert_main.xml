@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:layout_editor_absoluteY="89dp">
 
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
@@ -35,7 +36,7 @@
             android:id="@+id/talla_pregunta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="200dp"
+            android:layout_marginStart="380dp"
             android:text="Talla isabelino:"
             android:textStyle="bold" />
 
@@ -75,7 +76,7 @@
             android:id="@+id/isabelino_pregunta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="222dp"
+            android:layout_marginStart="400dp"
             android:text="Compra el isabelino?"
             android:textStyle="bold" />
 
@@ -117,7 +118,7 @@
             android:id="@+id/medicamento_pregunta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="199dp"
+            android:layout_marginStart="377dp"
             android:text="Compra medicamento?"
             android:textStyle="bold" />
 
@@ -160,7 +161,7 @@
             android:id="@+id/comentario_pregunta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="233dp"
+            android:layout_marginStart="412dp"
             android:text="Comentario en cirugía: "
             android:textStyle="bold" />
 
@@ -252,7 +253,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout8"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:layout_marginTop="18dp"
@@ -278,10 +279,10 @@
 
     <LinearLayout
         android:id="@+id/linearLayout9"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:layout_marginTop="23dp"
+        android:layout_marginTop="8dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -307,13 +308,12 @@
         android:id="@+id/linearLayout10"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="2dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout9">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout9"
+        android:layout_margin="10dp">
 
 
         <TextView
@@ -329,5 +329,6 @@
             android:layout_gravity="right" />
 
     </LinearLayout>
+
 
 </android.support.constraint.ConstraintLayout>

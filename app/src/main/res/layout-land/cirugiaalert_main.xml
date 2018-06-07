@@ -10,8 +10,8 @@
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
 
 
            <!-- <android.support.design.widget.TextInputLayout
@@ -27,7 +27,7 @@
 
             </android.support.design.widget.TextInputLayout> -->
 
-          <!--  <Button
+         <!--   <Button
                 android:id="@+id/addsurgery"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -53,28 +53,28 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Pedro"
-                    android:layout_marginStart="25dp"/>
+                    android:layout_marginStart="130dp"/>
 
                 <CheckBox
                     android:id="@+id/cirujano2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Juan"
-                    android:layout_marginStart="25dp"/>
+                    android:layout_marginStart="130dp"/>
 
                 <CheckBox
                     android:id="@+id/cirujano3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ramón"
-                    android:layout_marginStart="25dp"/>
+                    android:layout_marginStart="130dp"/>
 
                 <CheckBox
                     android:id="@+id/cirujano4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Pablo"
-                    android:layout_marginStart="25dp"/>
+                    android:layout_marginStart="130dp"/>
 
 
             </LinearLayout>
@@ -82,8 +82,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp">
+            android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -132,35 +131,35 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginStart="200dp">
+                android:layout_marginStart="425dp">
 
                 <CheckBox
                     android:id="@+id/parocardiaco"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Paro cardiaco"
-                    android:layout_marginTop="15dp"/>
+                    android:layout_marginTop="10dp"/>
 
                 <CheckBox
                     android:id="@+id/tescuculoinguinal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Testiculo Inguinal"
-                    android:layout_marginTop="15dp"/>
+                    android:layout_marginTop="10dp"/>
 
                 <CheckBox
                     android:id="@+id/finado"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Finado"
-                    android:layout_marginTop="15dp"/>
+                    android:layout_marginTop="10dp"/>
 
                 <CheckBox
                     android:id="@+id/alergico"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Alérgico"
-                    android:layout_marginTop="15dp"/>
+                    android:layout_marginTop="10dp"/>
 
             </LinearLayout>
         </LinearLayout>
@@ -176,10 +175,11 @@
             </Spinner> -->
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginStart="10dp">
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp">
 
                 <TextView
                     android:id="@+id/texto"
@@ -190,47 +190,40 @@
 
                 <CheckBox
                     android:id="@+id/perro"
-                    android:layout_width="80dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="50dp"
-                    android:text="Perro" />
+                    android:text="Perro"
+                    android:layout_marginStart="70dp"/>
+
+                <CheckBox
+                    android:id="@+id/perra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Perra"
+                    android:layout_marginStart="100dp"/>
+
+                <CheckBox
+                    android:id="@+id/gato"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gato"
+                    android:layout_marginStart="100dp"/>
+
+                <CheckBox
+                    android:id="@+id/gata"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gata"
+                    android:layout_marginStart="100dp"/>
 
             </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginStart="15dp">
-
-            <CheckBox
-                android:id="@+id/perra"
-                android:layout_width="78dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="50dp"
-                android:text="Perra" />
-
-            <CheckBox
-                android:id="@+id/gato"
-                android:layout_width="76dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="50dp"
-                android:text="Gato" />
-
-            <CheckBox
-                android:id="@+id/gata"
-                android:layout_width="74dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="50dp"
-                android:text="Gata" />
-
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginStart="10dp">
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp">
 
             <TextView
                 android:id="@+id/texto_operacionanterior"
@@ -242,7 +235,7 @@
                 android:id="@+id/anteriormenteoperado_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="300dp"
+                android:layout_marginStart="700dp"
                 android:textStyle="bold"/>
 
         </LinearLayout>
@@ -251,7 +244,7 @@
         <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="20dp">
 
                 <AutoCompleteTextView
                     android:id="@+id/comentario"

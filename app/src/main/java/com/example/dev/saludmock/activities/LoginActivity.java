@@ -11,6 +11,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -82,6 +84,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private ImageView img;
+    private SharedPreferences shre;
 
 
     @Override
@@ -89,18 +92,28 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_login);
+        shre = getSharedPreferences("data", Context.MODE_PRIVATE);
 
          img = findViewById(R.id.logo_button);
         // Picasso.with(getBaseContext()).load(R.drawable.logo).into(img);
          img.setOnClickListener(new OnClickListener() {
              @Override
              public void onClick(View view) {
-                 Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
+
+                Intent GaleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(GaleryIntent, RESULT_LOAD_IMG);
+
 
 
              }
          });
+
+         if(shre!=null){
+             String path = shre.getString("path", null);
+             if(path!=null){
+                 img.setImageBitmap(BitmapFactory.decodeFile(path));
+             }
+         }
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -445,7 +458,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK && null != data){
-           Uri SelectedImage = data.getData();
+
+            Uri SelectedImage = data.getData();
            String[] FilePathColumn = {MediaStore.Images.Media.DATA};
 
            Cursor SelectedCursor = getContentResolver().query(SelectedImage, FilePathColumn, null, null, null);
@@ -460,7 +474,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
         storePath();
         retrievePath();
-        convertPathImage();
+      //  convertPathImage();
     }
 
     private void storePath(){

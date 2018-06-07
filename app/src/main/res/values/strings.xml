@@ -147,6 +147,7 @@
     <string name="title_dashboard">Medicamento</string>
     <string name="title_notifications">Reporte</string>
     <string name="title_search">Buscar Preregistro</string>
+    <string name="title_pets">Cargar Mascotas Entregadas</string>
 
     <string name="title_antibiotico">Antibiótico</string>
     <string name="title_tatuaje">Tatuaje</string>

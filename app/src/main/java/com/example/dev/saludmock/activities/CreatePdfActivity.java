@@ -136,7 +136,10 @@ public class CreatePdfActivity extends Activity {
         String direccion = getIntent().getExtras().getString("direccion");
         String edad = getIntent().getExtras().getString("edad");
         String raza = getIntent().getExtras().getString("raza");
+        //Tipo de mascota
+        String dmascota =getIntent().getExtras().getString("dmascota");
 
+      //  Toast.makeText(getApplicationContext(), tmascota, Toast.LENGTH_SHORT).show();
 
         if (estado.equals(Environment.MEDIA_MOUNTED)) {
             sdDisponible = true;
@@ -233,7 +236,7 @@ public class CreatePdfActivity extends Activity {
                // contentPanelActivity.buscaDesocupado(idDocumentStringS);
                 Intent intent = new Intent(CreatePdfActivity.this, ContentPanelActivity.class);
                 intent.putExtra("idDocumentStringS",idDocumentStringS);
-                intent.putExtra("tmascota", tmascota);
+                intent.putExtra("dmascota", dmascota);
                 startActivity(intent);
             } catch (Exception e) {
                 e.printStackTrace();
