@@ -1,9 +1,13 @@
 package com.example.dev.saludmock.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+
 import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,12 +20,15 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Message;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.multidex.MultiDexApplication;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +37,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,6 +53,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -64,7 +73,11 @@ import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
 import com.example.dev.saludmock.R;
+import com.example.dev.saludmock.adapters.DataAdapter;
+import com.example.dev.saludmock.adapters.NewDoctorAdapter;
 import com.example.dev.saludmock.adapters.NewRegistersArrayAdapter;
+import com.example.dev.saludmock.config.Application;
+import com.example.dev.saludmock.config.Configuration;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Font;
@@ -93,16 +106,31 @@ import at.markushi.ui.CircleButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 import okhttp3.internal.DiskLruCache;
 
 import static android.widget.ListPopupWindow.MATCH_PARENT;
 import static android.widget.ListPopupWindow.WRAP_CONTENT;
+import static com.couchbase.lite.Database.TAG;
 
 /**
  * Created by kennethrizo on 22/11/17.
  */
 
-public class ContentPanelActivity extends AppCompatActivity {
+public class ContentPanelActivity extends ListActivity  implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, View.OnKeyListener {
+
+
+    String estado = "desactivado";
+    String dString;
+
+    protected NewDoctorAdapter newDoctorAdapter;
+    ListView itemListView;
+
+    String button1_value, tv1_value;
+
+    private Object date;
+
+    // SharedPreferences preferences = getSharedPreferences("prefs_file_name", MODE_PRIVATE);
 
     private static final String CIRCLEBUTTON_COLOR = "CIRCLEBUTTON_COLOR";
 
@@ -128,156 +156,310 @@ public class ContentPanelActivity extends AppCompatActivity {
     //  String t2mascota = "gato";
 
     //botones de perros y gatos
-    @BindView(R.id.btn1) CircleButton circleButton1;
-    @BindView(R.id.btn2) CircleButton circleButton2;
-    @BindView(R.id.btn3) CircleButton circleButton3;
-    @BindView(R.id.btn4) CircleButton circleButton4;
-    @BindView(R.id.btn5) CircleButton circleButton5;
-    @BindView(R.id.btn6) CircleButton circleButton6;
-    @BindView(R.id.btn7) CircleButton circleButton7;
-    @BindView(R.id.btn8) CircleButton circleButton8;
-    @BindView(R.id.btn9) CircleButton circleButton9;
-    @BindView(R.id.btn10) CircleButton circleButton10;
-    @BindView(R.id.btn11) CircleButton circleButton11;
-    @BindView(R.id.btn12) CircleButton circleButton12;
-    @BindView(R.id.btn13) CircleButton circleButton13;
-    @BindView(R.id.btn14) CircleButton circleButton14;
-    @BindView(R.id.btn15) CircleButton circleButton15;
-    @BindView(R.id.btn16) CircleButton circleButton16;
-    @BindView(R.id.btn17) CircleButton circleButton17;
-    @BindView(R.id.btn18) CircleButton circleButton18;
-    @BindView(R.id.btn19) CircleButton circleButton19;
-    @BindView(R.id.btn20) CircleButton circleButton20;
-    @BindView(R.id.btn21) CircleButton circleButton21;
-    @BindView(R.id.btn22) CircleButton circleButton22;
-    @BindView(R.id.btn23) CircleButton circleButton23;
-    @BindView(R.id.btn24) CircleButton circleButton24;
-    @BindView(R.id.btn25) CircleButton circleButton25;
-    @BindView(R.id.btn26) CircleButton circleButton26;
-    @BindView(R.id.btn27) CircleButton circleButton27;
-    @BindView(R.id.btn28) CircleButton circleButton28;
-    @BindView(R.id.btn29) CircleButton circleButton29;
-    @BindView(R.id.btn30) CircleButton circleButton30;
-    @BindView(R.id.btn31) CircleButton circleButton31;
-    @BindView(R.id.btn32) CircleButton circleButton32;
-    @BindView(R.id.btn33) CircleButton circleButton33;
-    @BindView(R.id.btn34) CircleButton circleButton34;
-    @BindView(R.id.btn35) CircleButton circleButton35;
-    @BindView(R.id.btn36) CircleButton circleButton36;
-    @BindView(R.id.btn37) CircleButton circleButton37;
-    @BindView(R.id.btn38) CircleButton circleButton38;
-    @BindView(R.id.btn39) CircleButton circleButton39;
-    @BindView(R.id.btn40) CircleButton circleButton40;
-    @BindView(R.id.btn41) CircleButton circleButton41;
-    @BindView(R.id.btn42) CircleButton circleButton42;
-    @BindView(R.id.btn43) CircleButton circleButton43;
-    @BindView(R.id.btn44) CircleButton circleButton44;
-    @BindView(R.id.btn45) CircleButton circleButton45;
-    @BindView(R.id.btn46) CircleButton circleButton46;
-    @BindView(R.id.btn47) CircleButton circleButton47;
-    @BindView(R.id.btn48) CircleButton circleButton48;
-    @BindView(R.id.btn49) CircleButton circleButton49;
-    @BindView(R.id.btn50) CircleButton circleButton50;
-    @BindView(R.id.btn51) CircleButton circleButton51;
-    @BindView(R.id.btn52) CircleButton circleButton52;
-    @BindView(R.id.btn53) CircleButton circleButton53;
-    @BindView(R.id.btn54) CircleButton circleButton54;
-    @BindView(R.id.btn55) CircleButton circleButton55;
-    @BindView(R.id.btn56) CircleButton circleButton56;
-    @BindView(R.id.btn57) CircleButton circleButton57;
-    @BindView(R.id.btn58) CircleButton circleButton58;
-    @BindView(R.id.btn59) CircleButton circleButton59;
-    @BindView(R.id.btn60) CircleButton circleButton60;
-    @BindView(R.id.btn61) CircleButton circleButton61;
-    @BindView(R.id.btn62) CircleButton circleButton62;
-    @BindView(R.id.btn63) CircleButton circleButton63;
-    @BindView(R.id.btn64) CircleButton circleButton64;
-    @BindView(R.id.btn65) CircleButton circleButton65;
-    @BindView(R.id.btn66) CircleButton circleButton66;
-    @BindView(R.id.btn67) CircleButton circleButton67;
-    @BindView(R.id.btn68) CircleButton circleButton68;
-    @BindView(R.id.btn69) CircleButton circleButton69;
-    @BindView(R.id.btn70) CircleButton circleButton70;
-    @BindView(R.id.btn71) CircleButton circleButton71;
-    @BindView(R.id.btn72) CircleButton circleButton72;
+    @BindView(R.id.btn1)
+    CircleButton circleButton1;
+    @BindView(R.id.btn2)
+    CircleButton circleButton2;
+    @BindView(R.id.btn3)
+    CircleButton circleButton3;
+    @BindView(R.id.btn4)
+    CircleButton circleButton4;
+    @BindView(R.id.btn5)
+    CircleButton circleButton5;
+    @BindView(R.id.btn6)
+    CircleButton circleButton6;
+    @BindView(R.id.btn7)
+    CircleButton circleButton7;
+    @BindView(R.id.btn8)
+    CircleButton circleButton8;
+    @BindView(R.id.btn9)
+    CircleButton circleButton9;
+    @BindView(R.id.btn10)
+    CircleButton circleButton10;
+    @BindView(R.id.btn11)
+    CircleButton circleButton11;
+    @BindView(R.id.btn12)
+    CircleButton circleButton12;
+    @BindView(R.id.btn13)
+    CircleButton circleButton13;
+    @BindView(R.id.btn14)
+    CircleButton circleButton14;
+    @BindView(R.id.btn15)
+    CircleButton circleButton15;
+    @BindView(R.id.btn16)
+    CircleButton circleButton16;
+    @BindView(R.id.btn17)
+    CircleButton circleButton17;
+    @BindView(R.id.btn18)
+    CircleButton circleButton18;
+    @BindView(R.id.btn19)
+    CircleButton circleButton19;
+    @BindView(R.id.btn20)
+    CircleButton circleButton20;
+    @BindView(R.id.btn21)
+    CircleButton circleButton21;
+    @BindView(R.id.btn22)
+    CircleButton circleButton22;
+    @BindView(R.id.btn23)
+    CircleButton circleButton23;
+    @BindView(R.id.btn24)
+    CircleButton circleButton24;
+    @BindView(R.id.btn25)
+    CircleButton circleButton25;
+    @BindView(R.id.btn26)
+    CircleButton circleButton26;
+    @BindView(R.id.btn27)
+    CircleButton circleButton27;
+    @BindView(R.id.btn28)
+    CircleButton circleButton28;
+    @BindView(R.id.btn29)
+    CircleButton circleButton29;
+    @BindView(R.id.btn30)
+    CircleButton circleButton30;
+    @BindView(R.id.btn31)
+    CircleButton circleButton31;
+    @BindView(R.id.btn32)
+    CircleButton circleButton32;
+    @BindView(R.id.btn33)
+    CircleButton circleButton33;
+    @BindView(R.id.btn34)
+    CircleButton circleButton34;
+    @BindView(R.id.btn35)
+    CircleButton circleButton35;
+    @BindView(R.id.btn36)
+    CircleButton circleButton36;
+    @BindView(R.id.btn37)
+    CircleButton circleButton37;
+    @BindView(R.id.btn38)
+    CircleButton circleButton38;
+    @BindView(R.id.btn39)
+    CircleButton circleButton39;
+    @BindView(R.id.btn40)
+    CircleButton circleButton40;
+    @BindView(R.id.btn41)
+    CircleButton circleButton41;
+    @BindView(R.id.btn42)
+    CircleButton circleButton42;
+    @BindView(R.id.btn43)
+    CircleButton circleButton43;
+    @BindView(R.id.btn44)
+    CircleButton circleButton44;
+    @BindView(R.id.btn45)
+    CircleButton circleButton45;
+    @BindView(R.id.btn46)
+    CircleButton circleButton46;
+    @BindView(R.id.btn47)
+    CircleButton circleButton47;
+    @BindView(R.id.btn48)
+    CircleButton circleButton48;
+    @BindView(R.id.btn49)
+    CircleButton circleButton49;
+    @BindView(R.id.btn50)
+    CircleButton circleButton50;
+    @BindView(R.id.btn51)
+    CircleButton circleButton51;
+    @BindView(R.id.btn52)
+    CircleButton circleButton52;
+    @BindView(R.id.btn53)
+    CircleButton circleButton53;
+    @BindView(R.id.btn54)
+    CircleButton circleButton54;
+    @BindView(R.id.btn55)
+    CircleButton circleButton55;
+    @BindView(R.id.btn56)
+    CircleButton circleButton56;
+    @BindView(R.id.btn57)
+    CircleButton circleButton57;
+    @BindView(R.id.btn58)
+    CircleButton circleButton58;
+    @BindView(R.id.btn59)
+    CircleButton circleButton59;
+    @BindView(R.id.btn60)
+    CircleButton circleButton60;
+    @BindView(R.id.btn61)
+    CircleButton circleButton61;
+    @BindView(R.id.btn62)
+    CircleButton circleButton62;
+    @BindView(R.id.btn63)
+    CircleButton circleButton63;
+    @BindView(R.id.btn64)
+    CircleButton circleButton64;
+    @BindView(R.id.btn65)
+    CircleButton circleButton65;
+    @BindView(R.id.btn66)
+    CircleButton circleButton66;
+    @BindView(R.id.btn67)
+    CircleButton circleButton67;
+    @BindView(R.id.btn68)
+    CircleButton circleButton68;
+    @BindView(R.id.btn69)
+    CircleButton circleButton69;
+    @BindView(R.id.btn70)
+    CircleButton circleButton70;
+    @BindView(R.id.btn71)
+    CircleButton circleButton71;
+    @BindView(R.id.btn72)
+    CircleButton circleButton72;
 
     //folio
-    @BindView(R.id.message) TextView tv1;
-    @BindView(R.id.message2) TextView tv2;
-    @BindView(R.id.message3) TextView tv3;
-    @BindView(R.id.message4) TextView tv4;
-    @BindView(R.id.message5) TextView tv5;
-    @BindView(R.id.message6) TextView tv6;
-    @BindView(R.id.message7) TextView tv7;
-    @BindView(R.id.message8) TextView tv8;
-    @BindView(R.id.message9) TextView tv9;
-    @BindView(R.id.message10) TextView tv10;
-    @BindView(R.id.message11) TextView tv11;
-    @BindView(R.id.message12) TextView tv12;
-    @BindView(R.id.message13) TextView tv13;
-    @BindView(R.id.message14) TextView tv14;
-    @BindView(R.id.message15) TextView tv15;
-    @BindView(R.id.message16) TextView tv16;
-    @BindView(R.id.message17) TextView tv17;
-    @BindView(R.id.message18) TextView tv18;
-    @BindView(R.id.message19) TextView tv19;
-    @BindView(R.id.message20) TextView tv20;
-    @BindView(R.id.message21) TextView tv21;
-    @BindView(R.id.message22) TextView tv22;
-    @BindView(R.id.message23) TextView tv23;
-    @BindView(R.id.message24) TextView tv24;
-    @BindView(R.id.message25) TextView tv25;
-    @BindView(R.id.message26) TextView tv26;
-    @BindView(R.id.message27) TextView tv27;
-    @BindView(R.id.message28) TextView tv28;
-    @BindView(R.id.message29) TextView tv29;
-    @BindView(R.id.message30) TextView tv30;
-    @BindView(R.id.message31) TextView tv31;
-    @BindView(R.id.message32) TextView tv32;
-    @BindView(R.id.message33) TextView tv33;
-    @BindView(R.id.message34) TextView tv34;
-    @BindView(R.id.message35) TextView tv35;
-    @BindView(R.id.message36) TextView tv36;
-    @BindView(R.id.message37) TextView tv37;
-    @BindView(R.id.message38) TextView tv38;
-    @BindView(R.id.message39) TextView tv39;
-    @BindView(R.id.message40) TextView tv40;
-    @BindView(R.id.message41) TextView tv41;
-    @BindView(R.id.message42) TextView tv42;
-    @BindView(R.id.message43) TextView tv43;
-    @BindView(R.id.message44) TextView tv44;
-    @BindView(R.id.message45) TextView tv45;
-    @BindView(R.id.message46) TextView tv46;
-    @BindView(R.id.message47) TextView tv47;
-    @BindView(R.id.message48) TextView tv48;
-    @BindView(R.id.message49) TextView tv49;
-    @BindView(R.id.message50) TextView tv50;
-    @BindView(R.id.message51) TextView tv51;
-    @BindView(R.id.message52) TextView tv52;
-    @BindView(R.id.message53) TextView tv53;
-    @BindView(R.id.message54) TextView tv54;
-    @BindView(R.id.message55) TextView tv55;
-    @BindView(R.id.message56) TextView tv56;
-    @BindView(R.id.message57) TextView tv57;
-    @BindView(R.id.message58) TextView tv58;
-    @BindView(R.id.message59) TextView tv59;
-    @BindView(R.id.message60) TextView tv60;
-    @BindView(R.id.message61) TextView tv61;
-    @BindView(R.id.message62) TextView tv62;
-    @BindView(R.id.message63) TextView tv63;
-    @BindView(R.id.message64) TextView tv64;
-    @BindView(R.id.message65) TextView tv65;
-    @BindView(R.id.message66) TextView tv66;
-    @BindView(R.id.message67) TextView tv67;
-    @BindView(R.id.message68) TextView tv68;
-    @BindView(R.id.message69) TextView tv69;
-    @BindView(R.id.message70) TextView tv70;
-    @BindView(R.id.message71) TextView tv71;
-    @BindView(R.id.message72) TextView tv72;
+    @BindView(R.id.message)
+    TextView tv1;
+    @BindView(R.id.message2)
+    TextView tv2;
+    @BindView(R.id.message3)
+    TextView tv3;
+    @BindView(R.id.message4)
+    TextView tv4;
+    @BindView(R.id.message5)
+    TextView tv5;
+    @BindView(R.id.message6)
+    TextView tv6;
+    @BindView(R.id.message7)
+    TextView tv7;
+    @BindView(R.id.message8)
+    TextView tv8;
+    @BindView(R.id.message9)
+    TextView tv9;
+    @BindView(R.id.message10)
+    TextView tv10;
+    @BindView(R.id.message11)
+    TextView tv11;
+    @BindView(R.id.message12)
+    TextView tv12;
+    @BindView(R.id.message13)
+    TextView tv13;
+    @BindView(R.id.message14)
+    TextView tv14;
+    @BindView(R.id.message15)
+    TextView tv15;
+    @BindView(R.id.message16)
+    TextView tv16;
+    @BindView(R.id.message17)
+    TextView tv17;
+    @BindView(R.id.message18)
+    TextView tv18;
+    @BindView(R.id.message19)
+    TextView tv19;
+    @BindView(R.id.message20)
+    TextView tv20;
+    @BindView(R.id.message21)
+    TextView tv21;
+    @BindView(R.id.message22)
+    TextView tv22;
+    @BindView(R.id.message23)
+    TextView tv23;
+    @BindView(R.id.message24)
+    TextView tv24;
+    @BindView(R.id.message25)
+    TextView tv25;
+    @BindView(R.id.message26)
+    TextView tv26;
+    @BindView(R.id.message27)
+    TextView tv27;
+    @BindView(R.id.message28)
+    TextView tv28;
+    @BindView(R.id.message29)
+    TextView tv29;
+    @BindView(R.id.message30)
+    TextView tv30;
+    @BindView(R.id.message31)
+    TextView tv31;
+    @BindView(R.id.message32)
+    TextView tv32;
+    @BindView(R.id.message33)
+    TextView tv33;
+    @BindView(R.id.message34)
+    TextView tv34;
+    @BindView(R.id.message35)
+    TextView tv35;
+    @BindView(R.id.message36)
+    TextView tv36;
+    @BindView(R.id.message37)
+    TextView tv37;
+    @BindView(R.id.message38)
+    TextView tv38;
+    @BindView(R.id.message39)
+    TextView tv39;
+    @BindView(R.id.message40)
+    TextView tv40;
+    @BindView(R.id.message41)
+    TextView tv41;
+    @BindView(R.id.message42)
+    TextView tv42;
+    @BindView(R.id.message43)
+    TextView tv43;
+    @BindView(R.id.message44)
+    TextView tv44;
+    @BindView(R.id.message45)
+    TextView tv45;
+    @BindView(R.id.message46)
+    TextView tv46;
+    @BindView(R.id.message47)
+    TextView tv47;
+    @BindView(R.id.message48)
+    TextView tv48;
+    @BindView(R.id.message49)
+    TextView tv49;
+    @BindView(R.id.message50)
+    TextView tv50;
+    @BindView(R.id.message51)
+    TextView tv51;
+    @BindView(R.id.message52)
+    TextView tv52;
+    @BindView(R.id.message53)
+    TextView tv53;
+    @BindView(R.id.message54)
+    TextView tv54;
+    @BindView(R.id.message55)
+    TextView tv55;
+    @BindView(R.id.message56)
+    TextView tv56;
+    @BindView(R.id.message57)
+    TextView tv57;
+    @BindView(R.id.message58)
+    TextView tv58;
+    @BindView(R.id.message59)
+    TextView tv59;
+    @BindView(R.id.message60)
+    TextView tv60;
+    @BindView(R.id.message61)
+    TextView tv61;
+    @BindView(R.id.message62)
+    TextView tv62;
+    @BindView(R.id.message63)
+    TextView tv63;
+    @BindView(R.id.message64)
+    TextView tv64;
+    @BindView(R.id.message65)
+    TextView tv65;
+    @BindView(R.id.message66)
+    TextView tv66;
+    @BindView(R.id.message67)
+    TextView tv67;
+    @BindView(R.id.message68)
+    TextView tv68;
+    @BindView(R.id.message69)
+    TextView tv69;
+    @BindView(R.id.message70)
+    TextView tv70;
+    @BindView(R.id.message71)
+    TextView tv71;
+    @BindView(R.id.message72)
+    TextView tv72;
 
     Locale l = new Locale("es", "MX");
-   Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"),l);
+
+    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"), l);
+
     String fecha = cal.get(Calendar.YEAR) + "/" + (cal.get(Calendar.MONTH) + 1) + "/" + cal.get(Calendar.DATE)/* + "T" + cal.get(Calendar.HOUR) + ":" + cal.get(Calendar.MINUTE) + ":"  + cal.get(Calendar.SECOND)*/;
+
+    int anio = cal.get(Calendar.YEAR);
+
+    int dia = cal.get(Calendar.DAY_OF_MONTH);
+
+    int mes = cal.get(Calendar.MONTH) + 1;
+
+    String anioString = Integer.toString(anio);
 
     int idDocument;
 
@@ -296,6 +478,7 @@ public class ContentPanelActivity extends AppCompatActivity {
     private AutoCompleteTextView celo;
     private AutoCompleteTextView lactar;
     private AutoCompleteTextView peso;
+    private AutoCompleteTextView doctor;
 
     AutoCompleteTextView email;
 
@@ -341,72 +524,163 @@ public class ContentPanelActivity extends AppCompatActivity {
 
     AutoCompleteTextView comentario;
 
-    CheckBox cirujano1, cirujano2, cirujano3, cirujano4;
+   private CheckBox cirujano1,
+            cirujano2,
+            cirujano3,
+            cirujano4,
+            cirujano5,
+            cirujano6,
+            cirujano7,
+            cirujano8,
+    cirujano9,
+    cirujano10,
+    cirujano11,
+    cirujano12;
 
     CheckBox uno, dos, tres, cuatro, cinco, seis, siete;
 
+    private TextView mTextView = null;
+
+    private Database database;
+    private Application application;
+    // String mes = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_panel);
 
+        itemListView = findViewById(R.id.itemListView);
+        //application = (Application) getApplication();
+
+        //this.database = application.getDatabase();
+
+        date = anio + "/" + mes + "/" + dia;
+
+        Toast.makeText(getApplicationContext(), String.valueOf(date), Toast.LENGTH_SHORT).show();
+
         bottomNavigationView = findViewById(R.id.navigation);
 
         ButterKnife.bind(this);
 
+        for(int i = 0; i <= 7; anio++){
+            Toast.makeText(getApplicationContext(), String.valueOf(anio), Toast.LENGTH_SHORT).show();
+        }
+
         //  imageButton = (ImageButton)findViewById(R.id.imageButton);
 
-      //  mascota = getIntent().getStringExtra("mascota");
+        //  mascota = getIntent().getStringExtra("mascota");
 
-       // mTextMessage = (TextView) findViewById(R.id.message);
+        // mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         et = findViewById(R.id.et);
 
-
         //  String idDocumentS = Integer.toString(idDocument);
 
-      //  Toast.makeText(getApplicationContext(), idDocumentS, Toast.LENGTH_SHORT).show();
+        //  Toast.makeText(getApplicationContext(), idDocumentS, Toast.LENGTH_SHORT).show();
 
 
         //TRAE NULO A TMASCOTA
 
-        //Recibe los datos de los preregistros que vienen de google sheets
-        Bundle datos = this.getIntent().getExtras();
-        if(datos != null) {
-            String idDocumentStringS = datos.getString("idDocumentStringS");
-            String dmascota = datos.getString("dmascota");
-            //falta editar si escogen perro o perra, para cambiar de método
-            if (idDocumentStringS != null) {
-                Toast.makeText(getApplication(), dmascota, Toast.LENGTH_SHORT).show();
-                buscaDesocupado(idDocumentStringS, dmascota);
-            }else if (dmascota == null){
-             //  Toast.makeText(getApplicationContext(), "Viene nulo", Toast.LENGTH_SHORT).show();
-            }else if(!dmascota.equals("Perro") || !dmascota.equals("Perra") || !dmascota.equals("Gato") || !dmascota.equals("Gato")){
-                Toast.makeText(getApplicationContext(), "Error, no viene ninguna de las opciones mostradas", Toast.LENGTH_SHORT).show();
-            }
+        if (savedInstanceState != null) {
+
+            savedInstanceState.get(button1_value);
+            savedInstanceState.get(tv1_value);
+
+            Toast.makeText(getApplicationContext(), button1_value, Toast.LENGTH_LONG).show();
         }
 
+        //Recibe los datos de los preregistros que vienen de google sheets
+        Bundle datos = this.getIntent().getExtras();
+        if (datos != null) {
+
+            try {
+                showNoFinishedButtons();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            String idDocumentStringS = datos.getString("idDocumentStringS");
+            String dmascota = datos.getString("dmascota");
+            String estadorecibido = datos.getString("active");
+
+            if(idDocumentStringS != null && dmascota != null ) {
+                estadorecibido = "activado";
+
+                //se necesita guardar a activado porqur solo lo cambiamos pero no se guarda en el registro
+
+                //Create a manager
+                Manager manager = null;
+                try {
+                    manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //Create or open the database named app
+                Database database = null;
+                try {
+                    database = manager.getDatabase("adla");
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
+                }
+
+                //create a new document
+                Document document = database.getDocument(idDocumentStringS);
+
+                try {
+                    final String finalEstadorecibido = estadorecibido;
+
+                    document.update(new Document.DocumentUpdater() {
+                        @Override
+                        public boolean update(UnsavedRevision newRevision) {
+                            Map<String, Object> properties = newRevision.getProperties();
+                            properties.put("active", finalEstadorecibido);
+                            return true;
+                        }
+                    });
+                    Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "No se pudo actualizar nuevo preregistro", Toast.LENGTH_LONG).show();
+                }
+
+                //falta editar si escogen perro o perra, para cambiar de método
+
+                if (idDocumentStringS != null) {
+
+                    Toast.makeText(getApplication(), dmascota, Toast.LENGTH_SHORT).show();
+                    buscaDesocupado(idDocumentStringS, dmascota, estadorecibido);
+
+                } else if (dmascota == null) {
+                    // Toast.makeText(getApplicationContext(), "Viene nulo", Toast.LENGTH_SHORT).show();
+                } else if (!dmascota.equals("Perro") || !dmascota.equals("Perra") || !dmascota.equals("Gato") || !dmascota.equals("Gato")) {
+                    Toast.makeText(getApplicationContext(), "Error, no viene ninguna de las opciones mostradas", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        }else {
+
+
+        }
+       if(datos== null) {
+           try {
+               showNoFinishedButtons();
+           } catch (Exception e) {
+               e.printStackTrace();
+           }
+       }
+
+  /*    new Thread(new Runnable() {
+            @Override
+            public void run() {
+                setupSync();
+                }
+        }).start();*/
+
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 
     @Override
     protected void onStop() {
@@ -426,8 +700,14 @@ public class ContentPanelActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_search:
-                    Intent intent = new Intent(ContentPanelActivity.this, AddUrlSheet.class);
+                    //   Toast.makeText(getApplicationContext(), "Boton Funcionando", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(ContentPanelActivity.this, AddNewDoctor.class);
                     startActivity(intent);
+              /*      try {
+                        addDoctor();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }*/
                     return true;
                 case R.id.navigation_home:
                    /* Intent i = new Intent(ContentPanelActivity.this, RegistroActivity.class);
@@ -435,12 +715,14 @@ public class ContentPanelActivity extends AppCompatActivity {
                     registroActivity();
                     return true;
                 case R.id.navigation_dashboard:
-               //recuperacionDialog();
+                    Intent i = new Intent(ContentPanelActivity.this, DownloadSheetToDB.class);
+                    startActivity(i);
+                    //recuperacionDialog();
                     return true;
                 case R.id.navigation_notifications:
                     reporteRegistros();
-                   // Intent tintent = new Intent(ContentPanelActivity.this, ReporteActivity.class);
-                   // startActivity(tintent);
+                    // Intent tintent = new Intent(ContentPanelActivity.this, ReporteActivity.class);
+                    // startActivity(tintent);
                     return true;
                 case R.id.load_deleted:
                     try {
@@ -450,45 +732,45 @@ public class ContentPanelActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    return true;}
+                    return true;
+            }
             return false;
         }
     };
 
-
-    public void registroActivity(){
+    public void registroActivity() {
 
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.registroalert_main, null);
 
-         nombre = view.findViewById(R.id.nombre_dueño);
-         direccion = view.findViewById(R.id.direccion);
-         telefono = view.findViewById(R.id.telefono);
+        nombre = view.findViewById(R.id.nombre_dueño);
+        direccion = view.findViewById(R.id.direccion);
+        telefono = view.findViewById(R.id.telefono);
         email = view.findViewById(R.id.email);
-         nmascota = view.findViewById(R.id.mascota);
-       // final Spinner tipo_mascota = view.findViewById(R.id.tamano_mascota);
-         perro = view.findViewById(R.id.perro);
-         perra = view.findViewById(R.id.perra);
-         gato = view.findViewById(R.id.gato);
-         gata = view.findViewById(R.id.gata);
-       //final Spinner msocial =view.findViewById(R.id.tmascota);
+        nmascota = view.findViewById(R.id.mascota);
+        // final Spinner tipo_mascota = view.findViewById(R.id.tamano_mascota);
+        perro = view.findViewById(R.id.perro);
+        perra = view.findViewById(R.id.perra);
+        gato = view.findViewById(R.id.gato);
+        gata = view.findViewById(R.id.gata);
+        //final Spinner msocial =view.findViewById(R.id.tmascota);
 
-         facebook = view.findViewById(R.id.fb);
-         volante = view.findViewById(R.id.volante);
-         lona = view.findViewById(R.id.lona);
-         campana = view.findViewById(R.id.campana);
-         recomendacion = view.findViewById(R.id.recomendacion);
-         otro = view.findViewById(R.id.otro);
+        facebook = view.findViewById(R.id.fb);
+        volante = view.findViewById(R.id.volante);
+        lona = view.findViewById(R.id.lona);
+        campana = view.findViewById(R.id.campana);
+        recomendacion = view.findViewById(R.id.recomendacion);
+        otro = view.findViewById(R.id.otro);
 
-         chico = view.findViewById(R.id.chico);
-         mediano = view.findViewById(R.id.mediano);
-         grande = view.findViewById(R.id.grande);
-         gigante = view.findViewById(R.id.gigante);
+        chico = view.findViewById(R.id.chico);
+        mediano = view.findViewById(R.id.mediano);
+        grande = view.findViewById(R.id.grande);
+        gigante = view.findViewById(R.id.gigante);
 
-         raza = view.findViewById(R.id.raza);
-         edad = view.findViewById(R.id.edad);
-      //  final Spinner tmascota = view.findViewById(R.id.msocial);
-         comentarios = view.findViewById(R.id.comentarios);
+        raza = view.findViewById(R.id.raza);
+        edad = view.findViewById(R.id.edad);
+        //  final Spinner tmascota = view.findViewById(R.id.msocial);
+        comentarios = view.findViewById(R.id.comentarios);
         tratamiento = view.findViewById(R.id.tratamiento);
         rescatado = view.findViewById(R.id.rescatado);
         vacuna = view.findViewById(R.id.vacuna);
@@ -507,159 +789,166 @@ public class ContentPanelActivity extends AppCompatActivity {
         validaRegistro();
 
         builder.setPositiveButton("Guardar",
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                            String tipoMascotaString = "";
-                            String msocialString = "";
-                            String tamanoMascotaString;
+                        String tipoMascotaString = "";
+                        String msocialString = "";
+                        String tamanoMascotaString;
 
-                            if (perro.isChecked()) {
-                                tipoMascotaString = "Perro";
-                            } else if (perra.isChecked()) {
-                                tipoMascotaString = "Perra";
-                            } else if (gato.isChecked()) {
-                                tipoMascotaString = "Gato";
-                            } else if (gata.isChecked()) {
-                                tipoMascotaString = "Gata";
-                            } else {
-                                Toast.makeText(getApplicationContext(), "Error no se selecciono detalle de la mascota", Toast.LENGTH_SHORT).show();
-                            }
+                        if (perro.isChecked()) {
+                            tipoMascotaString = "Perro";
+                        } else if (perra.isChecked()) {
+                            tipoMascotaString = "Perra";
+                        } else if (gato.isChecked()) {
+                            tipoMascotaString = "Gato";
+                        } else if (gata.isChecked()) {
+                            tipoMascotaString = "Gata";
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Error no se selecciono detalle de la mascota", Toast.LENGTH_SHORT).show();
+                        }
 
-                            if (facebook.isChecked()) {
-                                msocialString = "Facebook";
-                            } else if (volante.isChecked()) {
-                                msocialString = "Volante";
-                            } else if (lona.isChecked()) {
-                                msocialString = "Vi una lona en la Campaña";
-                            } else if (campana.isChecked()) {
-                                msocialString = "He ido a otra campaña de Abogados de los Animales";
-                            } else if (recomendacion.isChecked()) {
-                                msocialString = "Recomendación de otra persona";
-                            } else if (otro.isChecked()) {
-                                msocialString = "Otro";
-                            } else {
-                                msocialString = "No se selecciono ninguna opción";
-                            }
+                        if (facebook.isChecked()) {
+                            msocialString = "Facebook";
+                        } else if (volante.isChecked()) {
+                            msocialString = "Volante";
+                        } else if (lona.isChecked()) {
+                            msocialString = "Vi una lona en la Campaña";
+                        } else if (campana.isChecked()) {
+                            msocialString = "He ido a otra campaña de Abogados de los Animales";
+                        } else if (recomendacion.isChecked()) {
+                            msocialString = "Recomendación de otra persona";
+                        } else if (otro.isChecked()) {
+                            msocialString = "Otro";
+                        } else {
+                            msocialString = "No se selecciono ninguna opción";
+                        }
 
-                            if (chico.isChecked()) {
-                                tamanoMascotaString = "Chico";
-                            } else if (mediano.isChecked()) {
-                                tamanoMascotaString = "Mediano";
-                            } else if (grande.isChecked()) {
-                                tamanoMascotaString = "Grande";
-                            } else if (gigante.isChecked()) {
-                                tamanoMascotaString = "Gigante";
-                            } else {
-                                tamanoMascotaString = "No se selecciono ninguna opción";
-                            }
+                        if (chico.isChecked()) {
+                            tamanoMascotaString = "Chico";
+                        } else if (mediano.isChecked()) {
+                            tamanoMascotaString = "Mediano";
+                        } else if (grande.isChecked()) {
+                            tamanoMascotaString = "Grande";
+                        } else if (gigante.isChecked()) {
+                            tamanoMascotaString = "Gigante";
+                        } else {
+                            tamanoMascotaString = "No se selecciono ninguna opción";
+                        }
 
-                            nombreString = nombre.getText().toString(); //
-                            direccionString = direccion.getText().toString();//
-                            telefonoString = telefono.getText().toString(); //
-                            String emailString = email.getText().toString();//
-                            mascotaString = nmascota.getText().toString();//
-                            //    String msocialString = msocial.getSelectedItem().toString(); //
-                            razaString = raza.getText().toString();//
-                            edadString = edad.getText().toString();//
-                            // String tamanoMascotaString = msocial.getSelectedItem().toString(); //
-                            String comentarioString = comentarios.getText().toString(); //
-                            tratamientoString = tratamiento.getText().toString(); //
-                            rescatadoString = rescatado.getText().toString(); //
-                            vacunaString = vacuna.getText().toString();  //
-                            desparacitacionString = desparacitacion.getText().toString(); //
-                            celoString = celo.getText().toString();//
-                            lactarString = lactar.getText().toString();//
-                            pesoString = peso.getText().toString();
-                            String alergiaString = alergia.getText().toString();
-
-
-                            //create manager
-                            Manager manager = null;
-                            try {
-                                manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                            //Create or open the database named app
-                            Database database = null;
-                            try {
-                                database = manager.getDatabase("adla");
-                            } catch (CouchbaseLiteException d) {
-                                d.printStackTrace();
-                            }
-
-                            SharedPreferences preferences = getSharedPreferences("values", MODE_PRIVATE);
-                            idDocument = preferences.getInt("idDocument", 0);
-
-                            idDocument++;
-
-                            SharedPreferences prefs = getSharedPreferences("values", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = prefs.edit();
-                            editor.putInt("idDocument", idDocument);
-                            editor.commit();
-
-                            String idDocumentS = Integer.toString(idDocument);
+                        nombreString = nombre.getText().toString(); //
+                        direccionString = direccion.getText().toString();//
+                        telefonoString = telefono.getText().toString(); //
+                        String emailString = email.getText().toString();//
+                        mascotaString = nmascota.getText().toString();//
+                        //    String msocialString = msocial.getSelectedItem().toString(); //
+                        razaString = raza.getText().toString();//
+                        edadString = edad.getText().toString();//
+                        // String tamanoMascotaString = msocial.getSelectedItem().toString(); //
+                        String comentarioString = comentarios.getText().toString(); //
+                        tratamientoString = tratamiento.getText().toString(); //
+                        rescatadoString = rescatado.getText().toString(); //
+                        vacunaString = vacuna.getText().toString();  //
+                        desparacitacionString = desparacitacion.getText().toString(); //
+                        celoString = celo.getText().toString();//
+                        lactarString = lactar.getText().toString();//
+                        pesoString = peso.getText().toString();
+                        String alergiaString = alergia.getText().toString();
 
 
-                            //The properties that will be saved on the document
-                            Map<String, Object> properties = new HashMap<String, Object>();
-                            properties.put("folio", idDocumentS);
-                            properties.put("nombreDueno", nombreString);
-                            properties.put("direccion", direccionString);
-                            properties.put("telefono", telefonoString);
-                            properties.put("correo", emailString);
-                            properties.put("nombreMascota", mascota);
-                            properties.put("mediosocial", msocialString);
-                            properties.put("raza", razaString);
-                            properties.put("edad", edadString);
-                            properties.put("tamanoMascota", tamanoMascotaString);
-                            properties.put("comentarioRegistro", comentarioString);
-                            properties.put("tratamiento", tratamientoString);
-                            properties.put("rescatado", rescatadoString);
-                            properties.put("vacuna", vacunaString);
-                            properties.put("desparacitacion", desparacitacionString);
-                            properties.put("celo", celoString);
-                            properties.put("lactar", lactarString);
-                            properties.put("tipoMascota", tipoMascotaString);
-                            properties.put("peso", pesoString);
-                            properties.put("alergia", alergiaString);
-                            properties.put("creat_at", fecha);
+                        //create manager
+                        Manager manager = null;
+                        try {
+                            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        //Create or open the database named app
+                        Database database = null;
+                        try {
+                            database = manager.getDatabase("adla");
+                        } catch (CouchbaseLiteException d) {
+                            d.printStackTrace();
+                        }
+
+                        SharedPreferences preferences = getSharedPreferences("values", MODE_PRIVATE);
+                        idDocument = preferences.getInt("idDocument", 0);
+
+                        idDocument++;
+
+                        SharedPreferences prefs = getSharedPreferences("values", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putInt("idDocument", idDocument);
+                        editor.clear().commit();
+
+                        String idDocumentS = Integer.toString(idDocument);
+
+                        estado = "activado";
+
+                        //The properties that will be saved on the document
+                        Map<String, Object> properties = new HashMap<String, Object>();
+                        properties.put("folio", idDocumentS);
+                        properties.put("nombreDueno", nombreString);
+                        properties.put("direccion", direccionString);
+                        properties.put("telefono", telefonoString);
+                        properties.put("correo", emailString);
+                        properties.put("nombreMascota", mascota);
+                        properties.put("mediosocial", msocialString);
+                        properties.put("raza", razaString);
+                        properties.put("edad", edadString);
+                        properties.put("tamanoMascota", tamanoMascotaString);
+                        properties.put("comentarioRegistro", comentarioString);
+                        properties.put("tratamiento", tratamientoString);
+                        properties.put("rescatado", rescatadoString);
+                        properties.put("vacuna", vacunaString);
+                        properties.put("desparacitacion", desparacitacionString);
+                        properties.put("celo", celoString);
+                        properties.put("lactar", lactarString);
+                        properties.put("tipoMascota", tipoMascotaString);
+                        properties.put("peso", pesoString);
+                        properties.put("alergia", alergiaString);
+                        properties.put("creat_at", fecha);
+                        properties.put("active", estado);
+                        //properties.put("campana", anioString + mes);
 
 
-                            //Create a new document
-                            Document document = database.getDocument(idDocumentS);
+                        //Create a new document
+                        Document document = database.getDocument(idDocumentS);
 
 
-                            //Save the document to the database
-                            try {
-                                document.putProperties(properties);
-                            } catch (CouchbaseLiteException e) {
-                                e.printStackTrace();
-                            }
+                        //Save the document to the database
+                        try {
+                            document.putProperties(properties);
+                        } catch (CouchbaseLiteException e) {
+                            e.printStackTrace();
+                        }
 
-                            if (tipoMascotaString != "Detalle de la Mascota") {
+                        Toast.makeText(getApplicationContext(), "Esta guardando " + estado, Toast.LENGTH_SHORT).show();
 
-                                buscaDesocupado(idDocumentS, tipoMascotaString);
+                        if (tipoMascotaString != "Detalle de la Mascota") {
 
-                                Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
-                                askPermissionAndWriteFile();
-                            } else {
-                                Toast.makeText(getApplicationContext(), "Debe seleccionar alguna opción en Detalle de la mascota", Toast.LENGTH_SHORT).show();
-                            }
+                            buscaDesocupado(idDocumentS, tipoMascotaString, estado);
 
-
+                            // Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
+                            askPermissionAndWriteFile();
+                        } else {
+                            // Toast.makeText(Context.CONTEXT_IGNORE_SECURITY, "Debe seleccionar alguna opción en Detalle de la mascota", Toast.LENGTH_SHORT).show();
                         }
 
 
-                    });
+
+
+                    }
+
+
+                });
 
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
+                finish();
             }
         });
 
@@ -667,7 +956,7 @@ public class ContentPanelActivity extends AppCompatActivity {
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
-    public void pagoDialog(final String idDocumentStringS){
+    public void pagoDialog(final String idDocumentStringS) {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Pago");
@@ -699,49 +988,49 @@ public class ContentPanelActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                       String precio = "";
-                       String stringCantidadTarjeta = "";
+                        String precio = "";
+                        String stringCantidadTarjeta = "";
                         String stringCantidadEfectivo = "";
                         String aprecio = acprecio.getText().toString();
-                       String cantidadTarjeta = editTarjeta.getText().toString();
-                       String cantidadEfectivo = editEfectivo.getText().toString();
-                     //  String devolucionString = devolucion.getText().toString();
+                        String cantidadTarjeta = editTarjeta.getText().toString();
+                        String cantidadEfectivo = editEfectivo.getText().toString();
+                        //  String devolucionString = devolucion.getText().toString();
 
-                        if(button1.isChecked()){
+                        if (button1.isChecked()) {
                             //button1.setBackgroundColor(Color.GREEN);
                             precio = "200";
-                        }else if(button2.isChecked()){
-                           // button2.setBackgroundColor(Color.GREEN);
+                        } else if (button2.isChecked()) {
+                            // button2.setBackgroundColor(Color.GREEN);
                             precio = "250";
-                        }else if(button3.isChecked()) {
+                        } else if (button3.isChecked()) {
                             //button3.setBackgroundColor(Color.GREEN);
                             precio = "300";
 
-                        }else if(button4.isChecked()) {
+                        } else if (button4.isChecked()) {
                             precio = "0";
 
-                        }else if(button5.isChecked()){
+                        } else if (button5.isChecked()) {
                             precio = "150";
-                        }else{
+                        } else {
                             precio = aprecio;
                         }
 
-                        if(sTarjeta.isChecked()){
-                             stringCantidadTarjeta = cantidadTarjeta;
+                        if (sTarjeta.isChecked()) {
+                            stringCantidadTarjeta = cantidadTarjeta;
                         }
 
-                        if(sEfectivo.isChecked()){
-                             stringCantidadEfectivo = cantidadEfectivo;
-                        }else{
+                        if (sEfectivo.isChecked()) {
+                            stringCantidadEfectivo = cantidadEfectivo;
+                        } else {
 
                         }
 
-                       if(devolucion.isChecked()){
-                        precio = "0";
-                        stringCantidadEfectivo = "0";
-                        stringCantidadTarjeta = "0";
+                        if (devolucion.isChecked()) {
+                            precio = "0";
+                            stringCantidadEfectivo = "0";
+                            stringCantidadTarjeta = "0";
 
-                       }
+                        }
 
                         //create manager
                         Manager manager = null;
@@ -765,7 +1054,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         //Create a new document
                         Document document = database.getDocument(idDocumentS);
 
-                        try{
+                        try {
                             final String finalPrecio = precio;
                             final String finalStringCantidadTarjeta = stringCantidadTarjeta;
                             final String finalStringCantidadEfectivo = stringCantidadEfectivo;
@@ -780,7 +1069,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                                 }
                             });
                             Toast.makeText(getApplicationContext(), "correcto", Toast.LENGTH_LONG).show();
-                        }catch (CouchbaseLiteException e){
+                        } catch (CouchbaseLiteException e) {
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
                         }
@@ -798,10 +1087,10 @@ public class ContentPanelActivity extends AppCompatActivity {
 
     }
 
-    public void anestesiaDialog(final String idDocumentStringS){
+    public void anestesiaDialog(final String idDocumentStringS) {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
-        builder.setTitle("Folio " + idDocumentStringS );
+        builder.setTitle("Folio " + idDocumentStringS);
 
         // Context context = builder.getContext();
         LinearLayout layout = new LinearLayout(getApplicationContext());
@@ -837,17 +1126,17 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                         // Create a manager
                         Manager manager = null;
-                        try{
+                        try {
                             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-                        }catch (IOException e){
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
 
                         //Create or open the database named app
                         Database database = null;
-                        try{
+                        try {
                             database = manager.getDatabase("adla");
-                        }catch (CouchbaseLiteException e){
+                        } catch (CouchbaseLiteException e) {
                             e.printStackTrace();
                         }
 
@@ -862,28 +1151,28 @@ public class ContentPanelActivity extends AppCompatActivity {
                         Document document = database.getDocument(idDocumentStringS);
 
                         //Save the document to the database
-                        try{
+                        try {
                             document.putProperties(properties);
-                        }catch (CouchbaseLiteException e){
+                        } catch (CouchbaseLiteException e) {
                             e.printStackTrace();
                         }
 
 
                         Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
 
-                      // int color = Color.GREEN;
+                        // int color = Color.GREEN;
                     }
                 });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-           dialogInterface.cancel();
+                dialogInterface.cancel();
             }
         });
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
-    public void cirugiaDialog(final String idDocumentStringS){
+    public void cirugiaDialog(final String idDocumentStringS) {
 
         final String tipoMascotaString;
         final String operacionAnteriorString;
@@ -891,7 +1180,7 @@ public class ContentPanelActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.cirugiaalert_main, null);
 
-       // final AutoCompleteTextView cirujano = view.findViewById(R.id.nombre_cirujano);
+        // final AutoCompleteTextView cirujano = view.findViewById(R.id.nombre_cirujano);
         //final Button addsurgery = view.findViewById(R.id.addsurgery);
 
         //2if
@@ -902,6 +1191,14 @@ public class ContentPanelActivity extends AppCompatActivity {
         cirujano2 = view.findViewById(R.id.cirujano2);
         cirujano3 = view.findViewById(R.id.cirujano3);
         cirujano4 = view.findViewById(R.id.cirujano4);
+        cirujano5 = view.findViewById(R.id.cirujano5);
+        cirujano6 = view.findViewById(R.id.cirujano6);
+        cirujano7 = view.findViewById(R.id.cirujano7);
+        cirujano8 = view.findViewById(R.id.cirujano8);
+        cirujano9 = view.findViewById(R.id.cirujano9);
+        cirujano10 = view.findViewById(R.id.cirujano10);
+        cirujano11 = view.findViewById(R.id.cirujano11);
+        cirujano12 = view.findViewById(R.id.cirujano12);
 
 
         final CheckBox prenada = view.findViewById(R.id.prenada);
@@ -922,9 +1219,9 @@ public class ContentPanelActivity extends AppCompatActivity {
         final Switch operacionanterior = view.findViewById(R.id.anteriormenteoperado_switch);
 
         //  final TextView tvtexto = view.findViewById(R.id.texto);
-      //  final TextView tv = view.findViewById(R.id.tipomascotaseleccionada);
+        //  final TextView tv = view.findViewById(R.id.tipomascotaseleccionada);
 
-       // final Spinner tipo_mascota =view.findViewById(R.id.tmascota);
+        // final Spinner tipo_mascota =view.findViewById(R.id.tmascota);
 
         //tipo_mascota
      /*   final ArrayAdapter<String> adp = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, pet);
@@ -932,13 +1229,13 @@ public class ContentPanelActivity extends AppCompatActivity {
         tipo_mascota.setAdapter(adp);*/
 
 
-
+        showMeRows();
 
         //Create a manager
         Manager manager = null;
-        try{
+        try {
             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -956,8 +1253,8 @@ public class ContentPanelActivity extends AppCompatActivity {
         Map<String, Object> properties = doc.getProperties();
         tipoMascotaString = (String) properties.get("tipoMascota");
 
-     //   int position = tipo_mascota.getSelectedItemPosition();
-     //   String Text = pet[position].toString();
+        //   int position = tipo_mascota.getSelectedItemPosition();
+        //   String Text = pet[position].toString();
 
     /*    if(tipoMascotaString.equals("Perro")){
 
@@ -995,25 +1292,25 @@ public class ContentPanelActivity extends AppCompatActivity {
             tipo_mascota.setSelection(spinnerPosition);
         }*/
 
-    if(tipoMascotaString.equals("Perro")){
-       perro.setChecked(true);
-    }else if(tipoMascotaString.equals("Perra")){
-        perra.setChecked(true);
-    }else if(tipoMascotaString.equals("Gato")){
-        gato.setChecked(true);
-    }else if(tipoMascotaString.equals("Gata")){
-        gata.setChecked(true);
-    }else{
-        Toast.makeText(getApplicationContext(), "No hay selecionado ningun tipo de mascota", Toast.LENGTH_SHORT).show();
-    }
+        if (tipoMascotaString.equals("Perro")) {
+            perro.setChecked(true);
+        } else if (tipoMascotaString.equals("Perra")) {
+            perra.setChecked(true);
+        } else if (tipoMascotaString.equals("Gato")) {
+            gato.setChecked(true);
+        } else if (tipoMascotaString.equals("Gata")) {
+            gata.setChecked(true);
+        } else {
+            Toast.makeText(getApplicationContext(), "No hay selecionado ningun tipo de mascota", Toast.LENGTH_SHORT).show();
+        }
 
         validaCirugia();
 
-    if(operacionanterior.isChecked()){
-        operacionAnteriorString = "Si";
-    }else{
-        operacionAnteriorString = " No";
-    }
+        if (operacionanterior.isChecked()) {
+            operacionAnteriorString = "Si";
+        } else {
+            operacionAnteriorString = " No";
+        }
 
     /*addsurgery.setOnClickListener(new View.OnClickListener() {
         @Override
@@ -1033,9 +1330,9 @@ public class ContentPanelActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                   // final String ncirujano = cirujano.getText().toString();
-                    final String ncomentario = comentario.getText().toString();
-                   // final String tipomascotaString = tipo_mascota.getSelectedItem().toString();
+                        // final String ncirujano = cirujano.getText().toString();
+                        final String ncomentario = comentario.getText().toString();
+                        // final String tipomascotaString = tipo_mascota.getSelectedItem().toString();
 
                         String prenadaString = "";
                         String celoString = "";
@@ -1046,130 +1343,146 @@ public class ContentPanelActivity extends AppCompatActivity {
                         String testiculoInguinalString = "";
                         String finadoString = "";
                         String alergicoString = "";
-                         String ncirujano = "";
+                        String ncirujano = "";
 
-                        if(cirujano1.isChecked()){
-                            ncirujano = "Pedro";
-                        }else if(cirujano2.isChecked()){
-                            ncirujano = "Juan";
-                        }else if(cirujano3.isChecked()){
-                            ncirujano = "Ramón";
-                        }else if(cirujano4.isChecked()){
-                            ncirujano = "Pablo";
-                        }else{
+                        //cambiar los ncirujano a la variable del nombre que se tecleará
+                        if (cirujano1.isChecked()) {
+                            ncirujano = dString;
+                        } else if (cirujano2.isChecked()) {
+                            ncirujano = dString;
+                        } else if (cirujano3.isChecked()) {
+                            ncirujano = dString;
+                        } else if (cirujano4.isChecked()) {
+                            ncirujano = dString;
+                        }else if (cirujano4.isChecked()) {
+                            ncirujano = dString;
+                        }else if (cirujano4.isChecked()) {
+                            ncirujano = dString;
+                        }else if (cirujano4.isChecked()) {
+                            ncirujano = dString;
+                        }else if (cirujano4.isChecked()) {
+                            ncirujano = dString;
+                        }else if (cirujano4.isChecked()) {
+                            ncirujano = dString;
+                        }else if (cirujano4.isChecked()) {
+                            ncirujano = dString;
+                        }else if (cirujano4.isChecked()) {
+                            ncirujano = dString;
+                        }else if (cirujano4.isChecked()) {
+                            ncirujano = dString;
+                        } else {
                             ncirujano = "No se selecciono cirujano";
                         }
 
-                        if(prenada.isChecked()){
+                        if (prenada.isChecked()) {
                             prenadaString = "Si";
-                        }else{
+                        } else {
                             prenadaString = "No";
                         }
 
-                        if(celo.isChecked()){
+                        if (celo.isChecked()) {
                             celoString = "Si";
-                        }else{
+                        } else {
                             celoString = "No";
                         }
 
-                        if(lactante.isChecked()){
+                        if (lactante.isChecked()) {
                             lactanteString = "Si";
-                        }else{
+                        } else {
                             lactanteString = "No";
                         }
 
-                        if (hemorragia.isChecked()){
+                        if (hemorragia.isChecked()) {
                             hemorragiaString = "Si";
-                        }else{
+                        } else {
                             hemorragiaString = "No";
                         }
 
-                        if (paroRespiratorio.isChecked()){
+                        if (paroRespiratorio.isChecked()) {
                             paroRespiratorioString = "Si";
-                        }else{
+                        } else {
                             paroRespiratorioString = "No";
                         }
 
-                        if(paroCardiaco.isChecked()){
+                        if (paroCardiaco.isChecked()) {
                             paroCardicoString = "Si";
-                        }else{
+                        } else {
                             paroCardicoString = "No";
                         }
 
-                        if(testiculoInguinal.isChecked()){
+                        if (testiculoInguinal.isChecked()) {
                             testiculoInguinalString = "Si";
-                        }else{
+                        } else {
                             testiculoInguinalString = "No";
                         }
 
-                        if(finado.isChecked()){
+                        if (finado.isChecked()) {
                             finadoString = "Si";
-                        }else{
+                        } else {
                             finadoString = "No";
                         }
 
-                        if(alergico.isChecked()){
+                        if (alergico.isChecked()) {
                             alergicoString = "Si";
-                        }else{
+                        } else {
                             alergicoString = "No";
                         }
 
 
-
                         //Create a manager
                         Manager manager = null;
-                        try{
+                        try {
                             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-                        }catch (IOException e){
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                         //Create or open the database named app
                         Database database = null;
-                        try{
+                        try {
                             database = manager.getDatabase("adla");
-                        }catch (CouchbaseLiteException e){
+                        } catch (CouchbaseLiteException e) {
                             e.printStackTrace();
                         }
 
                         //create a new document
                         Document document = database.getDocument(idDocumentStringS);
 
-                        try{
+                        try {
 
-                        final String finalPrenadaString = prenadaString;
-                        final String finalCeloString = celoString;
-                        final String finalLactanteString = lactanteString;
-                        final String finalHemorragiaString = hemorragiaString;
-                        final String finalParoRespiratorioString = paroRespiratorioString;
-                        final String finalParoCardicoString = paroCardicoString;
-                        final String finalTesticuloInguinalString = testiculoInguinalString;
-                        final String finalFinadoString = finadoString;
-                        final String finalAlergicoString = alergicoString;
-                        final String finalncirujano = ncirujano;
+                            final String finalPrenadaString = prenadaString;
+                            final String finalCeloString = celoString;
+                            final String finalLactanteString = lactanteString;
+                            final String finalHemorragiaString = hemorragiaString;
+                            final String finalParoRespiratorioString = paroRespiratorioString;
+                            final String finalParoCardicoString = paroCardicoString;
+                            final String finalTesticuloInguinalString = testiculoInguinalString;
+                            final String finalFinadoString = finadoString;
+                            final String finalAlergicoString = alergicoString;
+                            final String finalncirujano = ncirujano;
 
-                        //The properties that will be saved on the document
-                        document.update(new Document.DocumentUpdater() {
-                            @Override
-                            public boolean update(UnsavedRevision newRevision) {
-                                Map<String, Object> properties = newRevision.getProperties();
-                                properties.put("cirujano", finalncirujano);
-                                properties.put("comentario", ncomentario);
-                                properties.put("preñada", finalPrenadaString);
-                                properties.put("celo_cirugia", finalCeloString);
-                                properties.put("lactante_cirugia", finalLactanteString);
-                                properties.put("hemorragia", finalHemorragiaString);
-                                properties.put("parorespiratorio", finalParoRespiratorioString);
-                                properties.put("parocardiaco", finalParoCardicoString);
-                                properties.put("testiculoinguinal", finalTesticuloInguinalString);
-                                properties.put("finado", finalFinadoString);
-                                properties.put("alergico_cirugia", finalAlergicoString);
-                                properties.put("operacion_anterior", operacionAnteriorString);
-                                properties.put("fecha_cirugia", fecha);
-                                return true;
-                            }
-                        });
+                            //The properties that will be saved on the document
+                            document.update(new Document.DocumentUpdater() {
+                                @Override
+                                public boolean update(UnsavedRevision newRevision) {
+                                    Map<String, Object> properties = newRevision.getProperties();
+                                    properties.put("cirujano", finalncirujano);
+                                    properties.put("comentario", ncomentario);
+                                    properties.put("preñada", finalPrenadaString);
+                                    properties.put("celo_cirugia", finalCeloString);
+                                    properties.put("lactante_cirugia", finalLactanteString);
+                                    properties.put("hemorragia", finalHemorragiaString);
+                                    properties.put("parorespiratorio", finalParoRespiratorioString);
+                                    properties.put("parocardiaco", finalParoCardicoString);
+                                    properties.put("testiculoinguinal", finalTesticuloInguinalString);
+                                    properties.put("finado", finalFinadoString);
+                                    properties.put("alergico_cirugia", finalAlergicoString);
+                                    properties.put("operacion_anterior", operacionAnteriorString);
+                                    properties.put("fecha_cirugia", fecha);
+                                    return true;
+                                }
+                            });
                             Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_SHORT).show();
-                        }catch (CouchbaseLiteException e){
+                        } catch (CouchbaseLiteException e) {
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
                         }
@@ -1228,7 +1541,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
                         }*/
-                  //  }
+                        //  }
                     }
                 });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -1240,7 +1553,7 @@ public class ContentPanelActivity extends AppCompatActivity {
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
-    public void recuperacionDialog(final String idDocumentStringS){
+    public void recuperacionDialog(final String idDocumentStringS) {
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
@@ -1254,10 +1567,10 @@ public class ContentPanelActivity extends AppCompatActivity {
         final Switch analgesico = view.findViewById(R.id.analgesico_switch);
         final Switch suero = view.findViewById(R.id.suero_switch);
         final Switch cicatrizante = view.findViewById(R.id.cicatrizante_switch);
-       // final AutoCompleteTextView comentario = view.findViewById(R.id.comentario);
+        // final AutoCompleteTextView comentario = view.findViewById(R.id.comentario);
 
         //1 if
-         uno = view.findViewById(R.id.uno);
+        uno = view.findViewById(R.id.uno);
         dos = view.findViewById(R.id.dos);
         tres = view.findViewById(R.id.tres);
         cuatro = view.findViewById(R.id.cuatro);
@@ -1289,75 +1602,75 @@ public class ContentPanelActivity extends AppCompatActivity {
                         final String llevaIsabelinoString;
                         final String llevaMedicamentoString;
 
-                        if(antibiotico.isChecked()){
-                       antibioticoString = "si";
-                     // Toast.makeText(getApplicationContext(), "Antibiótico" + antibioticoString, Toast.LENGTH_SHORT).show();
+                        if (antibiotico.isChecked()) {
+                            antibioticoString = "si";
+                            // Toast.makeText(getApplicationContext(), "Antibiótico" + antibioticoString, Toast.LENGTH_SHORT).show();
 
-                      }else{
-                       antibioticoString = "no";
-                     //  Toast.makeText(getApplicationContext(), "Antibiótico" + antibioticoString, Toast.LENGTH_SHORT).show();
-                      }
-
-                   if(tatuaje.isChecked()){
-                       tatuajeString = "si";
-                     //  Toast.makeText(getApplicationContext(), "Tatuaje" + tatuajeString, Toast.LENGTH_SHORT).show();
-                   }else{
-                       tatuajeString = "no";
-                      // Toast.makeText(getApplicationContext(), "Tatuaje" + tatuajeString, Toast.LENGTH_SHORT).show();
-                       }
-
-                   if(analgesico.isChecked()){
-                       analgesicoString = "si";
-                           // Toast.makeText(getApplicationContext(), "Analgésico" + analgesicoString, Toast.LENGTH_SHORT).show();
-                        }else{
-                       analgesicoString = "no";
-                           // Toast.makeText(getApplicationContext(), "Analgésico" + analgesicoString, Toast.LENGTH_SHORT).show();
+                        } else {
+                            antibioticoString = "no";
+                            //  Toast.makeText(getApplicationContext(), "Antibiótico" + antibioticoString, Toast.LENGTH_SHORT).show();
                         }
 
-                   if(suero.isChecked()){
-                       sueroString = "si";
-                          //  Toast.makeText(getApplicationContext(), "Suero" + sueroString, Toast.LENGTH_SHORT).show();
-                        }else{
-                       sueroString = "no";
-                          //  Toast.makeText(getApplicationContext(), "Suero" + sueroString, Toast.LENGTH_SHORT).show();
+                        if (tatuaje.isChecked()) {
+                            tatuajeString = "si";
+                            //  Toast.makeText(getApplicationContext(), "Tatuaje" + tatuajeString, Toast.LENGTH_SHORT).show();
+                        } else {
+                            tatuajeString = "no";
+                            // Toast.makeText(getApplicationContext(), "Tatuaje" + tatuajeString, Toast.LENGTH_SHORT).show();
                         }
 
-                        if(cicatrizante.isChecked()){
-                       cicatrizanteString = "si";
-                           // Toast.makeText(getApplicationContext(), "Cicatrizante" + cicatrizanteString, Toast.LENGTH_SHORT).show();
-                        }else{
+                        if (analgesico.isChecked()) {
+                            analgesicoString = "si";
+                            // Toast.makeText(getApplicationContext(), "Analgésico" + analgesicoString, Toast.LENGTH_SHORT).show();
+                        } else {
+                            analgesicoString = "no";
+                            // Toast.makeText(getApplicationContext(), "Analgésico" + analgesicoString, Toast.LENGTH_SHORT).show();
+                        }
+
+                        if (suero.isChecked()) {
+                            sueroString = "si";
+                            //  Toast.makeText(getApplicationContext(), "Suero" + sueroString, Toast.LENGTH_SHORT).show();
+                        } else {
+                            sueroString = "no";
+                            //  Toast.makeText(getApplicationContext(), "Suero" + sueroString, Toast.LENGTH_SHORT).show();
+                        }
+
+                        if (cicatrizante.isChecked()) {
+                            cicatrizanteString = "si";
+                            // Toast.makeText(getApplicationContext(), "Cicatrizante" + cicatrizanteString, Toast.LENGTH_SHORT).show();
+                        } else {
                             cicatrizanteString = "no";
-                           // Toast.makeText(getApplicationContext(), "Cicatrizante" + cicatrizanteString, Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(getApplicationContext(), "Cicatrizante" + cicatrizanteString, Toast.LENGTH_SHORT).show();
                         }
 
-                       if(uno.isChecked()){
+                        if (uno.isChecked()) {
                             tallaIsabelinoString = "1";
-                        }else if(dos.isChecked()){
+                        } else if (dos.isChecked()) {
                             tallaIsabelinoString = "2";
-                        }else if(tres.isChecked()) {
-                           tallaIsabelinoString = "3";
-                       } else if(cuatro.isChecked()) {
-                           tallaIsabelinoString = "4";
-                       } else if(cinco.isChecked()) {
-                           tallaIsabelinoString = "5";
-                       } else if(seis.isChecked()) {
-                           tallaIsabelinoString = "6";
-                       }else if(tres.isChecked()){
-                           tallaIsabelinoString = "7";
-                       }else{
+                        } else if (tres.isChecked()) {
+                            tallaIsabelinoString = "3";
+                        } else if (cuatro.isChecked()) {
+                            tallaIsabelinoString = "4";
+                        } else if (cinco.isChecked()) {
+                            tallaIsabelinoString = "5";
+                        } else if (seis.isChecked()) {
+                            tallaIsabelinoString = "6";
+                        } else if (tres.isChecked()) {
+                            tallaIsabelinoString = "7";
+                        } else {
                             tallaIsabelinoString = "SN";
                         }
 
 
-                        if(llevaIsabelino.isChecked()){
+                        if (llevaIsabelino.isChecked()) {
                             llevaIsabelinoString = "Si";
-                        }else{
+                        } else {
                             llevaIsabelinoString = "No";
                         }
 
-                        if(llevaMedicamento.isChecked()){
+                        if (llevaMedicamento.isChecked()) {
                             llevaMedicamentoString = "Si";
-                        }else {
+                        } else {
                             llevaMedicamentoString = "No";
                         }
 
@@ -1366,24 +1679,24 @@ public class ContentPanelActivity extends AppCompatActivity {
                         //Create manager
                         Manager manager = null;
 
-                        try{
+                        try {
                             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-                        }catch (IOException e){
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
 
                         //Create or open the database named app
                         Database database = null;
 
-                        try{
+                        try {
                             database = manager.getDatabase("adla");
-                        }catch (CouchbaseLiteException e){
+                        } catch (CouchbaseLiteException e) {
                             e.printStackTrace();
                         }
 
                         Document document = database.getDocument(idDocumentStringS);
 
-                        try{
+                        try {
                             document.update(new Document.DocumentUpdater() {
                                 @Override
                                 public boolean update(UnsavedRevision newRevision) {
@@ -1402,7 +1715,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                                 }
                             });
                             Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
-                        }catch (CouchbaseLiteException e){
+                        } catch (CouchbaseLiteException e) {
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
                         }
@@ -1417,7 +1730,7 @@ public class ContentPanelActivity extends AppCompatActivity {
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
-    public void compraMedicamentoDialog(final String idDocumentStringS){
+    public void compraMedicamentoDialog(final String idDocumentStringS) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Medicamento");
@@ -1463,17 +1776,17 @@ public class ContentPanelActivity extends AppCompatActivity {
         String tatuajeString = (String) properties.get("tatuaje");
         String analgesicoString = (String) properties.get("analgesico");
         String sueroString = (String) properties.get("suero");
-        String cicatrizanteString = (String)properties.get("cicatrizante");
+        String cicatrizanteString = (String) properties.get("cicatrizante");
         String comentarioString = (String) properties.get("comentario_recuperacion");
         String tallaIsabelinoString = (String) properties.get("tallaIsabelino");
         String llevaIsabelinoString = (String) properties.get("llevaIsabelino");
         String llevaMedicamentoString = (String) properties.get("llevaMedicamento");
 
-        if(antibioticoString != null){
+        if (antibioticoString != null) {
             antibiotico.setText(antibioticoString);
         }
 
-        if(tatuajeString != null){
+        if (tatuajeString != null) {
             tatuaje.setText(tatuajeString);
         }
 
@@ -1481,27 +1794,27 @@ public class ContentPanelActivity extends AppCompatActivity {
             analgesico.setText(analgesicoString);
         }
 
-        if(sueroString != null){
+        if (sueroString != null) {
             suero.setText(sueroString);
         }
 
-        if(cicatrizanteString != null){
+        if (cicatrizanteString != null) {
             cicatrizante.setText(cicatrizanteString);
         }
 
-        if(tallaIsabelinoString != null){
+        if (tallaIsabelinoString != null) {
             tallaIsabelino.setText(tallaIsabelinoString);
         }
 
-        if(llevaIsabelinoString != null){
-           llevaIsabelino.setText(llevaIsabelinoString);
+        if (llevaIsabelinoString != null) {
+            llevaIsabelino.setText(llevaIsabelinoString);
         }
 
-        if(llevaMedicamentoString !=null){
-          llevaMedicamento.setText(llevaMedicamentoString);
+        if (llevaMedicamentoString != null) {
+            llevaMedicamento.setText(llevaMedicamentoString);
         }
 
-        if(comentarioString != null){
+        if (comentarioString != null) {
             comentario.setText(comentarioString);
         }
 
@@ -1532,27 +1845,27 @@ public class ContentPanelActivity extends AppCompatActivity {
                             preguntaString = "No";
                         }
 
-                        if(isabelino.isChecked()){
+                        if (isabelino.isChecked()) {
                             isabelinoString = "Si";
-                        }else{
+                        } else {
                             isabelinoString = "No";
                         }
 
-                        if(isodine.isChecked()){
+                        if (isodine.isChecked()) {
                             isodineString = "Si";
-                        }else {
+                        } else {
                             isodineString = "No";
                         }
 
-                        if(entregaMascota.isChecked()){
+                        if (entregaMascota.isChecked()) {
                             entregaMascotaString = "Si";
-                        }else {
+                        } else {
                             entregaMascotaString = "No";
                         }
 
-                        if(candidato.isChecked()){
+                        if (candidato.isChecked()) {
                             candidatoString = "No";
-                        }else{
+                        } else {
                             candidatoString = "Si";
                         }
 
@@ -1575,6 +1888,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         }
 
                         Document document = database.getDocument(idDocumentStringS1);
+                        estado = "desactivado";
 
                         try {
                             document.update(new Document.DocumentUpdater() {
@@ -1587,11 +1901,15 @@ public class ContentPanelActivity extends AppCompatActivity {
                                     properties.put("mascota_entregada", entregaMascotaString);
                                     properties.put("candidato", candidatoString);
                                     properties.put("medicamento_fecha", fecha);
+                                    properties.put("active", estado);
                                     return true;
                                 }
                             });
-                            Toast.makeText(getApplicationContext(), preguntaString, Toast.LENGTH_LONG).show();
-                            Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
+                           // Toast.makeText(getApplicationContext(), preguntaString, Toast.LENGTH_LONG).show();
+                          //  Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
+
+
+                            Toast.makeText(getApplicationContext(), estado, Toast.LENGTH_SHORT).show();
                         } catch (CouchbaseLiteException e) {
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "Hay un problema al guardar los datos de mediacmento!", Toast.LENGTH_LONG).show();
@@ -1599,18 +1917,18 @@ public class ContentPanelActivity extends AppCompatActivity {
                         }
                     }
 
-                    });
+                });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.cancel();
-                        }
-                    });
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
         builder.show();
     }
 
 
-    public void reporteRegistros(){
+    public void reporteRegistros() {
 
         final Calendar c = Calendar.getInstance();
         int mYear = c.get(Calendar.YEAR); // current year
@@ -1620,7 +1938,7 @@ public class ContentPanelActivity extends AppCompatActivity {
         datePickerDialog = new DatePickerDialog(ContentPanelActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-               // Toast.makeText(getApplicationContext(), dayOfMonth + monthOfYear + year, Toast.LENGTH_LONG).show();
+                // Toast.makeText(getApplicationContext(), dayOfMonth + monthOfYear + year, Toast.LENGTH_LONG).show();
 
                 int m = monthOfYear + 1;
 
@@ -1628,25 +1946,26 @@ public class ContentPanelActivity extends AppCompatActivity {
                 String mes = String.valueOf(m);
                 String anio = String.valueOf(year);
 
-               //  Toast.makeText(getApplicationContext(), anio + "/" + mes + "/" + dia, Toast.LENGTH_LONG).show();
+                //  Toast.makeText(getApplicationContext(), anio + "/" + mes + "/" + dia, Toast.LENGTH_LONG).show();
 
-                 Intent i = new Intent(ContentPanelActivity.this, ReporteActivity.class);
-                 i.putExtra("dia",dia);
-                 i.putExtra("mes",mes);
-                 i.putExtra("anio",anio);
-                 startActivity(i);
+                Intent i = new Intent(ContentPanelActivity.this, ReporteActivity.class);
+                i.putExtra("dia", dia);
+                i.putExtra("mes", mes);
+                i.putExtra("anio", anio);
+                startActivity(i);
 
             }
         }, mYear, mMonth, mDay);
         datePickerDialog.show();
-            }
+    }
 
 
-    public void buscaDesocupado(final String idDocumentStringS, final String tipoMascotaString ){
+    public void buscaDesocupado(final String idDocumentStringS, final String tipoMascotaString, final String active) {
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ContentPanelActivity.this);
+        SharedPreferences.Editor editor = preferences.edit();
 
-
-      /*  final SharedPreferences prefs = getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE);
+        /*  final SharedPreferences prefs = getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE);
 
         circleButton1.setVisibility(prefs.getBoolean("boton1", false) ? View.VISIBLE : View.GONE);
         tv1.setVisibility(prefs.getBoolean("tv1", false)  ? View.VISIBLE : View.GONE);
@@ -1757,15 +2076,15 @@ public class ContentPanelActivity extends AppCompatActivity {
         circleButton36.setVisibility(prefs.getBoolean("boton36", false) ? View.VISIBLE : View.GONE);
         tv36.setVisibility(prefs.getBoolean("tv36", false) ? View.VISIBLE : View.GONE);*/
 
-        if(circleButton1.getVisibility() == View.GONE && tv1.getVisibility() == View.GONE){
+        if (circleButton1.getVisibility() == View.GONE && tv1.getVisibility() == View.GONE) {
 
             final int sdk = Build.VERSION.SDK_INT;
 
             circleButton1.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton1.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton1.setImageResource(R.drawable.ic_gato);
             }
 
@@ -1785,7 +2104,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                             if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton1.setColor(Color.GREEN);
-                            }else if(which == 1){
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton1.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -1797,8 +2116,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton1.setVisibility(View.GONE);
-                                    tv1.setVisibility(View.GONE);
-
+                                tv1.setVisibility(View.GONE);
 
 
                             }
@@ -1809,16 +2127,14 @@ public class ContentPanelActivity extends AppCompatActivity {
             });
 
 
-
-
-        } else if(circleButton2.getVisibility() == View.GONE && tv2.getVisibility() == View.GONE){
+        } else if (circleButton2.getVisibility() == View.GONE && tv2.getVisibility() == View.GONE) {
 
 
             circleButton2.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton2.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton2.setImageResource(R.drawable.ic_gato);
             }
 
@@ -1835,7 +2151,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton2.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -1860,14 +2176,13 @@ public class ContentPanelActivity extends AppCompatActivity {
             });
 
 
-
-        }else if (circleButton3.getVisibility() == View.GONE && tv3.getVisibility() == View.GONE){
+        } else if (circleButton3.getVisibility() == View.GONE && tv3.getVisibility() == View.GONE) {
 
             circleButton3.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton3.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton3.setImageResource(R.drawable.ic_gato);
             }
 
@@ -1876,7 +2191,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton3.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1885,10 +2200,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton3.setColor(Color.GREEN);
-                            }else if (which == 1) {
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton3.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -1910,13 +2225,13 @@ public class ContentPanelActivity extends AppCompatActivity {
             });
 
 
-        }else if(circleButton4.getVisibility() == View.GONE && tv4.getVisibility() == View.GONE){
+        } else if (circleButton4.getVisibility() == View.GONE && tv4.getVisibility() == View.GONE) {
 
             circleButton4.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton4.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton4.setImageResource(R.drawable.ic_gato);
             }
 
@@ -1925,7 +2240,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton4.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1933,7 +2248,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton4.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -1958,13 +2273,13 @@ public class ContentPanelActivity extends AppCompatActivity {
             });
 
 
-        }else if(circleButton5.getVisibility() == View.GONE && tv5.getVisibility() == View.GONE){
+        } else if (circleButton5.getVisibility() == View.GONE && tv5.getVisibility() == View.GONE) {
 
             circleButton5.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton5.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton5.setImageResource(R.drawable.ic_gato);
             }
 
@@ -1973,7 +2288,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton5.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -1981,7 +2296,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton5.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2006,13 +2321,13 @@ public class ContentPanelActivity extends AppCompatActivity {
             });
 
 
-        }else if(circleButton6.getVisibility() == View.GONE && tv6.getVisibility() == View.GONE){
+        } else if (circleButton6.getVisibility() == View.GONE && tv6.getVisibility() == View.GONE) {
 
             circleButton6.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton6.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton6.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2021,7 +2336,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton6.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2029,7 +2344,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton6.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2053,13 +2368,13 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
 
-        }else if(circleButton7.getVisibility() == View.GONE && tv7.getVisibility() == View.GONE){
+        } else if (circleButton7.getVisibility() == View.GONE && tv7.getVisibility() == View.GONE) {
 
             circleButton7.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton7.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton7.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2068,7 +2383,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton7.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2076,7 +2391,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton7.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2101,14 +2416,14 @@ public class ContentPanelActivity extends AppCompatActivity {
             });
 
 
-        }else if(circleButton8.getVisibility() == View.GONE && tv8.getVisibility() == View.GONE){
+        } else if (circleButton8.getVisibility() == View.GONE && tv8.getVisibility() == View.GONE) {
 
 
             circleButton8.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton8.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton8.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2117,7 +2432,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton8.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2125,8 +2440,8 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
-                               pagoDialog(idDocumentStringS);
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
                                 circleButton8.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -2149,13 +2464,13 @@ public class ContentPanelActivity extends AppCompatActivity {
                 }
             });
 
-        }else if(circleButton9.getVisibility() == View.GONE && tv9.getVisibility() == View.GONE){
+        } else if (circleButton9.getVisibility() == View.GONE && tv9.getVisibility() == View.GONE) {
 
             circleButton9.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton9.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton9.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2164,7 +2479,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton9.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2172,7 +2487,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton9.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2197,13 +2512,13 @@ public class ContentPanelActivity extends AppCompatActivity {
             });
 
 
-        }else if(circleButton10.getVisibility() == View.GONE && tv10.getVisibility() == View.GONE){
+        } else if (circleButton10.getVisibility() == View.GONE && tv10.getVisibility() == View.GONE) {
 
             circleButton10.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton10.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton10.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2212,7 +2527,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton10.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2220,7 +2535,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton10.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2245,17 +2560,16 @@ public class ContentPanelActivity extends AppCompatActivity {
             });
 
 
+        } else if (circleButton11.getVisibility() == View.GONE && tv11.getVisibility() == View.GONE) {
 
-        }else if(circleButton11.getVisibility() == View.GONE && tv11.getVisibility() == View.GONE){
-
-    //        prefs.edit().putBoolean("boton11", true).apply();
-    //        prefs.edit().putBoolean("tv11", true).apply();
+            //        prefs.edit().putBoolean("boton11", true).apply();
+            //        prefs.edit().putBoolean("tv11", true).apply();
 
             circleButton11.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton11.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton11.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2272,7 +2586,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton11.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2295,16 +2609,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton12.getVisibility() == View.GONE && tv12.getVisibility() == View.GONE){
+        } else if (circleButton12.getVisibility() == View.GONE && tv12.getVisibility() == View.GONE) {
 
-    //        prefs.edit().putBoolean("boton12", true).apply();
-    //        prefs.edit().putBoolean("tv12", true).apply();
+            //        prefs.edit().putBoolean("boton12", true).apply();
+            //        prefs.edit().putBoolean("tv12", true).apply();
 
             circleButton12.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton12.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton12.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2313,7 +2627,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton12.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2321,7 +2635,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton12.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2344,16 +2658,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton13.getVisibility() == View.GONE && tv13.getVisibility() == View.GONE){
+        } else if (circleButton13.getVisibility() == View.GONE && tv13.getVisibility() == View.GONE) {
 
-        //   prefs.edit().putBoolean("boton13", true).apply();
-        //    prefs.edit().putBoolean("tv13", true).apply();
+            //   prefs.edit().putBoolean("boton13", true).apply();
+            //    prefs.edit().putBoolean("tv13", true).apply();
 
             circleButton13.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton13.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton13.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2362,7 +2676,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton13.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2370,7 +2684,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2393,16 +2707,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton14.getVisibility() == View.GONE && tv14.getVisibility() == View.GONE){
+        } else if (circleButton14.getVisibility() == View.GONE && tv14.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton14", true).apply();
-        //    prefs.edit().putBoolean("tv14", true).apply();
+            //    prefs.edit().putBoolean("boton14", true).apply();
+            //    prefs.edit().putBoolean("tv14", true).apply();
 
             circleButton14.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton14.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton14.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2419,9 +2733,9 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
-                             pagoDialog(idDocumentStringS);
-                             circleButton14.setColor(Color.GREEN);
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
+                                circleButton14.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton14.setColor(Color.BLUE);
@@ -2442,16 +2756,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton15.getVisibility() == View.GONE && tv15.getVisibility() == View.GONE){
+        } else if (circleButton15.getVisibility() == View.GONE && tv15.getVisibility() == View.GONE) {
 
-       //    prefs.edit().putBoolean("boton15", true).apply();
-       //     prefs.edit().putBoolean("tv15", true).apply();
+            //    prefs.edit().putBoolean("boton15", true).apply();
+            //     prefs.edit().putBoolean("tv15", true).apply();
 
             circleButton15.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton15.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton15.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2460,7 +2774,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton15.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2468,7 +2782,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton15.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2491,16 +2805,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton16.getVisibility() == View.GONE && tv16.getVisibility() == View.GONE){
+        } else if (circleButton16.getVisibility() == View.GONE && tv16.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton16", true).apply();
-        //    prefs.edit().putBoolean("tv16", true).apply();
+            //    prefs.edit().putBoolean("boton16", true).apply();
+            //    prefs.edit().putBoolean("tv16", true).apply();
 
             circleButton16.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton16.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton16.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2517,7 +2831,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton16.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2540,16 +2854,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton17.getVisibility() == View.GONE && tv17.getVisibility() == View.GONE){
+        } else if (circleButton17.getVisibility() == View.GONE && tv17.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton17", true).apply();
-        //    prefs.edit().putBoolean("tv17", true).apply();
+            //    prefs.edit().putBoolean("boton17", true).apply();
+            //    prefs.edit().putBoolean("tv17", true).apply();
 
             circleButton17.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton17.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton17.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2567,10 +2881,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                           if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
-                               circleButton17.setColor(Color.GREEN);
-                            }else if (which == 1) {
+                                circleButton17.setColor(Color.GREEN);
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton17.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -2590,16 +2904,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton18.getVisibility() == View.GONE && tv18.getVisibility() == View.GONE){
+        } else if (circleButton18.getVisibility() == View.GONE && tv18.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton18", true).apply();
-        //    prefs.edit().putBoolean("tv18", true).apply();
+            //    prefs.edit().putBoolean("boton18", true).apply();
+            //    prefs.edit().putBoolean("tv18", true).apply();
 
             circleButton18.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton18.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton18.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2608,7 +2922,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton18.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2616,7 +2930,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton18.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2639,16 +2953,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton19.getVisibility() == View.GONE && tv19.getVisibility() == View.GONE){
+        } else if (circleButton19.getVisibility() == View.GONE && tv19.getVisibility() == View.GONE) {
 
-         //   prefs.edit().putBoolean("boton19", true).apply();
-         //   prefs.edit().putBoolean("tv19", true).apply();
+            //   prefs.edit().putBoolean("boton19", true).apply();
+            //   prefs.edit().putBoolean("tv19", true).apply();
 
             circleButton19.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton19.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton19.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2657,7 +2971,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton19.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2665,7 +2979,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton19.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2688,16 +3002,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton20.getVisibility() == View.GONE && tv20.getVisibility() == View.GONE){
+        } else if (circleButton20.getVisibility() == View.GONE && tv20.getVisibility() == View.GONE) {
 
-         //   prefs.edit().putBoolean("boton20", true).apply();
-         //   prefs.edit().putBoolean("tv20", true).apply();
+            //   prefs.edit().putBoolean("boton20", true).apply();
+            //   prefs.edit().putBoolean("tv20", true).apply();
 
             circleButton20.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton20.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton20.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2706,7 +3020,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton20.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2714,7 +3028,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton20.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2737,16 +3051,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton21.getVisibility() == View.GONE && tv21.getVisibility() == View.GONE){
+        } else if (circleButton21.getVisibility() == View.GONE && tv21.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton21", true).apply();
-        //    prefs.edit().putBoolean("tv21", true).apply();
+            //    prefs.edit().putBoolean("boton21", true).apply();
+            //    prefs.edit().putBoolean("tv21", true).apply();
 
             circleButton21.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton21.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton21.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2755,7 +3069,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton21.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2763,7 +3077,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton21.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2786,16 +3100,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton22.getVisibility() == View.GONE && tv22.getVisibility() == View.GONE){
+        } else if (circleButton22.getVisibility() == View.GONE && tv22.getVisibility() == View.GONE) {
 
-         //   prefs.edit().putBoolean("boton22", true).apply();
-         //   prefs.edit().putBoolean("tv22", true).apply();
+            //   prefs.edit().putBoolean("boton22", true).apply();
+            //   prefs.edit().putBoolean("tv22", true).apply();
 
             circleButton22.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton22.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton22.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2804,7 +3118,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton22.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2812,7 +3126,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton22.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2835,16 +3149,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton23.getVisibility() == View.GONE && tv23.getVisibility() == View.GONE){
+        } else if (circleButton23.getVisibility() == View.GONE && tv23.getVisibility() == View.GONE) {
 
-         //   prefs.edit().putBoolean("boton23", true).apply();
-        //    prefs.edit().putBoolean("tv23", true).apply();
+            //   prefs.edit().putBoolean("boton23", true).apply();
+            //    prefs.edit().putBoolean("tv23", true).apply();
 
             circleButton23.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton23.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton23.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2853,7 +3167,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton23.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2862,7 +3176,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton23.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2885,16 +3199,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton24.getVisibility() == View.GONE && tv24.getVisibility() == View.GONE){
+        } else if (circleButton24.getVisibility() == View.GONE && tv24.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton24", true).apply();
-        //    prefs.edit().putBoolean("tv24", true).apply();
+            //    prefs.edit().putBoolean("boton24", true).apply();
+            //    prefs.edit().putBoolean("tv24", true).apply();
 
             circleButton24.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton24.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton24.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2903,7 +3217,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton24.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2911,7 +3225,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton24.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -2934,16 +3248,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton25.getVisibility() == View.GONE && tv25.getVisibility() == View.GONE){
+        } else if (circleButton25.getVisibility() == View.GONE && tv25.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton25", true).apply();
-        //    prefs.edit().putBoolean("tv25", true).apply();
+            //    prefs.edit().putBoolean("boton25", true).apply();
+            //    prefs.edit().putBoolean("tv25", true).apply();
 
             circleButton25.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton25.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton25.setImageResource(R.drawable.ic_gato);
             }
 
@@ -2952,7 +3266,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton25.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -2960,8 +3274,8 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
-                               pagoDialog(idDocumentStringS);
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
                                 circleButton25.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -2983,16 +3297,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton26.getVisibility() == View.GONE && tv26.getVisibility() == View.GONE){
+        } else if (circleButton26.getVisibility() == View.GONE && tv26.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton26", true).apply();
-        //    prefs.edit().putBoolean("tv26", true).apply();
+            //    prefs.edit().putBoolean("boton26", true).apply();
+            //    prefs.edit().putBoolean("tv26", true).apply();
 
             circleButton26.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton26.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton26.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3001,7 +3315,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton26.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3009,7 +3323,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton26.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3032,16 +3346,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton27.getVisibility() == View.GONE && tv27.getVisibility() == View.GONE){
+        } else if (circleButton27.getVisibility() == View.GONE && tv27.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton27", true).apply();
-        //    prefs.edit().putBoolean("tv27", true).apply();
+            //    prefs.edit().putBoolean("boton27", true).apply();
+            //    prefs.edit().putBoolean("tv27", true).apply();
 
             circleButton27.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton27.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton27.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3050,7 +3364,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton27.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3058,7 +3372,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton27.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3081,16 +3395,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton28.getVisibility() == View.GONE && tv28.getVisibility() == View.GONE){
+        } else if (circleButton28.getVisibility() == View.GONE && tv28.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton28", true).apply();
-        //    prefs.edit().putBoolean("tv28", true).apply();
+            //    prefs.edit().putBoolean("boton28", true).apply();
+            //    prefs.edit().putBoolean("tv28", true).apply();
 
             circleButton28.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton28.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton28.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3099,7 +3413,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton28.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3107,8 +3421,8 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
-                               pagoDialog(idDocumentStringS);
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
                                 circleButton28.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -3130,16 +3444,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton29.getVisibility() == View.GONE && tv29.getVisibility() == View.GONE){
+        } else if (circleButton29.getVisibility() == View.GONE && tv29.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton29", true).apply();
-        //    prefs.edit().putBoolean("tv29", true).apply();
+            //    prefs.edit().putBoolean("boton29", true).apply();
+            //    prefs.edit().putBoolean("tv29", true).apply();
 
             circleButton29.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton29.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton29.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3148,7 +3462,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton29.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3156,10 +3470,11 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton29.setColor(Color.GREEN);
-                            } if (which == 1) {
+                            }
+                            if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton29.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -3179,16 +3494,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton30.getVisibility() == View.GONE && tv30.getVisibility() == View.GONE){
+        } else if (circleButton30.getVisibility() == View.GONE && tv30.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton30", true).apply();
-        //    prefs.edit().putBoolean("tv30", true).apply();
+            //    prefs.edit().putBoolean("boton30", true).apply();
+            //    prefs.edit().putBoolean("tv30", true).apply();
 
             circleButton30.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton30.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton30.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3197,7 +3512,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton30.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3205,7 +3520,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton30.setColor(Color.GREEN);
                             } else if (which == 0) {
@@ -3228,16 +3543,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton31.getVisibility() == View.GONE && tv31.getVisibility() == View.GONE){
+        } else if (circleButton31.getVisibility() == View.GONE && tv31.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton31", true).apply();
-        //    prefs.edit().putBoolean("tv31", true).apply();
+            //    prefs.edit().putBoolean("boton31", true).apply();
+            //    prefs.edit().putBoolean("tv31", true).apply();
 
             circleButton31.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton31.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton31.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3246,7 +3561,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton31.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3254,7 +3569,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton31.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3277,16 +3592,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton32.getVisibility() == View.GONE && tv32.getVisibility() == View.GONE){
+        } else if (circleButton32.getVisibility() == View.GONE && tv32.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton32", true).apply();
-        //    prefs.edit().putBoolean("tv32", true).apply();
+            //    prefs.edit().putBoolean("boton32", true).apply();
+            //    prefs.edit().putBoolean("tv32", true).apply();
 
             circleButton32.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton32.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton32.setImageResource(R.drawable.ic_gato);
             }
             tv32.setVisibility(View.VISIBLE);
@@ -3294,7 +3609,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton32.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3302,10 +3617,11 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                           if(which == 0){
-                               pagoDialog(idDocumentStringS);
-                               circleButton32.setColor(Color.GREEN);
-                           } if (which == 0) {
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
+                                circleButton32.setColor(Color.GREEN);
+                            }
+                            if (which == 0) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton32.setColor(Color.BLUE);
                             } else if (which == 1) {
@@ -3325,16 +3641,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton33.getVisibility() == View.GONE && tv33.getVisibility() == View.GONE){
+        } else if (circleButton33.getVisibility() == View.GONE && tv33.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton33", true).apply();
-        //    prefs.edit().putBoolean("tv33", true).apply();
+            //    prefs.edit().putBoolean("boton33", true).apply();
+            //    prefs.edit().putBoolean("tv33", true).apply();
 
             circleButton33.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton33.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton33.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3343,7 +3659,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton33.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3351,8 +3667,8 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
-                              pagoDialog(idDocumentStringS);
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
                                 circleButton33.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -3374,16 +3690,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton34.getVisibility() == View.GONE && tv34.getVisibility() == View.GONE){
+        } else if (circleButton34.getVisibility() == View.GONE && tv34.getVisibility() == View.GONE) {
 
-         //   prefs.edit().putBoolean("boton34", true).apply();
-         //   prefs.edit().putBoolean("tv34", true).apply();
+            //   prefs.edit().putBoolean("boton34", true).apply();
+            //   prefs.edit().putBoolean("tv34", true).apply();
 
             circleButton34.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton34.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton34.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3392,7 +3708,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton34.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3400,7 +3716,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton34.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3423,16 +3739,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton35.getVisibility() == View.GONE && tv35.getVisibility() == View.GONE){
+        } else if (circleButton35.getVisibility() == View.GONE && tv35.getVisibility() == View.GONE) {
 
-        //    prefs.edit().putBoolean("boton35", true).apply();
-        //    prefs.edit().putBoolean("tv35", true).apply();
+            //    prefs.edit().putBoolean("boton35", true).apply();
+            //    prefs.edit().putBoolean("tv35", true).apply();
 
             circleButton35.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton35.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton35.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3441,7 +3757,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton35.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3450,7 +3766,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton35.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3473,16 +3789,16 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton36.getVisibility() == View.GONE && tv36.getVisibility() == View.GONE){
+        } else if (circleButton36.getVisibility() == View.GONE && tv36.getVisibility() == View.GONE) {
 
-         //   prefs.edit().putBoolean("boton36", true).apply();
-         //   prefs.edit().putBoolean("tv36", true).apply();
+            //   prefs.edit().putBoolean("boton36", true).apply();
+            //   prefs.edit().putBoolean("tv36", true).apply();
 
             circleButton36.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton36.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton36.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3491,7 +3807,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton36.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3499,7 +3815,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0) {
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton36.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3522,12 +3838,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton37.getVisibility() == View.GONE && tv37.getVisibility() == View.GONE){
+        } else if (circleButton37.getVisibility() == View.GONE && tv37.getVisibility() == View.GONE) {
             circleButton37.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton37.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton37.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3536,7 +3852,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton37.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3544,7 +3860,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton37.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3568,12 +3884,12 @@ public class ContentPanelActivity extends AppCompatActivity {
 
                 }
             });
-        }else if(circleButton38.getVisibility() == View.GONE && tv38.getVisibility() == View.GONE){
+        } else if (circleButton38.getVisibility() == View.GONE && tv38.getVisibility() == View.GONE) {
             circleButton38.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton38.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton38.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3582,7 +3898,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton38.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3590,7 +3906,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton38.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3613,12 +3929,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton39.getVisibility() == View.GONE && tv39.getVisibility() == View.GONE){
+        } else if (circleButton39.getVisibility() == View.GONE && tv39.getVisibility() == View.GONE) {
             circleButton39.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton39.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton39.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3627,7 +3943,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton39.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3635,7 +3951,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton39.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3659,12 +3975,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton40.getVisibility() == View.GONE && tv40.getVisibility() == View.GONE){
+        } else if (circleButton40.getVisibility() == View.GONE && tv40.getVisibility() == View.GONE) {
             circleButton40.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton40.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton40.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3673,7 +3989,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton40.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3681,8 +3997,8 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
-                              pagoDialog(idDocumentStringS);
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
                                 circleButton40.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -3704,12 +4020,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton41.getVisibility() == View.GONE && tv41.getVisibility() == View.GONE){
+        } else if (circleButton41.getVisibility() == View.GONE && tv41.getVisibility() == View.GONE) {
             circleButton41.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton41.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton41.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3718,7 +4034,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton41.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3726,10 +4042,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                           if(which == 0){
-                               pagoDialog(idDocumentStringS);
-                               circleButton41.setColor(Color.GREEN);
-                           } else if (which == 1) {
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
+                                circleButton41.setColor(Color.GREEN);
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton41.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -3749,11 +4065,11 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton42.getVisibility() == View.GONE && tv42.getVisibility() == View.GONE){
+        } else if (circleButton42.getVisibility() == View.GONE && tv42.getVisibility() == View.GONE) {
             circleButton42.setVisibility(View.VISIBLE);
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton42.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton42.setImageResource(R.drawable.ic_gato);
             }
             tv42.setVisibility(View.VISIBLE);
@@ -3761,7 +4077,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton42.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3769,7 +4085,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton42.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3792,12 +4108,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton43.getVisibility() == View.GONE && tv43.getVisibility() == View.GONE){
+        } else if (circleButton43.getVisibility() == View.GONE && tv43.getVisibility() == View.GONE) {
             circleButton43.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton43.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton43.setImageResource(R.drawable.ic_gato);
             }
             tv43.setVisibility(View.VISIBLE);
@@ -3813,7 +4129,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton43.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3836,12 +4152,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton44.getVisibility() == View.GONE && tv44.getVisibility() == View.GONE){
+        } else if (circleButton44.getVisibility() == View.GONE && tv44.getVisibility() == View.GONE) {
             circleButton44.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton44.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton44.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3850,7 +4166,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton44.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3858,7 +4174,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton44.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3881,12 +4197,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton45.getVisibility() == View.GONE && tv45.getVisibility() == View.GONE){
+        } else if (circleButton45.getVisibility() == View.GONE && tv45.getVisibility() == View.GONE) {
             circleButton45.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton45.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton45.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3895,7 +4211,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton45.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3903,7 +4219,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton45.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -3926,12 +4242,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton46.getVisibility() == View.GONE && tv46.getVisibility() == View.GONE){
+        } else if (circleButton46.getVisibility() == View.GONE && tv46.getVisibility() == View.GONE) {
             circleButton46.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton46.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton46.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3940,7 +4256,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton46.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3948,10 +4264,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                           if(which == 0){
-                               pagoDialog(idDocumentStringS);
-                               circleButton46.setColor(Color.GREEN);
-                           } else if(which == 1) {
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
+                                circleButton46.setColor(Color.GREEN);
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton46.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -3971,12 +4287,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton47.getVisibility() == View.GONE && tv47.getVisibility() == View.GONE){
+        } else if (circleButton47.getVisibility() == View.GONE && tv47.getVisibility() == View.GONE) {
             circleButton47.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton47.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton47.setImageResource(R.drawable.ic_gato);
             }
 
@@ -3985,7 +4301,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton47.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -3993,10 +4309,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton47.setColor(Color.GREEN);
-                            }else if (which == 1) {
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton47.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -4016,12 +4332,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton48.getVisibility() == View.GONE && tv48.getVisibility() == View.GONE){
+        } else if (circleButton48.getVisibility() == View.GONE && tv48.getVisibility() == View.GONE) {
             circleButton48.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton48.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton48.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4030,7 +4346,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton48.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4038,7 +4354,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton48.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4061,12 +4377,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton49.getVisibility() == View.GONE && tv49.getVisibility() == View.GONE){
+        } else if (circleButton49.getVisibility() == View.GONE && tv49.getVisibility() == View.GONE) {
             circleButton49.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton49.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton49.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4075,7 +4391,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton49.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4083,7 +4399,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton49.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4106,12 +4422,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton50.getVisibility() == View.GONE && tv50.getVisibility() == View.GONE){
+        } else if (circleButton50.getVisibility() == View.GONE && tv50.getVisibility() == View.GONE) {
             circleButton50.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton50.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton50.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4120,7 +4436,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton50.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4128,7 +4444,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton50.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4151,12 +4467,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton51.getVisibility() == View.GONE && tv51.getVisibility() == View.GONE){
+        } else if (circleButton51.getVisibility() == View.GONE && tv51.getVisibility() == View.GONE) {
             circleButton51.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton51.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton51.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4165,7 +4481,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton51.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4173,8 +4489,8 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
-                              pagoDialog(idDocumentStringS);
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
                                 circleButton51.setColor(Color.GREEN);
                             } else if (which == 0) {
                                 anestesiaDialog(idDocumentStringS);
@@ -4196,12 +4512,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton52.getVisibility() == View.GONE && tv52.getVisibility() == View.GONE){
+        } else if (circleButton52.getVisibility() == View.GONE && tv52.getVisibility() == View.GONE) {
             circleButton52.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton52.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton52.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4210,7 +4526,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton52.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4219,7 +4535,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton52.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4242,12 +4558,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton53.getVisibility() == View.GONE && tv53.getVisibility() == View.GONE){
+        } else if (circleButton53.getVisibility() == View.GONE && tv53.getVisibility() == View.GONE) {
             circleButton53.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton53.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton53.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4264,7 +4580,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton53.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4287,12 +4603,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton54.getVisibility() == View.GONE && tv54.getVisibility() == View.GONE){
+        } else if (circleButton54.getVisibility() == View.GONE && tv54.getVisibility() == View.GONE) {
             circleButton54.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton54.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton54.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4301,7 +4617,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton54.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4310,7 +4626,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton54.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4333,12 +4649,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton55.getVisibility() == View.GONE && tv55.getVisibility() == View.GONE){
+        } else if (circleButton55.getVisibility() == View.GONE && tv55.getVisibility() == View.GONE) {
             circleButton55.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton55.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton55.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4347,7 +4663,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton55.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4355,7 +4671,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton55.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4378,12 +4694,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton56.getVisibility() == View.GONE && tv56.getVisibility() == View.GONE){
+        } else if (circleButton56.getVisibility() == View.GONE && tv56.getVisibility() == View.GONE) {
             circleButton56.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton56.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton56.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4392,7 +4708,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton56.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4400,8 +4716,8 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
-                               pagoDialog(idDocumentStringS);
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
                                 circleButton56.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -4423,12 +4739,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton57.getVisibility() == View.GONE && tv57.getVisibility() == View.GONE){
+        } else if (circleButton57.getVisibility() == View.GONE && tv57.getVisibility() == View.GONE) {
             circleButton57.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton57.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton57.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4437,7 +4753,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton57.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4445,7 +4761,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton57.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4468,12 +4784,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton58.getVisibility() == View.GONE && tv58.getVisibility() == View.GONE){
+        } else if (circleButton58.getVisibility() == View.GONE && tv58.getVisibility() == View.GONE) {
             circleButton58.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton58.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton58.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4482,7 +4798,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton58.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4491,7 +4807,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton58.setColor(Color.GREEN);
                             } else if (which == 0) {
@@ -4514,12 +4830,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton59.getVisibility() == View.GONE && tv59.getVisibility() == View.GONE){
+        } else if (circleButton59.getVisibility() == View.GONE && tv59.getVisibility() == View.GONE) {
             circleButton59.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton59.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton59.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4528,7 +4844,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton59.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4536,10 +4852,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                           if(which == 0){
-                               pagoDialog(idDocumentStringS);
-                               circleButton59.setColor(Color.GREEN);
-                           } else if (which == 1) {
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
+                                circleButton59.setColor(Color.GREEN);
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton59.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -4559,12 +4875,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton60.getVisibility() == View.GONE && tv60.getVisibility() == View.GONE){
+        } else if (circleButton60.getVisibility() == View.GONE && tv60.getVisibility() == View.GONE) {
             circleButton60.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton60.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton60.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4573,7 +4889,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton60.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4581,10 +4897,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                           if(which == 0){
-                             pagoDialog(idDocumentStringS);
-                               circleButton60.setColor(Color.GREEN);
-                           } else if (which == 1) {
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
+                                circleButton60.setColor(Color.GREEN);
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton60.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -4604,12 +4920,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton61.getVisibility() == View.GONE && tv61.getVisibility() == View.GONE){
+        } else if (circleButton61.getVisibility() == View.GONE && tv61.getVisibility() == View.GONE) {
             circleButton61.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton61.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton61.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4618,7 +4934,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton61.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4626,10 +4942,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                           if(which == 0){
-                               pagoDialog(idDocumentStringS);
-                               circleButton61.setColor(Color.GREEN);
-                           } else if (which == 1) {
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
+                                circleButton61.setColor(Color.GREEN);
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton61.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -4649,12 +4965,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton62.getVisibility() == View.GONE && tv62.getVisibility() == View.GONE){
+        } else if (circleButton62.getVisibility() == View.GONE && tv62.getVisibility() == View.GONE) {
             circleButton62.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton62.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton62.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4663,7 +4979,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton62.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4671,7 +4987,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4694,12 +5010,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton63.getVisibility() == View.GONE && tv63.getVisibility() == View.GONE){
+        } else if (circleButton63.getVisibility() == View.GONE && tv63.getVisibility() == View.GONE) {
             circleButton63.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton63.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton63.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4708,7 +5024,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton63.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4716,10 +5032,11 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.GREEN);
-                            } if (which == 1) {
+                            }
+                            if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -4739,12 +5056,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton64.getVisibility() == View.GONE && tv64.getVisibility() == View.GONE){
+        } else if (circleButton64.getVisibility() == View.GONE && tv64.getVisibility() == View.GONE) {
             circleButton64.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton64.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton64.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4753,7 +5070,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton64.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4762,7 +5079,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton64.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4785,12 +5102,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton65.getVisibility() == View.GONE && tv65.getVisibility() == View.GONE){
+        } else if (circleButton65.getVisibility() == View.GONE && tv65.getVisibility() == View.GONE) {
             circleButton65.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton65.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton65.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4799,7 +5116,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton65.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4807,10 +5124,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton65.setColor(Color.GREEN);
-                            }else if (which == 1) {
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton65.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -4830,12 +5147,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton66.getVisibility() == View.GONE && tv66.getVisibility() == View.GONE){
+        } else if (circleButton66.getVisibility() == View.GONE && tv66.getVisibility() == View.GONE) {
             circleButton66.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton66.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton66.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4844,7 +5161,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton66.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4852,7 +5169,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton66.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4875,12 +5192,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton67.getVisibility() == View.GONE && tv67.getVisibility() == View.GONE){
+        } else if (circleButton67.getVisibility() == View.GONE && tv67.getVisibility() == View.GONE) {
             circleButton67.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton67.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton67.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4889,7 +5206,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton67.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4898,7 +5215,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton67.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -4921,12 +5238,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton68.getVisibility() == View.GONE && tv68.getVisibility() == View.GONE){
+        } else if (circleButton68.getVisibility() == View.GONE && tv68.getVisibility() == View.GONE) {
             circleButton68.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton68.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton68.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4935,7 +5252,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton68.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4944,10 +5261,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton68.setColor(Color.GREEN);
-                            }else if (which == 1) {
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton68.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -4967,12 +5284,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton69.getVisibility() == View.GONE && tv69.getVisibility() == View.GONE){
+        } else if (circleButton69.getVisibility() == View.GONE && tv69.getVisibility() == View.GONE) {
             circleButton69.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton69.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton69.setImageResource(R.drawable.ic_gato);
             }
 
@@ -4981,7 +5298,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton69.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -4989,7 +5306,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton69.setColor(Color.GREEN);
                             } else if (which == 1) {
@@ -5012,12 +5329,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton70.getVisibility() == View.GONE && tv70.getVisibility() == View.GONE){
+        } else if (circleButton70.getVisibility() == View.GONE && tv70.getVisibility() == View.GONE) {
             circleButton70.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton70.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton70.setImageResource(R.drawable.ic_gato);
             }
 
@@ -5026,7 +5343,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton70.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -5034,10 +5351,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                           if(which == 0){
-                             pagoDialog(idDocumentStringS);
-                               circleButton70.setColor(Color.GREEN);
-                           } else if (which == 1) {
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
+                                circleButton70.setColor(Color.GREEN);
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton70.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -5057,12 +5374,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton71.getVisibility() == View.GONE && tv71.getVisibility() == View.GONE){
+        } else if (circleButton71.getVisibility() == View.GONE && tv71.getVisibility() == View.GONE) {
             circleButton71.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton71.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton71.setImageResource(R.drawable.ic_gato);
             }
 
@@ -5071,7 +5388,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton71.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -5079,10 +5396,11 @@ public class ContentPanelActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            if(which == 0){
+                            if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton71.setColor(Color.GREEN);
-                            } if (which == 1) {
+                            }
+                            if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton71.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -5102,12 +5420,12 @@ public class ContentPanelActivity extends AppCompatActivity {
                     builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
                 }
             });
-        }else if(circleButton72.getVisibility() == View.GONE && tv72.getVisibility() == View.GONE){
+        } else if (circleButton72.getVisibility() == View.GONE && tv72.getVisibility() == View.GONE) {
             circleButton72.setVisibility(View.VISIBLE);
 
-            if(tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")){
+            if (tipoMascotaString.equals("Perro") || tipoMascotaString.equals("Perra")) {
                 circleButton72.setImageResource(R.drawable.ic_perro);
-            }else if(tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")){
+            } else if (tipoMascotaString.equals("Gato") || tipoMascotaString.equals("Gata")) {
                 circleButton72.setImageResource(R.drawable.ic_gato);
             }
 
@@ -5116,7 +5434,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             circleButton72.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final CharSequence modulos[] = new CharSequence[]{"Pago","Anestesia", "Cirugía", "Recuperación", "Medicamento"};
+                    final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
                     builder.setTitle("Selecciona Módulo");
@@ -5125,10 +5443,10 @@ public class ContentPanelActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
 
-                           if(which == 0){
-                               pagoDialog(idDocumentStringS);
-                               circleButton72.setColor(Color.GREEN);
-                           } else if (which == 1) {
+                            if (which == 0) {
+                                pagoDialog(idDocumentStringS);
+                                circleButton72.setColor(Color.GREEN);
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton72.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -5150,6 +5468,7 @@ public class ContentPanelActivity extends AppCompatActivity {
             });
         }
 
+        editor.commit();
 
     }
 
@@ -5223,7 +5542,7 @@ public class ContentPanelActivity extends AppCompatActivity {
 
         final Chunk A = new Chunk("ABOGADOS DE LOS ANIMALES, A.C.", BLACK_BOLD1);
         final Chunk B = new Chunk("CAMPAÑA DE ESTERILIZACIÓN", BLACK_BOLD2);
-        final Chunk C = new Chunk("SOLICITUD Y RESPONSIVA" + "Ciudad: Querétaro " +  "Fecha: ", BLACK_BOLD2);
+        final Chunk C = new Chunk("SOLICITUD Y RESPONSIVA" + "Ciudad: Querétaro " + "Fecha: ", BLACK_BOLD2);
         final Chunk D = new Chunk("ABOGADOS DE LOS ANIMALES, A.C.", BLACK_BOLD3);
         final Chunk E = new Chunk("El curso post operatorio es responsabilidad del propietario de la mascota esterilizada y deberá ser supervisada por un médico veterinario competente, siguiendo las recomendaciones del médico veterinario que efectúe la cirugía. \n \n", BLACK_BOLD3);
         final Chunk F = new Chunk("REQUISITOS: \n ", BLACK_BOLD3);
@@ -5251,7 +5570,7 @@ public class ContentPanelActivity extends AppCompatActivity {
                 String file = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ Cartas Responsivas";
 
                 File dir = new File(file);
-                if(!dir.exists())
+                if (!dir.exists())
                     dir.mkdirs();
                 Log.d("PDFCreator", "PDF Path:" + file);
 
@@ -5366,9 +5685,9 @@ public class ContentPanelActivity extends AppCompatActivity {
         builder.show().getWindow().setLayout(WRAP_CONTENT, WRAP_CONTENT);
     }
 
-    public void validaRegistro(){
+    public void validaRegistro() {
 
-        if(nombre.length() == 0){
+    /*    if(nombre.length() == 0){
             nombre.setError("No puede dejar el campo de Nombre vacío");
         }
 
@@ -5447,47 +5766,109 @@ public class ContentPanelActivity extends AppCompatActivity {
             gigante.setError("Debe de seleccionar una opción de la fila");
         } else{
 
-        }
+        }*/
     }
 
-    private void validaPago(){
+    private void validaPago() {
 
-     if(!button1.isChecked() || !button2.isChecked() || !button3.isChecked() || !button4.isChecked() || !button5.isChecked()){
+    /* if(!button1.isChecked() || !button2.isChecked() || !button3.isChecked() || !button4.isChecked() || !button5.isChecked()){
          button4.setError("Debe de seleccionar una opción de la fila");
-     }
+     }*/
 
     }
 
-    private void validaAnestesia(){
-        if(dosis1.length() == 0){
+    private void validaAnestesia() {
+      /*  if(dosis1.length() == 0){
             dosis1.setError("Debe de aplicar al menos una dosis a la mascota");
-        }
+        }*/
     }
 
-    private void validaCirugia(){
+    private void validaCirugia() {
 
-        if (comentario.length() == 0){
+     /*   if (comentario.length() == 0){
             comentario.setError("No puede dejar el campo de Comentario vacio");
         }
 
         if(!cirujano1.isChecked() || !cirujano2.isChecked() || !cirujano4.isChecked() || !cirujano3.isChecked()){
             cirujano4.setError("Debe de seleccionar un cirujano");
-        }
+        }*/
     }
 
-    private void validaRecuperacion(){
-    if(!uno.isChecked() || !dos.isChecked() || !tres.isChecked() || !cuatro.isChecked() || !cinco.isChecked() || !seis.isChecked() || !siete.isChecked()){
+    private void validaRecuperacion() {
+  /*  if(!uno.isChecked() || !dos.isChecked() || !tres.isChecked() || !cuatro.isChecked() || !cinco.isChecked() || !seis.isChecked() || !siete.isChecked()){
        // cirujano4.setError("Debe de seleccionar una talla");
-    }
+    }*/
 
     }
 
 
+    private void loadDeletedRecords() throws Exception {
+
+      Object nombre = null,
+                nombreMascota = null,
+                peso = null,
+                raza = null,
+                rescatado = null,
+                tamanoMascota = null,
+                telefono = null,
+                tipoMascota,
+                tratamiento = null,
+                vacuna = null,
+                medioSocial = null,
+                lactar = null,
+                folio = null,
+                edad = null,
+                direccion = null,
+                desparacitacion = null,
+                fecha = null,
+                correo = null,
+                comentarioRegistro = null,
+                celo = null,
+                alergia = null,
+
+                precio_anestesia = null,
+                cantidadTarjeta = null,
+                cantidadEfectivo = null,
+
+                dosis1 = null,
+                dosis2 = null,
+                dosis3 = null,
+                fecha_anestesia = null,  //checar si se encuentra el campo en el xls
+
+                cirujano = null,
+                comentario = null,
+                prenada = null,
+                celo_cirugia = null,
+                lactante_cirugia = null,
+                hemorragia = null,
+                parorespiratorio = null,
+                parocardiaco = null,
+                testiculoinguinal = null,
+                finado = null,
+                alergico_cirugia = null,
+                operacion_anterior = null,
+                fecha_cirugia = null,
+
+                antibiotico = null,
+                tatuaje = null,
+                analgesico = null,
+                suero = null,
+                cicatrizante = null,
+                recuperacion_fecha = null,
+                comentario_recuperacion = null,
+                tallaIsabelino = null,
+                llevaIsabelino = null,
+                llevaMedicamento = null,
 
 
-    private void loadDeletedRecords() throws Exception{
+                pregunta_medicamento = null,
+                isabelino = null,
+                isodine = null,
+                mascota_entregada = null,
+                candidato = null,
+                medicamento_fecha = null,
+                estado_catch = null;
 
-        String idDocumentS;
 
         //Create a manager
         Manager manager = null;
@@ -5497,67 +5878,164 @@ public class ContentPanelActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-       Database database = null;
+        database = null;
         try {
             database = manager.getDatabase("adla");
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }
 
-        com.couchbase.lite.View membersView = database.getView("mascota_entregada");
-        // if (membersView == null) {
-        membersView.setMap(
-                new Mapper() {
-                    @Override
-                    public void map(Map<String, Object> document, Emitter emitter) {
-                        com.couchbase.lite.util.Log.e("inside map", "map");
-                        Object saved = document.get("mascota_entregada");
-                        Object id = document.get("folio");
-                        if (saved != null)
-                            emitter.emit((String) document.get("mascota_entregada"), document);
-                    }
-                }, "1" /* The version number of the mapper... */
-        );
-        // }
-        Query query = database.getView("mascota_entregada").createQuery();
-        query.setStartKey(saved);
-        result = query.run();
+        com.couchbase.lite.View membersView = database.getView("creat_at");
 
-      // String convert = saved.toString();
+        if (membersView != date) {
+            membersView.setMap(
+                    new Mapper() {
+                        @Override
+                        public void map(Map<String, Object> document, Emitter emitter) {
+                            com.couchbase.lite.util.Log.e("inside map", "map");
+                            Object date = document.get("creat_at");
+                            if (date != null)
+                                emitter.emit((String) document.get("creat_at"), document);
 
 
-        for (Iterator<QueryRow> it = result; it.hasNext(); ) {
-            QueryRow row = it.next();
+                        }
+                    }, "1" /* The version number of the mapper... */
+            );
+            // }
 
-           // Log.w("ADLA", "REPORT", row.getKey(), ((Double)row.getValue()).toString());
+            Query query = database.getView("creat_at").createQuery();
+            query.setStartKey(date);
 
-        }
+          //  Query query1 = database.getView("active").createQuery();
+          //  query1.setStartKey("activado");
 
+            try {
 
+                result = query.run();
 
+                } catch (CouchbaseLiteException e) {
 
-
-        //displayRows(result);
-
-       // getRowsFromQueryEnumerator(result);
-    }
-
-    private void displayRows(QueryEnumerator queryEnumerator) {
-
-        final List<QueryRow> rows = getRowsFromQueryEnumerator(queryEnumerator);
-
-        //  tv.setText(rows);
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-              // buscaDesocupado();
+                e.printStackTrace();
 
             }
-        });
-    }
 
+            for (Iterator<QueryRow> it = result; it.hasNext(); ) {
+                QueryRow row = it.next();
+
+                folio = row.getDocument().getProperty("folio"); //0
+                nombre = row.getDocument().getProperty("nombreDueno");  //1
+                nombreMascota = row.getDocument().getProperty("nombreMascota");  //2 Trae nulo
+                peso = row.getDocument().getProperty("peso");  //3
+                raza = row.getDocument().getProperty("raza");  //4
+                rescatado = row.getDocument().getProperty("rescatado");  //5
+                tamanoMascota = row.getDocument().getProperty("tamanoMascota");  //6
+                telefono = row.getDocument().getProperty("telefono");  //7
+                tipoMascota = row.getDocument().getProperty("tipoMascota");  //8
+                tratamiento = row.getDocument().getProperty("tratamiento");  //9
+                vacuna = row.getDocument().getProperty("vacuna");   //10
+                medioSocial = row.getDocument().getProperty("mediosocial");  //11
+                lactar = row.getDocument().getProperty("lactar");  //12
+                // folio = row.getDocument().getProperty("folio"); //13
+                edad = row.getDocument().getProperty("edad");  //14
+                direccion = row.getDocument().getProperty("direccion");  //15
+                desparacitacion = row.getDocument().getProperty("desparacitacion");  //16
+                fecha = row.getDocument().getProperty("creat_at"); //17
+                correo = row.getDocument().getProperty("correo");  //18
+                comentarioRegistro = row.getDocument().getProperty("comentarioRegistro"); //19
+                celo = row.getDocument().getProperty("celo"); //20
+                alergia = row.getDocument().getProperty("alergia"); //21
+
+                precio_anestesia = row.getDocument().getProperty("precio_anestesia");
+                cantidadEfectivo = row.getDocument().getProperty("cantidadEfectivo");
+                cantidadTarjeta = row.getDocument().getProperty("cantidadTarjeta");
+
+                dosis1 = row.getDocument().getProperty("dosis1");
+                dosis2 = row.getDocument().getProperty("dosis2");
+                dosis3 = row.getDocument().getProperty("dosis3");
+                fecha_anestesia = row.getDocument().getProperty("fecha_anestesia");
+
+                cirujano = row.getDocument().getProperty("cirujano");
+                comentario = row.getDocument().getProperty("comentario");
+                prenada = row.getDocument().getProperty("preñada");
+                celo_cirugia = row.getDocument().getProperty("celo_cirugia");
+                lactante_cirugia = row.getDocument().getProperty("lactante_cirugia");
+                hemorragia = row.getDocument().getProperty("hemorragia");
+                parorespiratorio = row.getDocument().getProperty("parorespiratorio");
+                parocardiaco = row.getDocument().getProperty("parocardiaco");
+                testiculoinguinal = row.getDocument().getProperty("testiculoinguinal");
+                finado = row.getDocument().getProperty("finado");
+                alergico_cirugia = row.getDocument().getProperty("alergico_cirugia");
+                operacion_anterior = row.getDocument().getProperty("operacion_anterior");
+                fecha_cirugia = row.getDocument().getProperty("fecha_cirugia");
+
+                antibiotico = row.getDocument().getProperty("antibiotico");
+                tatuaje = row.getDocument().getProperty("tatuaje");
+                analgesico = row.getDocument().getProperty("analgesico");
+                suero = row.getDocument().getProperty("suero");
+                cicatrizante = row.getDocument().getProperty("cicatrizante");
+                recuperacion_fecha = row.getDocument().getProperty("recuperacion_fecha");
+                comentario_recuperacion = row.getDocument().getProperty("comentario_recuperacion");
+                tallaIsabelino = row.getDocument().getProperty("tallaIsabelino");
+                llevaIsabelino = row.getDocument().getProperty("tallaIsabelino");
+                llevaMedicamento = row.getDocument().getProperty("llevaMedicamento");
+
+                pregunta_medicamento = row.getDocument().getProperty("pregunta_medicamento");
+                isabelino = row.getDocument().getProperty("isabelino");
+                isodine = row.getDocument().getProperty("isodine");
+                mascota_entregada = row.getDocument().getProperty("mascota_entregada");
+                candidato = row.getDocument().getProperty("candidato");
+                medicamento_fecha = row.getDocument().getProperty("medicamento_fecha");
+                estado_catch = row.getDocument().getProperty("active");
+
+                //  Toast.makeText(getApplicationContext(), String.valueOf(fecha) + " " + folio, Toast.LENGTH_SHORT).show();
+
+                if (estado_catch.equals("desactivado")){
+                    estado_catch = "activado";
+
+                    //create manager
+                     manager = null;
+                    try {
+                        manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    //Create or open the database named app
+                    Database database = null;
+                    try {
+                        database = manager.getDatabase("adla");
+                    } catch (CouchbaseLiteException d) {
+                        d.printStackTrace();
+                    }
+
+                    //Create a new document
+                    Document document = database.getDocument(String.valueOf(folio));
+
+                    try {
+                        final Object finalEstado_catch = estado_catch;
+                        document.update(new Document.DocumentUpdater() {
+                            @Override
+                            public boolean update(UnsavedRevision newRevision) {
+                                Map<String, Object> properties = newRevision.getProperties();
+                                properties.put("active", finalEstado_catch);
+                                return true;
+                            }
+                        });
+                        Toast.makeText(getApplicationContext(), "correcto", Toast.LENGTH_LONG).show();
+                    } catch (CouchbaseLiteException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
+                    }
+                    buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
+                }else if(estado_catch.equals("activado")){
+                 //   buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
+                }else{
+                   // buscaDesocupado(String.valueOf(folio), "Nada", active_catch_boolean);
+                }
+
+            }
+        }
+    }
     private List<QueryRow> getRowsFromQueryEnumerator(QueryEnumerator queryEnumerator) {
         List<QueryRow> rows = new ArrayList<QueryRow>();
         for (Iterator<QueryRow> it = queryEnumerator; it.hasNext(); ) {
@@ -5567,55 +6045,361 @@ public class ContentPanelActivity extends AppCompatActivity {
         return rows;
     }
 
-    private String newDoctor(){
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        return false;
+    }
 
-        final String name = "";
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Agregar Médico");
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.agregarmedico_main, null);
+    }
 
-        final AutoCompleteTextView newdoctor = view.findViewById(R.id.newdoctor);
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        return false;
+    }
 
-        builder.setView(view);
+    public void showMeRows(){
 
-        builder.setPositiveButton("Guardar",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+        //Create a manager
+        Manager manager = null;
+        try {
+            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-                   //    name = newdoctor.getText().toString();
+        Database database = null;
+        try {
+            database = manager.getDatabase("adlad");
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
 
+        com.couchbase.lite.View doctorView = database.getView("doctor");
+
+        if (doctorView != null) {
+            doctorView.setMap(
+                    new Mapper() {
+                        @Override
+                        public void map(Map<String, Object> document, Emitter emitter) {
+                            com.couchbase.lite.util.Log.e("inside map", "map");
+                            Object doctorn = document.get("doctor");
+                            if (doctorn != null)
+                                emitter.emit((String) document.get("doctor"), document);
+
+
+                        }
+                    }, "1" /* The version number of the mapper... */
+            );
+            // }
+
+            Query query = database.getView("doctor").createQuery();
+            query.setDescending(true);
+
+
+            try {
+
+                result = query.run();
+
+            } catch (CouchbaseLiteException e) {
+
+                e.printStackTrace();
+
+            }
+
+            for (Iterator<QueryRow> it = result; it.hasNext(); ) {
+                QueryRow row = it.next();
+
+                Object doctor = row.getDocument().getProperty("doctor");
+
+                Toast.makeText(getApplicationContext(), String.valueOf(doctor), Toast.LENGTH_SHORT).show();
+
+                if(doctor != null){
+
+                     dString = String.valueOf(doctor);
+
+                    if(cirujano1.getVisibility() == View.GONE){
+                        cirujano1.setVisibility(View.VISIBLE);
+                        cirujano1.setText(dString);
+                    }else if(cirujano2.getVisibility() == View.GONE){
+                        cirujano2.setVisibility(View.VISIBLE);
+                        cirujano2.setText(dString);
+                    }else if(cirujano3.getVisibility() == View.GONE){
+                        cirujano3.setVisibility(View.VISIBLE);
+                        cirujano3.setText(dString);
+                    }else if(cirujano4.getVisibility() == View.GONE){
+                        cirujano4.setVisibility(View.VISIBLE);
+                        cirujano4.setText(dString);
+                    }else if(cirujano5.getVisibility() == View.GONE){
+                        cirujano5.setVisibility(View.VISIBLE);
+                        cirujano5.setText(dString);
+                    }else if(cirujano6.getVisibility() == View.GONE){
+                        cirujano6.setVisibility(View.VISIBLE);
+                        cirujano6.setText(dString);
+                    }else if(cirujano7.getVisibility() == View.GONE){
+                        cirujano7.setVisibility(View.VISIBLE);
+                        cirujano7.setText(dString);
+                    }else if(cirujano8.getVisibility() == View.GONE){
+                        cirujano8.setVisibility(View.VISIBLE);
+                        cirujano8.setText(dString);
+                    }else if(cirujano9.getVisibility() == View.GONE){
+                        cirujano9.setVisibility(View.VISIBLE);
+                        cirujano9.setText(dString);
+                    }else if(cirujano10.getVisibility() == View.GONE){
+                        cirujano10.setVisibility(View.VISIBLE);
+                        cirujano10.setText(dString);
+                    }else if(cirujano11.getVisibility() == View.GONE){
+                        cirujano11.setVisibility(View.VISIBLE);
+                        cirujano11.setText(dString);
+                    }else if(cirujano12.getVisibility() == View.GONE){
+                        cirujano12.setVisibility(View.VISIBLE);
+                        cirujano12.setText(dString);
+                    }else{
+
+                        Toast.makeText(getApplicationContext(), "No hay suficientes Checkbox para los registros", Toast.LENGTH_SHORT).show();
                     }
 
-                });
-        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.cancel();
+                }
             }
-        });
-        builder.show();
 
-        return name;
-    }
+        }else{
 
+            Toast.makeText(getApplicationContext(), "Sin registros", Toast.LENGTH_SHORT).show();
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+            }
 
 
-    }
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+          //  displayRows(result);
+
+          //  getRowsFromQueryEnumerator(result);
+
+        Toast.makeText(getApplicationContext(), "Show", Toast.LENGTH_SHORT).show();
+
+        }
+
+        public void showNoFinishedButtons() throws Exception{
+
+        Toast.makeText(getApplicationContext(), "vamos a cargarlos", Toast.LENGTH_SHORT).show();
+
+            Object nombre = null,
+                    nombreMascota = null,
+                    peso = null,
+                    raza = null,
+                    rescatado = null,
+                    tamanoMascota = null,
+                    telefono = null,
+                    tipoMascota,
+                    tratamiento = null,
+                    vacuna = null,
+                    medioSocial = null,
+                    lactar = null,
+                    folio = null,
+                    edad = null,
+                    direccion = null,
+                    desparacitacion = null,
+                    fecha = null,
+                    correo = null,
+                    comentarioRegistro = null,
+                    celo = null,
+                    alergia = null,
+
+                    precio_anestesia = null,
+                    cantidadTarjeta = null,
+                    cantidadEfectivo = null,
+
+                    dosis1 = null,
+                    dosis2 = null,
+                    dosis3 = null,
+                    fecha_anestesia = null,  //checar si se encuentra el campo en el xls
+
+                    cirujano = null,
+                    comentario = null,
+                    prenada = null,
+                    celo_cirugia = null,
+                    lactante_cirugia = null,
+                    hemorragia = null,
+                    parorespiratorio = null,
+                    parocardiaco = null,
+                    testiculoinguinal = null,
+                    finado = null,
+                    alergico_cirugia = null,
+                    operacion_anterior = null,
+                    fecha_cirugia = null,
+
+                    antibiotico = null,
+                    tatuaje = null,
+                    analgesico = null,
+                    suero = null,
+                    cicatrizante = null,
+                    recuperacion_fecha = null,
+                    comentario_recuperacion = null,
+                    tallaIsabelino = null,
+                    llevaIsabelino = null,
+                    llevaMedicamento = null,
 
 
+                    pregunta_medicamento = null,
+                    isabelino = null,
+                    isodine = null,
+                    mascota_entregada = null,
+                    candidato = null,
+                    medicamento_fecha = null,
+                    estado_catch = null;
+
+
+            //Create a manager
+            Manager manager = null;
+            try {
+                manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            database = null;
+            try {
+                database = manager.getDatabase("adla");
+            } catch (CouchbaseLiteException e) {
+                e.printStackTrace();
+            }
+
+            com.couchbase.lite.View membersView = database.getView("creat_at");
+
+            if (membersView != date) {
+                membersView.setMap(
+                        new Mapper() {
+                            @Override
+                            public void map(Map<String, Object> document, Emitter emitter) {
+                                com.couchbase.lite.util.Log.e("inside map", "map");
+                                Object date = document.get("creat_at");
+                                if (date != null)
+                                    emitter.emit((String) document.get("creat_at"), document);
+
+
+                            }
+                        }, "1" /* The version number of the mapper... */
+                );
+                // }
+
+                Query query = database.getView("creat_at").createQuery();
+                query.setStartKey(date);
+
+                //  Query query1 = database.getView("active").createQuery();
+                //  query1.setStartKey("activado");
+
+                try {
+
+                    result = query.run();
+
+                } catch (CouchbaseLiteException e) {
+
+                    e.printStackTrace();
+
+                }
+
+                for (Iterator<QueryRow> it = result; it.hasNext(); ) {
+                    QueryRow row = it.next();
+
+                    folio = row.getDocument().getProperty("folio"); //0
+                    nombre = row.getDocument().getProperty("nombreDueno");  //1
+                    nombreMascota = row.getDocument().getProperty("nombreMascota");  //2 Trae nulo
+                    peso = row.getDocument().getProperty("peso");  //3
+                    raza = row.getDocument().getProperty("raza");  //4
+                    rescatado = row.getDocument().getProperty("rescatado");  //5
+                    tamanoMascota = row.getDocument().getProperty("tamanoMascota");  //6
+                    telefono = row.getDocument().getProperty("telefono");  //7
+                    tipoMascota = row.getDocument().getProperty("tipoMascota");  //8
+                    tratamiento = row.getDocument().getProperty("tratamiento");  //9
+                    vacuna = row.getDocument().getProperty("vacuna");   //10
+                    medioSocial = row.getDocument().getProperty("mediosocial");  //11
+                    lactar = row.getDocument().getProperty("lactar");  //12
+                    // folio = row.getDocument().getProperty("folio"); //13
+                    edad = row.getDocument().getProperty("edad");  //14
+                    direccion = row.getDocument().getProperty("direccion");  //15
+                    desparacitacion = row.getDocument().getProperty("desparacitacion");  //16
+                    fecha = row.getDocument().getProperty("creat_at"); //17
+                    correo = row.getDocument().getProperty("correo");  //18
+                    comentarioRegistro = row.getDocument().getProperty("comentarioRegistro"); //19
+                    celo = row.getDocument().getProperty("celo"); //20
+                    alergia = row.getDocument().getProperty("alergia"); //21
+
+                    precio_anestesia = row.getDocument().getProperty("precio_anestesia");
+                    cantidadEfectivo = row.getDocument().getProperty("cantidadEfectivo");
+                    cantidadTarjeta = row.getDocument().getProperty("cantidadTarjeta");
+
+                    dosis1 = row.getDocument().getProperty("dosis1");
+                    dosis2 = row.getDocument().getProperty("dosis2");
+                    dosis3 = row.getDocument().getProperty("dosis3");
+                    fecha_anestesia = row.getDocument().getProperty("fecha_anestesia");
+
+                    cirujano = row.getDocument().getProperty("cirujano");
+                    comentario = row.getDocument().getProperty("comentario");
+                    prenada = row.getDocument().getProperty("preñada");
+                    celo_cirugia = row.getDocument().getProperty("celo_cirugia");
+                    lactante_cirugia = row.getDocument().getProperty("lactante_cirugia");
+                    hemorragia = row.getDocument().getProperty("hemorragia");
+                    parorespiratorio = row.getDocument().getProperty("parorespiratorio");
+                    parocardiaco = row.getDocument().getProperty("parocardiaco");
+                    testiculoinguinal = row.getDocument().getProperty("testiculoinguinal");
+                    finado = row.getDocument().getProperty("finado");
+                    alergico_cirugia = row.getDocument().getProperty("alergico_cirugia");
+                    operacion_anterior = row.getDocument().getProperty("operacion_anterior");
+                    fecha_cirugia = row.getDocument().getProperty("fecha_cirugia");
+
+                    antibiotico = row.getDocument().getProperty("antibiotico");
+                    tatuaje = row.getDocument().getProperty("tatuaje");
+                    analgesico = row.getDocument().getProperty("analgesico");
+                    suero = row.getDocument().getProperty("suero");
+                    cicatrizante = row.getDocument().getProperty("cicatrizante");
+                    recuperacion_fecha = row.getDocument().getProperty("recuperacion_fecha");
+                    comentario_recuperacion = row.getDocument().getProperty("comentario_recuperacion");
+                    tallaIsabelino = row.getDocument().getProperty("tallaIsabelino");
+                    llevaIsabelino = row.getDocument().getProperty("tallaIsabelino");
+                    llevaMedicamento = row.getDocument().getProperty("llevaMedicamento");
+
+                    pregunta_medicamento = row.getDocument().getProperty("pregunta_medicamento");
+                    isabelino = row.getDocument().getProperty("isabelino");
+                    isodine = row.getDocument().getProperty("isodine");
+                    mascota_entregada = row.getDocument().getProperty("mascota_entregada");
+                    candidato = row.getDocument().getProperty("candidato");
+                    medicamento_fecha = row.getDocument().getProperty("medicamento_fecha");
+                    estado_catch = row.getDocument().getProperty("active");
+
+                    //  Toast.makeText(getApplicationContext(), String.valueOf(fecha) + " " + folio, Toast.LENGTH_SHORT).show();
+
+                    if (estado_catch.equals("activado")){
+                        //estado_catch = "activado";
+                        buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
+                    }else if(estado_catch.equals("desactivado")){
+                        // buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
+                    }else{
+                        // buscaDesocupado(String.valueOf(folio), "Nada", active_catch_boolean);
+                    }
+
+                }
+            }
+
+        }
+
+
+    private void setupSync() {
+        try {
+            android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(android.content.Context.WIFI_SERVICE);
+            String serviceName = "My Android Message Service";
+           // Configuration configuration = new Configuration(wifi, database, serviceName);
+
+            Configuration configuration = new Configuration(wifi,database, serviceName);
+            int cbListenerPort = configuration.startCBLiteListener(5432);
+            //configuration.exposeService(cbListenerPort);
+            configuration.expoService(cbListenerPort);
+            configuration.listenForService();
+        } catch (Exception e) {
+            com.couchbase.lite.util.Log.e(Application.TAG, "Sync URL is invalid, setting up sync failed");
+            throw new RuntimeException(e);
         }
     }
 
 
-
+}

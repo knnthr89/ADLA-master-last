@@ -177,7 +177,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="190dp"
             android:orientation="vertical"
-            android:layout_marginStart="350dp">
+            android:layout_marginStart="120dp">
 
             <TextView
                 android:id="@+id/ctarjeta"
@@ -204,7 +204,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="180dp"
             android:orientation="vertical"
-            android:layout_marginStart="420dp">
+            android:layout_marginStart="220dp">
 
             <EditText
                 android:id="@+id/editTarjeta"

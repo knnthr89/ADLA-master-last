@@ -22,11 +22,11 @@ tools:context="com.example.dev.saludmock.activities.LoginActivity">
 
 <ImageView
     android:id="@+id/image_logo"
-    android:layout_width="83dp"
-    android:layout_height="75dp"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
     android:layout_marginBottom="16dp"
     android:layout_marginTop="8dp"
-    app:srcCompat="@drawable/ic_empty_image" />
+    android:src="@drawable/logo"/>
 
 <ScrollView
     android:id="@+id/login_form"
@@ -48,7 +48,7 @@ tools:context="com.example.dev.saludmock.activities.LoginActivity">
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_name"
-                android:imeActionId="@+id/login"
+
                 android:imeActionLabel="@string/action_sign_in_short"
                 android:imeOptions="actionUnspecified"
                 android:inputType="text"
@@ -89,14 +89,15 @@ tools:context="com.example.dev.saludmock.activities.LoginActivity">
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true">
 
             <AutoCompleteTextView
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_password"
-                android:imeActionId="@+id/login"
+
                 android:imeActionLabel="@string/action_sign_in_short"
                 android:imeOptions="actionUnspecified"
                 android:inputType="textPassword"
@@ -107,14 +108,15 @@ tools:context="com.example.dev.saludmock.activities.LoginActivity">
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true">
 
             <AutoCompleteTextView
                 android:id="@+id/password2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_password2"
-                android:imeActionId="@+id/login"
+
                 android:imeActionLabel="@string/action_sign_in_short"
                 android:imeOptions="actionUnspecified"
                 android:inputType="textPassword"

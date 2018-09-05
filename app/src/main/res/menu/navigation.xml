@@ -8,7 +8,7 @@
 
     <item
         android:id="@+id/navigation_dashboard"
-        android:icon="@drawable/ic_medicamento"
+        android:icon="@drawable/ic_buscar"
         android:title="@string/title_dashboard" />
 
     <item
@@ -17,7 +17,7 @@
         android:title="@string/title_notifications" />
     <item
         android:id="@+id/navigation_search"
-        android:icon="@drawable/ic_buscar"
+        android:icon="@drawable/ic_new_doctor"
         android:title="@string/title_search" />
     <item
         android:id="@+id/load_deleted"

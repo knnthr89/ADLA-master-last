@@ -5,14 +5,21 @@ package com.example.dev.saludmock.adapters;
  */
 
 import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.couchbase.lite.CouchbaseLiteException;
+import com.couchbase.lite.Database;
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.android.AndroidContext;
 import com.example.dev.saludmock.R;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -53,34 +60,42 @@ public class LlenarTablaAdapter extends ArrayAdapter<LlenarTablaAdapter.PocketMo
             convertView = mInflater.inflate(R.layout.text_view, null);
         }
         */
+
+
         try {
             if (convertView == null) {
                 LayoutInflater infalInflater = (LayoutInflater) this.mContext
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = infalInflater.inflate(R.layout.text_view, null);
                 PocketMov poc = lista.get(position);
-                TextView fecha = (TextView) convertView.findViewById(R.id.txt_direccion);
-                TextView amount = (TextView) convertView.findViewById(R.id.txt_numero);
-                TextView mascota = (TextView) convertView.findViewById(R.id.txt_telefono);
-                TextView telefono = (TextView) convertView.findViewById(R.id.txt_mascota);
-                TextView direccion = (TextView) convertView.findViewById(R.id.txt_nombre);
+
+                TextView fecha =  convertView.findViewById(R.id.txt_direccion);
+                TextView amount =  convertView.findViewById(R.id.txt_numero);
+                TextView mascota =  convertView.findViewById(R.id.txt_telefono);
+                TextView telefono = convertView.findViewById(R.id.txt_mascota);
+                TextView direccion = convertView.findViewById(R.id.txt_nombre);
                 fecha.setText(poc.getNumero());
                 amount.setText(poc.getNombre());
                 mascota.setText(poc.getMascota());
                 telefono.setText(poc.getTelefono());
                 direccion.setText(poc.getDireccion());
-            } else {
+
+
+                } else {
              //   convertView = convertView;
 
                 LayoutInflater infalInflater = (LayoutInflater) this.mContext
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = infalInflater.inflate(R.layout.text_view, null);
                 PocketMov poc = lista.get(position);
-                TextView fecha = (TextView) convertView.findViewById(R.id.txt_direccion);
-                TextView amount = (TextView) convertView.findViewById(R.id.txt_numero);
-                TextView mascota = (TextView) convertView.findViewById(R.id.txt_telefono);
-                TextView telefono = (TextView) convertView.findViewById(R.id.txt_mascota);
-                TextView direccion = (TextView) convertView.findViewById(R.id.txt_nombre);
+
+
+
+                   TextView fecha = convertView.findViewById(R.id.txt_direccion);
+                TextView amount =  convertView.findViewById(R.id.txt_numero);
+                TextView mascota = convertView.findViewById(R.id.txt_telefono);
+                TextView telefono =  convertView.findViewById(R.id.txt_mascota);
+                TextView direccion = convertView.findViewById(R.id.txt_nombre);
                 fecha.setText(poc.getNumero());
                 amount.setText(poc.getNombre());
                 mascota.setText(poc.getMascota());

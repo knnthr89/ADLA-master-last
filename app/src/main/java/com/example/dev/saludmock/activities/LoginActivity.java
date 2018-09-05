@@ -42,12 +42,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.CouchbaseLiteException;
+import com.couchbase.lite.Database;
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.android.AndroidContext;
 import com.couchbase.lite.internal.InterfaceAudience;
 import com.example.dev.saludmock.db.DBHelper;
 import com.example.dev.saludmock.R;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +89,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private ImageView img;
+    private ImageView logo;
     private SharedPreferences shre;
 
 
@@ -92,20 +98,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_login);
+        logo = (ImageView)findViewById(R.id.image_logo);
+
         shre = getSharedPreferences("data", Context.MODE_PRIVATE);
 
          img = findViewById(R.id.logo_button);
         // Picasso.with(getBaseContext()).load(R.drawable.logo).into(img);
-         img.setOnClickListener(new OnClickListener() {
+        img.setOnClickListener(new OnClickListener() {
              @Override
              public void onClick(View view) {
 
-                Intent GaleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                 Toast.makeText(getApplicationContext(), "Recuerde que la imágen debe de tener la dimensión de 70 px para que pueda mostrar correctamente la imágen", Toast.LENGTH_SHORT).show();
+
+                 int idDocument;
+                 Intent GaleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(GaleryIntent, RESULT_LOAD_IMG);
 
-
-
-             }
+                }
          });
 
          if(shre!=null){
@@ -124,7 +133,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                if (id == R.id.email || id == EditorInfo.IME_NULL) {
 
                     if (!isOnline()){
                         showLoginError(getString(R.string.error_network));
@@ -181,14 +190,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
         Button mEmailSignUpButton = (Button) findViewById(R.id.email_sign_up_button);
-        mEmailSignUpButton.setOnClickListener(new OnClickListener() {
+    mEmailSignUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isOnline()) {
+                /*if (!isOnline()) {
                     showLoginError(getString(R.string.error_network));
                     return;
-                }
-                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                }*/
+
+
+                Intent intent = new Intent(LoginActivity.this, ContentPanelActivity.class);
                 startActivity(intent);
 
             }
@@ -196,6 +207,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mProgressView = findViewById(R.id.login_progress);
         mLoginFormView = findViewById(R.id.login_form);
+
+        retrievePath();
 
     }
 
@@ -470,11 +483,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
            SelectedCursor.close();
 
            img.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-           Toast.makeText(getApplicationContext(), picturePath, Toast.LENGTH_SHORT).show();
+          // Toast.makeText(getApplicationContext(), picturePath, Toast.LENGTH_SHORT).show();
         }
         storePath();
         retrievePath();
-      //  convertPathImage();
+        //convertPathImage();
     }
 
     private void storePath(){
@@ -498,7 +511,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 
-            img = findViewById(R.id.logo_button);
+           // img = findViewById(R.id.logo_button);
             img.setImageBitmap(myBitmap);
 
         }

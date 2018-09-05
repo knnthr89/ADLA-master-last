@@ -8,9 +8,10 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="310dp"
+        android:layout_height="20dp"
         android:layout_margin="10dp"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -35,7 +36,7 @@
             android:id="@+id/talla_pregunta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="200dp"
+            android:layout_marginStart="100dp"
             android:text="Talla isabelino:"
             android:textStyle="bold" />
 
@@ -43,15 +44,15 @@
             android:id="@+id/talla_respuesta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="10dp"
             android:text="" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="313dp"
+        android:layout_height="22dp"
         android:layout_marginTop="40dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="@+id/linearLayout"
@@ -68,14 +69,14 @@
             android:id="@+id/tatuaje_respuesta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="33dp"
             android:text="" />
 
         <TextView
             android:id="@+id/isabelino_pregunta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="222dp"
+            android:layout_marginStart="57dp"
             android:text="Compra el isabelino?"
             android:textStyle="bold" />
 
@@ -83,17 +84,17 @@
             android:id="@+id/isabelino_respuesta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="16dp"
             android:text="" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="313dp"
+        android:layout_height="22dp"
 
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="32dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="@+id/linearLayout2"
         app:layout_constraintTop_toTopOf="@+id/linearLayout2">
@@ -117,7 +118,7 @@
             android:id="@+id/medicamento_pregunta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="199dp"
+            android:layout_marginStart="50dp"
             android:text="Compra medicamento?"
             android:textStyle="bold" />
 
@@ -125,7 +126,7 @@
             android:id="@+id/medicamento_respuesta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="10dp"
             android:text="" />
 
     </LinearLayout>
@@ -133,10 +134,10 @@
 
     <LinearLayout
         android:id="@+id/linearLayout4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="310dp"
+        android:layout_height="22dp"
 
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="32dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="@+id/linearLayout3"
         app:layout_constraintTop_toTopOf="@+id/linearLayout3">
@@ -152,7 +153,7 @@
             android:id="@+id/suero_respuesta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="43dp"
             android:text="" />
 
 
@@ -160,7 +161,7 @@
             android:id="@+id/comentario_pregunta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="233dp"
+            android:layout_marginStart="47dp"
             android:text="Comentario en cirugía: "
             android:textStyle="bold" />
 
@@ -168,15 +169,15 @@
             android:id="@+id/comentario_respuesta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="13dp"
             android:text="" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="106dp"
+        android:layout_height="20dp"
         android:layout_marginTop="30dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="@+id/linearLayout4"
@@ -193,7 +194,7 @@
             android:id="@+id/cicatrizante_respuesta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="5dp"
             android:text="" />
 
     </LinearLayout>
@@ -203,7 +204,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="36dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -214,7 +215,7 @@
             android:id="@+id/pregunta_compramedicamento"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/title_compramedicamento" />
+            android:text="@string/title_compramedicamentosmall" />
 
         <Switch
             android:id="@+id/antibiotico_switch"

@@ -38,7 +38,7 @@ public class ManagerCouch extends AppCompatActivity{
         }
     }
 
-  /*  public void document(){
+    /*public void document(){
         int numero = (int) (Math.random() * 10000000) + 1;
         String numeroString = Integer.toString(numero);
 

@@ -9,6 +9,11 @@
     tools:context="com.example.dev.saludmock.activities.ContentPanelActivity"
     tools:layout_editor_absoluteY="89dp">
 
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/ScrollView01"
+        android:layout_width="fill_parent"
+        android:layout_height="190dp">
+
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/frameLayout"
@@ -1668,6 +1673,8 @@
 
     </FrameLayout>
 
+    </ScrollView>
+
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
@@ -1686,5 +1693,12 @@
         android:layout_height="wrap_content"
         android:datePickerMode="spinner"
         android:visibility="gone"/>
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+    </ListView>Your content must have a ListView whose id attribute is 'android.R.id.list'
 
 </android.support.constraint.ConstraintLayout>

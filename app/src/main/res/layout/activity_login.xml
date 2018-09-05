@@ -26,6 +26,12 @@
         android:layout_height="90dip"
         android:src="@drawable/ic_empty_image" />
 
+    <ImageView
+        android:id="@+id/idimg"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo"/>
+
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -35,7 +41,8 @@
             android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="30dp">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -55,14 +62,14 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:passwordToggleEnabled="true">
+                app:passwordToggleEnabled="true"
+                android:layout_marginTop="15dp">
 
                 <EditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password"
-                    android:imeActionId="@+id/login"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
@@ -77,7 +84,7 @@
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="100dp"
                 android:text="@string/action_sign_in_short"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
@@ -88,7 +95,7 @@
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="15dp"
                 android:text="@string/action_sign_up_short"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"

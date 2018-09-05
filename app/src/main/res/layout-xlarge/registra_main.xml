@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/nombre_dueño"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/name_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/direccion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/address_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/phone_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/email_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/nombre_mascota"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/name_animal_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+
+        <!-- <TextView
+             android:id="@+id/tvCheckbox"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="¿Cómo te enteraste de la campaña?"/>
+
+
+           <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+               android:layout_width="wrap_content"
+               android:layout_height="37dp"
+               android:orientation="horizontal">
+
+               <RadioButton
+                   android:id="@+id/facebook"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content" />
+
+               <TextView
+                   android:id="@+id/tvFacebook"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Facebook" />
+
+               <RadioButton
+                   android:id="@+id/volante"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" />
+
+               <TextView
+                   android:id="@+id/tvVolante"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Volante" />
+
+               <RadioButton
+                   android:id="@+id/lona"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" />
+
+               <TextView
+                   android:id="@+id/tvLona"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Vi una lona en la campaña" />
+
+               <RadioButton
+                   android:id="@+id/campana"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" />
+
+               <TextView
+                   android:id="@+id/tvCampana"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Ya he ido a otra campaña de Abogados de los Animales" />
+
+               <RadioButton
+                   android:id="@+id/recomendacion"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" />
+
+               <TextView
+                   android:id="@+id/tvRecomendacion"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Recomendación de otra persona" />
+
+               <RadioButton
+                   android:id="@+id/otro"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" />
+
+               <TextView
+                   android:id="@+id/tvOtro"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Otro" />
+
+           </LinearLayout>-->
+
+
+        <Spinner
+            android:id="@+id/spinner1"
+            android:layout_width="382dp"
+            android:layout_height="34dp"
+            />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/raza"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/animal_race_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/edad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/age_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+    <Spinner
+        android:id="@+id/spinner2"
+        android:layout_width="382dp"
+        android:layout_height="34dp"
+        />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/comentarios"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/coments_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/cirugia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/surgery_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/recatado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/rescued_time_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/vacuna"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/time_vaccine_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/desparacitacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/time_deprivation_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/celo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/last_zeal_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/lactar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/time_breastfeed_register"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/peso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/weight_pet"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+    <Button
+    android:id="@+id/registrar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+        android:layout_gravity="center"
+    android:text="Registrar"/>
+
+</LinearLayout>
+
+    </ScrollView>

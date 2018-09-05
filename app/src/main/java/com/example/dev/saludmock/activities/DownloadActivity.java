@@ -3,6 +3,10 @@ package com.example.dev.saludmock.activities;
 /**
  * Created by dev on 15/08/17.
  */
+import com.couchbase.lite.CouchbaseLiteException;
+import com.couchbase.lite.Database;
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.android.AndroidContext;
 import com.example.dev.saludmock.adapters.LlenarTablaAdapter;
 import com.example.dev.saludmock.R;
 import com.google.android.gms.common.ConnectionResult;
@@ -23,9 +27,11 @@ import com.google.api.services.sheets.v4.model.*;
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -83,6 +89,7 @@ public class DownloadActivity extends Activity
     private ArrayList<LlenarTablaAdapter.PocketMov> listado;
 
     String sheet = "";
+    int idDocument;
 
     /**
      * Create the main activity.
@@ -162,7 +169,7 @@ public class DownloadActivity extends Activity
 
                 Toast.makeText(getApplicationContext(), dmascota, Toast.LENGTH_SHORT).show();
 
-                //Toast.makeText(getApplicationContext(), "Click en la posición "  + listado.get(position).getNombre(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Click en la posición "  + listado.get(position).getNombre(), Toast.LENGTH_SHORT).show();
                 //Object listItem = list.getItemAtPosition(position);
                 Intent i = new Intent(DownloadActivity.this, DownloadSheetToCouchbase.class);
                 i.putExtra("nombre",nom);
@@ -185,6 +192,23 @@ public class DownloadActivity extends Activity
                 i.putExtra("dmascota", dmascota);
 
                 startActivity(i);
+
+            /*    AlertDialog.Builder dialogo1 = new AlertDialog.Builder(DownloadActivity.this);
+                dialogo1.setTitle("Importante");
+                dialogo1.setMessage("¿ Acepta la ejecución de este programa en modo prueba ?");
+                dialogo1.setCancelable(false);
+                dialogo1.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogo1, int id) {
+                        aceptar();
+                    }
+                });
+                dialogo1.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogo1, int id) {
+                        cancelar();
+                    }
+                });
+                dialogo1.show();*/
+
             }
         });
 
@@ -445,6 +469,7 @@ public class DownloadActivity extends Activity
          * @throws IOException
          */
         private ArrayList<LlenarTablaAdapter.PocketMov> getDataFromApi() throws IOException {
+
             String spreadsheetId = sheet;
             String range = "Respuestas de Formulario 1!A2:Q";
             List<String> results = new ArrayList<String>();
@@ -460,6 +485,9 @@ public class DownloadActivity extends Activity
                     //AId
                     if(row.size() >= 0  || row.isEmpty()){
                         poc.setNumero(row.get(0).toString());
+                        String value1 = poc.getNumero();
+                        Toast.makeText(getApplicationContext(), value1, Toast.LENGTH_LONG).show();
+
                     }else {
                         poc.setNumero("");
                     }
@@ -633,5 +661,14 @@ public class DownloadActivity extends Activity
             }
         }
 
+    }
+
+    public void aceptar() {
+        Toast t=Toast.makeText(this,"Bienvenido a probar el programa.", Toast.LENGTH_SHORT);
+        t.show();
+    }
+
+    public void cancelar() {
+        finish();
     }
 }

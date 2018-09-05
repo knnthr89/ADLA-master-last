@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.dev.saludmock">
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -9,10 +11,11 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
@@ -58,15 +61,23 @@
             android:label="@string/title_activity_descargacampaña" />
         <activity
             android:name=".activities.ContentPanelActivity"
-            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_contentpanel" />
         <activity
             android:name=".activities.ReporteActivity"
             android:label="@string/title_activity_reporte" />
-        <activity android:name=".activities.AddUrlSheet"
-            android:label="@string/title_activity_addurlsheet"/>
-        <activity android:name=".activities.CreatePdfFromNewActivity"
-            android:label="@string/title_createpdf_activity"/>
+        <activity
+            android:name=".activities.AddUrlSheet"
+            android:label="@string/title_activity_addurlsheet" />
+        <activity
+            android:name=".activities.CreatePdfFromNewActivity"
+            android:label="@string/title_createpdf_activity" />
+        <activity android:name=".activities.DownloadSheetToDB" />
+        <activity android:name=".activities.DownloadSheetToDBStep2" />
+        <activity android:name=".activities.DownloadDataSheetToCB" />
+        <activity
+            android:name=".activities.AddNewDoctor"
+            android:label="@string/title_activity_add_new_doctor"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

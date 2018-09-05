@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/busqueda"
+        android:layout_below="@+id/spinner"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="17dp"
+        android:layout_alignParentEnd="true">
+
+        <AutoCompleteTextView
+            android:id="@+id/busqueda_registro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/busqueda_registro"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:layout_above="@+id/btn"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="57dp" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <TextView
+        android:id="@+id/tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Se requirió otra dosis?"
+        android:layout_above="@+id/dosis3"
+        android:layout_toStartOf="@+id/btn"
+        android:layout_marginBottom="14dp" />
+
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="22dp"
+        android:text="@string/save_dosis"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <AutoCompleteTextView
+        android:id="@+id/dosis1"
+        android:layout_width="376dp"
+        android:layout_height="53dp"
+        android:hint="@string/medicamento_dosis"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:layout_below="@+id/busqueda"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="13dp"
+        android:layout_alignParentEnd="true" />
+
+    <AutoCompleteTextView
+        android:id="@+id/dosis2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/medicamento_dosis3"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:layout_marginTop="13dp"
+        android:layout_below="@+id/dosis3"
+        android:layout_alignParentStart="true" />
+
+    <AutoCompleteTextView
+        android:id="@+id/dosis3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/medicamento_dosis2"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true" />
+
+
+</RelativeLayout>

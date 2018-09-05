@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/nombre_dueño"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Nombre del dueño"
+                android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/direccion"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Dirección"
+                android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/telefono"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Teléfono"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/email"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Correo Electrónico"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/mascota"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Nombre de la mascota"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tipom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Detalle de la mascota"
+                    android:layout_marginStart="10dp"
+                    android:textStyle="bold"
+                    />
+
+                <CheckBox
+                    android:id="@+id/perro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="Perro" />
+
+                <CheckBox
+                    android:id="@+id/perra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Perra"
+                    android:layout_marginStart="20dp"/>
+
+                <CheckBox
+                    android:id="@+id/gato"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gato"
+                    android:layout_marginStart="20dp"/>
+
+                <CheckBox
+                    android:id="@+id/gata"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gata"
+                    android:layout_marginStart="20dp"/>
+
+            </LinearLayout>
+
+        <!--    <Spinner
+                android:id="@+id/tamano_mascota"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"></Spinner> -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/titulosocial"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="¿Cómo te enteraste de la campaña?"
+                    android:layout_marginStart="10dp"
+                    android:textStyle="bold"
+                    />
+
+                <CheckBox
+                    android:id="@+id/fb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FB"
+                   />
+
+                <CheckBox
+                    android:id="@+id/volante"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Volante"
+                    />
+
+                <CheckBox
+                    android:id="@+id/lona"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vi una lona en la campaña"
+                   />
+
+                <CheckBox
+                    android:id="@+id/campana"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="He ido a otra campaña de Abogados de los Animales"
+                    />
+
+                <CheckBox
+                    android:id="@+id/recomendacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recomendación de otra persona"
+                    />
+
+                <CheckBox
+                    android:id="@+id/otro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Otro"
+                    />
+
+            </LinearLayout>
+
+         <!--   <Spinner
+                android:id="@+id/tmascota"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </Spinner>-->
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/raza"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Raza"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/edad"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Edad"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+         <!--   <Spinner
+                android:id="@+id/msocial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"></Spinner>-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tamano"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tamaño de mascota"
+                    android:layout_marginStart="5dp"
+                    android:textStyle="bold"
+                    />
+
+                <CheckBox
+                    android:id="@+id/chico"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chico" />
+
+                <CheckBox
+                    android:id="@+id/mediano"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mediano" />
+
+                <CheckBox
+                    android:id="@+id/grande"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Grande" />
+
+                <CheckBox
+                    android:id="@+id/gigante"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gigante" />
+
+            </LinearLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/comentarios"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Comentarios"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/tratamiento"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Tratamiento"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/rescatado"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Rescatado"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/vacuna"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Vacuna"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/desparacitacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Desparacitación"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/celo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Celo"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/lactar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Lactar"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/peso"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Peso"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/alergia"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="¿Tiene alguna alergía?, (Mencione cual)"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+
+            <!-- <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/nombre_cirujano"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Nombre del cirujano"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout> -->
+
+            <!--   <Button
+                android:id="@+id/addsurgery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Agregar cirujano"
+                android:layout_marginStart="1000dp"/> -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/ncirujano"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="Cirujano"
+                    android:textStyle="bold" />
+
+                <CheckBox
+                    android:id="@+id/cirujano1"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="88dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+                <CheckBox
+                    android:id="@+id/cirujano2"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="120dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+                <CheckBox
+                    android:id="@+id/cirujano3"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="120dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+                <CheckBox
+                    android:id="@+id/cirujano4"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="120dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cirujano5"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="150dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+                <CheckBox
+                    android:id="@+id/cirujano6"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="120dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+                <CheckBox
+                    android:id="@+id/cirujano7"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="120dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+                <CheckBox
+                    android:id="@+id/cirujano8"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="120dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
+                <CheckBox
+                    android:id="@+id/cirujano9"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="150dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+                <CheckBox
+                    android:id="@+id/cirujano10"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="120dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+                <CheckBox
+                    android:id="@+id/cirujano11"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="120dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+                <CheckBox
+                    android:id="@+id/cirujano12"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="120dp"
+                    android:text=""
+                    android:visibility="gone" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="250dp"
+                    android:orientation="vertical">
+
+                    <CheckBox
+                        android:id="@+id/prenada"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Preñada" />
+
+                    <CheckBox
+                        android:id="@+id/celo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="En celo" />
+
+                    <CheckBox
+                        android:id="@+id/lactante"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Lactante" />
+
+                    <CheckBox
+                        android:id="@+id/hemorragia"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Hemorragía" />
+
+                    <CheckBox
+                        android:id="@+id/parorespiratorio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Paro respiratorio" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="425dp"
+                    android:orientation="vertical">
+
+                    <CheckBox
+                        android:id="@+id/parocardiaco"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Paro cardiaco" />
+
+                    <CheckBox
+                        android:id="@+id/tescuculoinguinal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Testiculo Inguinal" />
+
+                    <CheckBox
+                        android:id="@+id/finado"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Finado" />
+
+                    <CheckBox
+                        android:id="@+id/alergico"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Alérgico" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <!--    <Spinner
+                android:id="@+id/tmascota"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </Spinner> -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/texto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sexo de la mascota seleccionada"
+                    android:textStyle="bold" />
+
+                <CheckBox
+                    android:id="@+id/perro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="130dp"
+                    android:text="Perro" />
+
+                <CheckBox
+                    android:id="@+id/perra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="130dp"
+                    android:text="Perra" />
+
+                <CheckBox
+                    android:id="@+id/gato"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="130dp"
+                    android:text="Gato" />
+
+                <CheckBox
+                    android:id="@+id/gata"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="130dp"
+                    android:text="Gata" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/texto_operacionanterior"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ya se encontraba operado:" />
+
+                <Switch
+                    android:id="@+id/anteriormenteoperado_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="1000dp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp">
+
+                <AutoCompleteTextView
+                    android:id="@+id/comentario"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Comentario"
+                    android:singleLine="true" />
+
+            </android.support.design.widget.TextInputLayout>
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

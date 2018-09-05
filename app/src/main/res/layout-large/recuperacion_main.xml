@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/busqueda"
+        android:layout_below="@+id/spinner"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentEnd="true">
+
+        <AutoCompleteTextView
+            android:id="@+id/busqueda_registro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/busqueda_registro"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:layout_above="@+id/btn"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="20dp" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <TextView
+        android:id="@+id/aplico"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Se aplicó:"
+        android:layout_below="@+id/busqueda"
+        android:layout_alignParentStart="true" />
+
+
+    <RadioButton
+        android:id="@+id/radio1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/radio4"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/aplico2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Antibiótico"
+        android:layout_alignBaseline="@+id/radio3"
+        android:layout_alignBottom="@+id/radio3"
+        android:layout_toEndOf="@+id/radio3" />
+
+    <RadioButton
+        android:id="@+id/radio2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:layout_above="@+id/radio4"
+        android:layout_alignEnd="@+id/btn" />
+
+    <TextView
+        android:id="@+id/aplico3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Suero"
+        android:layout_alignBaseline="@+id/radio4"
+        android:layout_alignBottom="@+id/radio4"
+        android:layout_toEndOf="@+id/radio4" />
+    <RadioButton
+        android:id="@+id/radio3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/radio1"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/aplico4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Analgésico"
+        android:layout_alignBaseline="@+id/radio1"
+        android:layout_alignBottom="@+id/radio1"
+        android:layout_toEndOf="@+id/radio3" />
+
+    <RadioButton
+        android:id="@+id/radio4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/radio5"
+        android:layout_alignStart="@+id/radio2" />
+
+
+    <TextView
+        android:id="@+id/aplico5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tatuaje"
+        android:layout_alignBaseline="@+id/radio2"
+        android:layout_alignBottom="@+id/radio2"
+        android:layout_toEndOf="@+id/radio2" />
+
+    <RadioButton
+        android:id="@+id/radio5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/radio6"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:id="@+id/aplico6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cicatrizante"
+        android:layout_alignBaseline="@+id/radio5"
+        android:layout_alignBottom="@+id/radio5"
+        android:layout_toEndOf="@+id/radio5" />
+
+    <RadioButton
+        android:id="@+id/radio6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignStart="@+id/radio4" />
+
+    <TextView
+        android:id="@+id/aplico7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Otro"
+        android:layout_alignBaseline="@+id/radio6"
+        android:layout_alignBottom="@+id/radio6"
+        android:layout_toEndOf="@+id/radio6" />
+
+
+    <EditText
+        android:id="@+id/et"
+        android:inputType="textMultiLine"
+        android:lines="4"
+        android:minLines="3"
+        android:gravity="top|left"
+        android:maxLines="5"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:scrollbars="vertical"
+        android:hint="@string/action_comments"
+        android:layout_above="@+id/btn"
+        android:layout_alignParentStart="true" />
+
+
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/save_dosis"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

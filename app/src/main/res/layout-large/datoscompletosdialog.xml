@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp">
+
+        <TextView
+            android:id="@+id/folio_guardado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Folio"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/folio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Número"
+           android:layout_marginStart="130dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp">
+
+        <TextView
+            android:id="@+id/dueno"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dueño"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/dueno_guardado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre"
+            android:layout_marginStart="124dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="30dp">
+
+        <TextView
+            android:id="@+id/direccion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dirección"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/direccion_guardado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dato"
+            android:layout_marginStart="105dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="45dp">
+
+        <TextView
+            android:id="@+id/telefono"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Teléfono"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/telefono_guardado"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="108dp"
+            android:text="Número" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="60dp">
+
+        <TextView
+            android:id="@+id/correo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Correo"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/correo_guardado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="mail"
+            android:layout_marginStart="121dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="75dp">
+
+        <TextView
+            android:id="@+id/nmascota"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre de mascota"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/nmascota_guardado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="nombre"
+            android:layout_marginStart="35dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="90dp">
+
+        <TextView
+            android:id="@+id/msocial_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Medio social"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/msocial_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="social"
+            android:layout_marginStart="85dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="105dp">
+
+        <TextView
+            android:id="@+id/raza_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Raza de la mascota"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/raza_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="raza"
+            android:layout_marginStart="41dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="120dp">
+
+        <TextView
+            android:id="@+id/edad_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edad de la mascota"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/edad_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="edad"
+            android:layout_marginStart="40dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="135dp">
+
+        <TextView
+            android:id="@+id/tamanomascota_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tamaño de mascota"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tamanomascota_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="tamano"
+            android:layout_marginStart="35dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="150dp">
+
+        <TextView
+            android:id="@+id/comentarioregistro_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comentario de registro"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/comentarioregistro_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="comentario"
+            android:layout_marginStart="20dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="165dp">
+
+        <TextView
+            android:id="@+id/tratamiento_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tratamiento"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tratamiento_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="tipo"
+            android:layout_marginStart="87dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="180dp">
+
+        <TextView
+            android:id="@+id/rescatado_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rescatado"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/rescatado_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="respuesta"
+            android:layout_marginStart="98dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="195dp">
+
+        <TextView
+            android:id="@+id/vacuna_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vacuna"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/vacuna_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="respuesta"
+            android:layout_marginStart="120dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="210dp">
+
+        <TextView
+            android:id="@+id/desparacitacion_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desparacitación"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/desparacitacion_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="respuesta"
+            android:layout_marginStart="65dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="225dp">
+
+        <TextView
+            android:id="@+id/celo_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Celo"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/celo_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="respuesta"
+            android:layout_marginStart="138dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="240dp">
+
+        <TextView
+            android:id="@+id/lactante_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lactante"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/lactante_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="respuesta"
+            android:layout_marginStart="110dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="255dp">
+
+        <TextView
+            android:id="@+id/tipo_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo de mascota"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tipomascota_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="respuesta"
+            android:layout_marginStart="60dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="270dp">
+
+        <TextView
+            android:id="@+id/peso_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/peso_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="fecha"
+            android:layout_marginStart="130dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="285dp">
+
+        <TextView
+            android:id="@+id/alergia_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alergía"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/alergia_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="respuesta"
+            android:layout_marginStart="122dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="300dp">
+
+        <TextView
+            android:id="@+id/fecharegistro_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha de registro"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/fecharegistro_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="respuesta"
+            android:layout_marginStart="55dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="315dp">
+
+        <TextView
+            android:id="@+id/precioanestesia_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Precio de anestesia"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/precioanestesia_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="precio"
+            android:layout_marginStart="55dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="330dp">
+
+        <TextView
+            android:id="@+id/cantidadtarjeta_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Precio de anestesia"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/cantidadtarjeta_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="precio"
+            android:layout_marginStart="55dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="230dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="345dp">
+
+        <TextView
+            android:id="@+id/cantidadefectivo_pregunta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Precio de anestesia"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/cantidadefectivo_respuesta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="precio"
+            android:layout_marginStart="55dp"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

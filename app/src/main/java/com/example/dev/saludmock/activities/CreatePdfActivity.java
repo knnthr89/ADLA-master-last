@@ -1,12 +1,17 @@
 package com.example.dev.saludmock.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.inputmethodservice.Keyboard;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
@@ -22,13 +27,33 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.LineSeparator;
+import com.opencsv.CSVWriter;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.IndexedColors;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+
+import static com.couchbase.lite.store.SQLiteViewStore.TAG;
 
 /**
  * Created by dev on 15/08/17.
@@ -41,16 +66,19 @@ public class CreatePdfActivity extends Activity {
 
     boolean sdDisponible = false;
     boolean sdAccesoEscritura = false;
+    String active = "desactivado";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_pdf);
+
         askPermissionAndWriteFile();
 
 
     }
-    private void askPermissionAndWriteFile() {
+
+    public void askPermissionAndWriteFile() {
         boolean canWrite = this.askPermission(REQUEST_ID_WRITE_PERMISSION,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
@@ -98,6 +126,7 @@ public class CreatePdfActivity extends Activity {
                 case REQUEST_ID_WRITE_PERMISSION: {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                         writeFile();
+
                     }
                 }
             }
@@ -116,18 +145,18 @@ public class CreatePdfActivity extends Activity {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 
-         final Font BLACK_BOLD1 = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, BaseColor.BLACK);
-         final Font BLACK_BOLD2 = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
-         final Font BLACK_BOLD3 = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK);
+        final Font BLACK_BOLD1 = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, BaseColor.BLACK);
+        final Font BLACK_BOLD2 = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
+        final Font BLACK_BOLD3 = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK);
 
-         final Chunk A = new Chunk("ABOGADOS DE LOS ANIMALES, A.C.", BLACK_BOLD1);
-         final Chunk B = new Chunk("CAMPAÑA DE ESTERILIZACIÓN", BLACK_BOLD2);
-         final Chunk C = new Chunk("SOLICITUD Y RESPONSIVA" + "Ciudad: Querétaro " +  "Fecha: ", BLACK_BOLD2);
-         final Chunk D = new Chunk("ABOGADOS DE LOS ANIMALES, A.C.", BLACK_BOLD3);
-         final Chunk E = new Chunk("El curso post operatorio es responsabilidad del propietario de la mascota esterilizada y deberá ser supervisada por un médico veterinario competente, siguiendo las recomendaciones del médico veterinario que efectúe la cirugía. \n \n", BLACK_BOLD3);
-         final Chunk F = new Chunk("REQUISITOS: \n ", BLACK_BOLD3);
+        final Chunk A = new Chunk("ABOGADOS DE LOS ANIMALES, A.C.", BLACK_BOLD1);
+        final Chunk B = new Chunk("CAMPAÑA DE ESTERILIZACIÓN", BLACK_BOLD2);
+        final Chunk C = new Chunk("SOLICITUD Y RESPONSIVA" + "Ciudad: Querétaro " + "Fecha: ", BLACK_BOLD2);
+        final Chunk D = new Chunk("ABOGADOS DE LOS ANIMALES, A.C.", BLACK_BOLD3);
+        final Chunk E = new Chunk("El curso post operatorio es responsabilidad del propietario de la mascota esterilizada y deberá ser supervisada por un médico veterinario competente, siguiendo las recomendaciones del médico veterinario que efectúe la cirugía. \n \n", BLACK_BOLD3);
+        final Chunk F = new Chunk("REQUISITOS: \n ", BLACK_BOLD3);
 
-        String idDocumentStringS = getIntent().getExtras().getString("numero_folio");
+        String idDocumentStringS = getIntent().getExtras().getString("idDocumentStringS");
         String nombre = getIntent().getExtras().getString("nombre");
         String numero = getIntent().getExtras().getString("numero");
         String mascota = getIntent().getExtras().getString("mascota");
@@ -137,9 +166,9 @@ public class CreatePdfActivity extends Activity {
         String edad = getIntent().getExtras().getString("edad");
         String raza = getIntent().getExtras().getString("raza");
         //Tipo de mascota
-        String dmascota =getIntent().getExtras().getString("dmascota");
+        String dmascota = getIntent().getExtras().getString("dmascota");
 
-      //  Toast.makeText(getApplicationContext(), tmascota, Toast.LENGTH_SHORT).show();
+        //  Toast.makeText(getApplicationContext(), tmascota, Toast.LENGTH_SHORT).show();
 
         if (estado.equals(Environment.MEDIA_MOUNTED)) {
             sdDisponible = true;
@@ -153,7 +182,7 @@ public class CreatePdfActivity extends Activity {
                 String file = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ Cartas Responsivas";
 
                 File dir = new File(file);
-                if(!dir.exists())
+                if (!dir.exists())
                     dir.mkdirs();
                 Log.d("PDFCreator", "PDF Path:" + file);
 
@@ -161,7 +190,7 @@ public class CreatePdfActivity extends Activity {
                 FileOutputStream fOut = new FileOutputStream(nfile);
                 PdfWriter.getInstance(doc, fOut);
                 //create pdf writer instance
-               // PdfWriter.getInstance(doc, new FileOutputStream(file));
+                // PdfWriter.getInstance(doc, new FileOutputStream(file));
                 //open the document for writing
                 doc.open();
 
@@ -231,17 +260,32 @@ public class CreatePdfActivity extends Activity {
                 //close the document
                 doc.close();
 
-                Toast.makeText(getApplicationContext(), "Su PDF ha sido creado y guardado en la memoria externa. " + idDocumentStringS, Toast.LENGTH_SHORT).show();
-              //  ContentPanelActivity contentPanelActivity = new ContentPanelActivity();
-               // contentPanelActivity.buscaDesocupado(idDocumentStringS);
+
+
+             //  ExportDatabaseCSVTask();
+
+              //  Toast.makeText(getApplicationContext(), "Su PDF ha sido creado y guardado en la memoria externa. " + idDocumentStringS, Toast.LENGTH_SHORT).show();
+                String cambio = Boolean.valueOf(active).toString();
+
+                Toast.makeText(getApplicationContext(), cambio, Toast.LENGTH_SHORT).show();
+                //  ContentPanelActivity contentPanelActivity = new ContentPanelActivity();
+                // contentPanelActivity.buscaDesocupado(idDocumentStringS);
                 Intent intent = new Intent(CreatePdfActivity.this, ContentPanelActivity.class);
-                intent.putExtra("idDocumentStringS",idDocumentStringS);
+                intent.putExtra("idDocumentStringS", idDocumentStringS);
                 intent.putExtra("dmascota", dmascota);
+                intent.putExtra("active", active);
                 startActivity(intent);
+                finish();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
+
     }
-}
+
+
+
+
+    }
+

@@ -158,7 +158,36 @@
     <string name="title_comentario">Comentario</string>
 
     <string name="title_compramedicamento">¿El cliente lleva medicamento para la mascota?</string>
+    <string name="title_compramedicamentosmall">¿lleva medicamento?</string>
     <string name="title_compraisabelino">¿El cliente lleva isabelino para la mascota?</string>
     <string name="title_compraisodine">¿El cliente lleva isodine para la mascota?</string>
     <string name="title_entregademascota">¿Se ha entregado la mascota?</string>
+
+    <string name="title_urlsheet">Teclea la URL del Sheet a descargar</string>
+
+
+    <string name="button_urlsheet">Consultar</string>
+
+
+    <string name="prompt_nombre">Nombre dueño mascota</string>
+    <string name="prompt_nombremascota"> Nombre de la mascota </string>
+    <string name="prompt_telefono"> Teléfono </string>
+    <string name="prompt_direccion"> Dirección </string>
+    <string name="prompt_edad"> Edad de la mascota</string>
+    <string name="prompt_raza"> Raza o aproximada</string>
+    <string name="prompt_tmascota">Tamaño de la mascota</string>
+    <string name="prompt_tratamiento">¿Ha sido sometido a algún tratamiento la mascota?</string>
+    <string name="prompt_mediosocial">Medio social por la cúal se enteró de la campaña</string>
+    <string name="prompt_comentarios">Comentarios</string>
+    <string name="prompt_trescatado">Tiempo que tiene que se rescató la mascota</string>
+    <string name="prompt_fvacuna">Fecha que se aplicó su ultima vacuna</string>
+    <string name="prompt_fdesparacitacion">Fecha que se desparacitó</string>
+    <string name="prompt_fcelo">Fecha de su último celo</string>
+    <string name="prompt_tlactar">¿Cuanto tiempo lleva que dejó de lactar?</string>
+    <string name="prompt_correo">Correo Electrónico</string>
+    <string name="prompt_dmascota">Detalles de la mascota</string>
+    <string name="prompt_alergia">¿Tiene alguna alergía la mascota?</string>
+    <string name="title_activity_add_new_doctor">AddNewDoctor</string>
+
+
 </resources>
