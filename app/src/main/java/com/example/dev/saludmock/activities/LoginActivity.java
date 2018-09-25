@@ -102,9 +102,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         shre = getSharedPreferences("data", Context.MODE_PRIVATE);
 
-         img = findViewById(R.id.logo_button);
+      //   img = findViewById(R.id.logo_button);
         // Picasso.with(getBaseContext()).load(R.drawable.logo).into(img);
-        img.setOnClickListener(new OnClickListener() {
+    /*    img.setOnClickListener(new OnClickListener() {
              @Override
              public void onClick(View view) {
 
@@ -115,7 +115,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 startActivityForResult(GaleryIntent, RESULT_LOAD_IMG);
 
                 }
-         });
+         });*/
 
          if(shre!=null){
              String path = shre.getString("path", null);

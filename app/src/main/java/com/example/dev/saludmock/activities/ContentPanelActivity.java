@@ -537,6 +537,8 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
     cirujano11,
     cirujano12;
 
+    Context context = this;
+
     CheckBox uno, dos, tres, cuatro, cinco, seis, siete;
 
     private TextView mTextView = null;
@@ -550,50 +552,46 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_panel);
 
-        itemListView = findViewById(R.id.itemListView);
-        //application = (Application) getApplication();
+        //itemListView = findViewById(R.id.itemListView);
+//        application = (Application) getApplication();
 
-        //this.database = application.getDatabase();
+      //  this.database = application.getDatabase();
+
+
 
         date = anio + "/" + mes + "/" + dia;
 
-        Toast.makeText(getApplicationContext(), String.valueOf(date), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), String.valueOf(date), Toast.LENGTH_SHORT).show();
 
         bottomNavigationView = findViewById(R.id.navigation);
 
         ButterKnife.bind(this);
 
-        for(int i = 0; i <= 7; anio++){
+        /*for(int i = 0; i <= 7; anio++){
             Toast.makeText(getApplicationContext(), String.valueOf(anio), Toast.LENGTH_SHORT).show();
-        }
+        }*/
 
         //  imageButton = (ImageButton)findViewById(R.id.imageButton);
 
-        //  mascota = getIntent().getStringExtra("mascota");
+
+       //   mascota = getIntent().getStringExtra("mascota");
 
         // mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        et = findViewById(R.id.et);
+       // et = findViewById(R.id.et);
 
-        //  String idDocumentS = Integer.toString(idDocument);
+
+         // String idDocumentS = Integer.toString(idDocument);
 
         //  Toast.makeText(getApplicationContext(), idDocumentS, Toast.LENGTH_SHORT).show();
 
 
         //TRAE NULO A TMASCOTA
 
-        if (savedInstanceState != null) {
-
-            savedInstanceState.get(button1_value);
-            savedInstanceState.get(tv1_value);
-
-            Toast.makeText(getApplicationContext(), button1_value, Toast.LENGTH_LONG).show();
-        }
-
         //Recibe los datos de los preregistros que vienen de google sheets
-        Bundle datos = this.getIntent().getExtras();
+       Bundle datos = this.getIntent().getExtras();
         if (datos != null) {
 
             try {
@@ -601,6 +599,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
 
             String idDocumentStringS = datos.getString("idDocumentStringS");
             String dmascota = datos.getString("dmascota");
@@ -664,20 +663,21 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
 
         }
-       if(datos== null) {
+      /*  if(datos== null) {
            try {
                showNoFinishedButtons();
            } catch (Exception e) {
                e.printStackTrace();
            }
-       }
+       }*/
 
-  /*    new Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 setupSync();
                 }
-        }).start();*/
+        }).start();
+
 
     }
 
@@ -1172,16 +1172,13 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
-    public void cirugiaDialog(final String idDocumentStringS) {
+  public void cirugiaDialog(final String idDocumentStringS) {
 
-        final String tipoMascotaString;
+        final String tipoMascotaString = null;
         final String operacionAnteriorString;
 
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.cirugiaalert_main, null);
-
-        // final AutoCompleteTextView cirujano = view.findViewById(R.id.nombre_cirujano);
-        //final Button addsurgery = view.findViewById(R.id.addsurgery);
 
         //2if
         comentario = view.findViewById(R.id.comentario);
@@ -1218,80 +1215,6 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
         final Switch operacionanterior = view.findViewById(R.id.anteriormenteoperado_switch);
 
-        //  final TextView tvtexto = view.findViewById(R.id.texto);
-        //  final TextView tv = view.findViewById(R.id.tipomascotaseleccionada);
-
-        // final Spinner tipo_mascota =view.findViewById(R.id.tmascota);
-
-        //tipo_mascota
-     /*   final ArrayAdapter<String> adp = new ArrayAdapter<String>(ContentPanelActivity.this, android.R.layout.simple_spinner_item, pet);
-        tipo_mascota.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        tipo_mascota.setAdapter(adp);*/
-
-
-        showMeRows();
-
-        //Create a manager
-        Manager manager = null;
-        try {
-            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Database database = null;
-        try {
-            database = manager.getDatabase("adla");
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-
-        Document doc = database.getDocument(idDocumentStringS);
-
-        doc.getProperty("tipoMascota");
-
-        Map<String, Object> properties = doc.getProperties();
-        tipoMascotaString = (String) properties.get("tipoMascota");
-
-        //   int position = tipo_mascota.getSelectedItemPosition();
-        //   String Text = pet[position].toString();
-
-    /*    if(tipoMascotaString.equals("Perro")){
-
-          //  Toast.makeText(getApplicationContext(), "Perro", Toast.LENGTH_SHORT).show();
-
-          int spinnerPosition = adp.getPosition(tipoMascotaString);
-          tipo_mascota.setSelection(spinnerPosition);
-
-        }else if(tipoMascotaString.equals("Perra")){
-
-          //  Toast.makeText(getApplicationContext(), "Perra", Toast.LENGTH_SHORT).show();
-
-            int spinnerPosition = adp.getPosition(tipoMascotaString);
-            tipo_mascota.setSelection(spinnerPosition);
-
-        }else if(tipoMascotaString.equals("Gato")){
-
-          //  Toast.makeText(getApplicationContext(), "Gato", Toast.LENGTH_SHORT).show();
-
-            int spinnerPosition = adp.getPosition(tipoMascotaString);
-            tipo_mascota.setSelection(spinnerPosition);
-
-        }else if(tipoMascotaString.equals("Gata")){
-
-         //   Toast.makeText(getApplicationContext(), "Gata", Toast.LENGTH_SHORT).show();
-
-            int spinnerPosition = adp.getPosition(tipoMascotaString);
-            tipo_mascota.setSelection(spinnerPosition);
-
-        }else{
-
-         //   Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
-
-            int spinnerPosition = adp.getPosition(tipoMascotaString);
-            tipo_mascota.setSelection(spinnerPosition);
-        }*/
-
         if (tipoMascotaString.equals("Perro")) {
             perro.setChecked(true);
         } else if (tipoMascotaString.equals("Perra")) {
@@ -1311,15 +1234,6 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         } else {
             operacionAnteriorString = " No";
         }
-
-    /*addsurgery.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            newDoctor();
-        }
-    });*/
-
-        //  tv.setText(tipoMascotaString);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Cirugía");
@@ -1486,63 +1400,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
                         }
-
-                   /*     //Create a manager
-                         manager = null;
-                        try {
-                            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
-                        //Create or open the database named app
-                         database = null;
-                        try {
-                            database = manager.getDatabase("adla");
-                        } catch (CouchbaseLiteException e) {
-                            e.printStackTrace();
-                        }
-
-                        //create a new document
-                         document = database.getDocument(idDocumentStringS);
-
-                        try{
-                            final String finalPrenadaString = prenadaString;
-                            final String finalCeloString = celoString;
-                            final String finalLactanteString = lactanteString;
-                            final String finalHemorragiaString = hemorragiaString;
-                            final String finalParoRespiratorioString = paroRespiratorioString;
-                            final String finalParoCardicoString = paroCardicoString;
-                            final String finalTesticuloInguinalString = testiculoInguinalString;
-                            final String finalFinadoString = finadoString;
-                            final String finalAlergicoString = alergicoString;
-                            document.update(new Document.DocumentUpdater() {
-                                @Override
-                                public boolean update(UnsavedRevision newRevision) {
-                                    Map<String, Object> properties = newRevision.getProperties();
-                                    properties.put("cirujano",ncirujano);
-                                    properties.put("comentario", ncomentario);
-                                    properties.put("preñada", finalPrenadaString);
-                                    properties.put("celo_cirugia", finalCeloString);
-                                    properties.put("lactante_cirugia", finalLactanteString);
-                                    properties.put("hemorragia", finalHemorragiaString);
-                                    properties.put("parorespiratorio", finalParoRespiratorioString);
-                                    properties.put("parocardiaco", finalParoCardicoString);
-                                    properties.put("testiculoinguinal", finalTesticuloInguinalString);
-                                    properties.put("finado", finalFinadoString);
-                                    properties.put("alergico_cirugia", finalAlergicoString);
-                                 //   properties.put("tipoMascota", tipomascotaString);
-                                    properties.put("fecha_cirugia", fecha);
-                                    return true;
-                                }
-                            });
-                            Toast.makeText(getApplicationContext(), "Se cambió de sexo la mascota", Toast.LENGTH_LONG).show();
-                            Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
-                        }catch (CouchbaseLiteException e){
-                            e.printStackTrace();
-                            Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
-                        }*/
-                        //  }
-                    }
                 });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
@@ -1567,7 +1425,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         final Switch analgesico = view.findViewById(R.id.analgesico_switch);
         final Switch suero = view.findViewById(R.id.suero_switch);
         final Switch cicatrizante = view.findViewById(R.id.cicatrizante_switch);
-        // final AutoCompleteTextView comentario = view.findViewById(R.id.comentario);
+
 
         //1 if
         uno = view.findViewById(R.id.uno);
@@ -1604,44 +1462,33 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
                         if (antibiotico.isChecked()) {
                             antibioticoString = "si";
-                            // Toast.makeText(getApplicationContext(), "Antibiótico" + antibioticoString, Toast.LENGTH_SHORT).show();
-
-                        } else {
+                            } else {
                             antibioticoString = "no";
-                            //  Toast.makeText(getApplicationContext(), "Antibiótico" + antibioticoString, Toast.LENGTH_SHORT).show();
-                        }
+                            }
 
                         if (tatuaje.isChecked()) {
                             tatuajeString = "si";
-                            //  Toast.makeText(getApplicationContext(), "Tatuaje" + tatuajeString, Toast.LENGTH_SHORT).show();
-                        } else {
+                            } else {
                             tatuajeString = "no";
-                            // Toast.makeText(getApplicationContext(), "Tatuaje" + tatuajeString, Toast.LENGTH_SHORT).show();
-                        }
+                            }
 
                         if (analgesico.isChecked()) {
                             analgesicoString = "si";
-                            // Toast.makeText(getApplicationContext(), "Analgésico" + analgesicoString, Toast.LENGTH_SHORT).show();
-                        } else {
+                            } else {
                             analgesicoString = "no";
-                            // Toast.makeText(getApplicationContext(), "Analgésico" + analgesicoString, Toast.LENGTH_SHORT).show();
-                        }
+                            }
 
                         if (suero.isChecked()) {
                             sueroString = "si";
-                            //  Toast.makeText(getApplicationContext(), "Suero" + sueroString, Toast.LENGTH_SHORT).show();
-                        } else {
+                            } else {
                             sueroString = "no";
-                            //  Toast.makeText(getApplicationContext(), "Suero" + sueroString, Toast.LENGTH_SHORT).show();
-                        }
+                            }
 
                         if (cicatrizante.isChecked()) {
                             cicatrizanteString = "si";
-                            // Toast.makeText(getApplicationContext(), "Cicatrizante" + cicatrizanteString, Toast.LENGTH_SHORT).show();
-                        } else {
+                            } else {
                             cicatrizanteString = "no";
-                            // Toast.makeText(getApplicationContext(), "Cicatrizante" + cicatrizanteString, Toast.LENGTH_SHORT).show();
-                        }
+                            }
 
                         if (uno.isChecked()) {
                             tallaIsabelinoString = "1";
@@ -1730,7 +1577,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
-    public void compraMedicamentoDialog(final String idDocumentStringS) {
+  public void compraMedicamentoDialog(final String idDocumentStringS) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Medicamento");
@@ -1817,7 +1664,6 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         if (comentarioString != null) {
             comentario.setText(comentarioString);
         }
-
 
         final Switch pregunta = view.findViewById(R.id.antibiotico_switch);
         final Switch isabelino = view.findViewById(R.id.isabelino_switch);
@@ -1962,119 +1808,8 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
     public void buscaDesocupado(final String idDocumentStringS, final String tipoMascotaString, final String active) {
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ContentPanelActivity.this);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        /*  final SharedPreferences prefs = getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE);
-
-        circleButton1.setVisibility(prefs.getBoolean("boton1", false) ? View.VISIBLE : View.GONE);
-        tv1.setVisibility(prefs.getBoolean("tv1", false)  ? View.VISIBLE : View.GONE);
-
-        circleButton2.setVisibility(prefs.getBoolean("boton2", false) ? View.VISIBLE : View.GONE);
-        tv2.setVisibility(prefs.getBoolean("tv2", false)  ? View.VISIBLE : View.GONE);
-
-        circleButton3.setVisibility(prefs.getBoolean("boton3", false) ? View.VISIBLE : View.GONE);
-        tv3.setVisibility(prefs.getBoolean("tv3", false)  ? View.VISIBLE : View.GONE);
-
-        circleButton4.setVisibility(prefs.getBoolean("boton4", false) ? View.VISIBLE : View.GONE);
-        tv4.setVisibility(prefs.getBoolean("tv4", false) ? View.VISIBLE : View.GONE);
-
-        circleButton5.setVisibility(prefs.getBoolean("boton5", false) ? View.VISIBLE : View.GONE);
-        tv5.setVisibility(prefs.getBoolean("tv5", false) ? View.VISIBLE : View.GONE);
-
-        circleButton6.setVisibility(prefs.getBoolean("boton6", false) ? View.VISIBLE : View.GONE);
-        tv6.setVisibility(prefs.getBoolean("tv6", false) ? View.VISIBLE : View.GONE);
-
-        circleButton7.setVisibility(prefs.getBoolean("boton7", false) ? View.VISIBLE : View.GONE);
-        tv7.setVisibility(prefs.getBoolean("tv7", false) ? View.VISIBLE : View.GONE);
-
-        circleButton8.setVisibility(prefs.getBoolean("boton8", false) ? View.VISIBLE : View.GONE);
-        tv8.setVisibility(prefs.getBoolean("tv8", false) ? View.VISIBLE : View.GONE);
-
-        circleButton9.setVisibility(prefs.getBoolean("boton9", false) ? View.VISIBLE : View.GONE);
-        tv9.setVisibility(prefs.getBoolean("tv9", false) ? View.VISIBLE : View.GONE);
-
-        circleButton10.setVisibility(prefs.getBoolean("boton10", false) ? View.VISIBLE : View.GONE);
-        tv10.setVisibility(prefs.getBoolean("tv10", false) ? View.VISIBLE : View.GONE);
-
-        circleButton11.setVisibility(prefs.getBoolean("boton11", false) ? View.VISIBLE : View.GONE);
-        tv11.setVisibility(prefs.getBoolean("tv11", false) ? View.VISIBLE : View.GONE);
-
-        circleButton12.setVisibility(prefs.getBoolean("boton12", false) ? View.VISIBLE : View.GONE);
-        tv12.setVisibility(prefs.getBoolean("tv12", false) ? View.VISIBLE : View.GONE);
-
-        circleButton13.setVisibility(prefs.getBoolean("boton13", false) ? View.VISIBLE : View.GONE);
-        tv13.setVisibility(prefs.getBoolean("tv13", false) ? View.VISIBLE : View.GONE);
-
-        circleButton14.setVisibility(prefs.getBoolean("boton14", false) ? View.VISIBLE : View.GONE);
-        tv14.setVisibility(prefs.getBoolean("tv14", false) ? View.VISIBLE : View.GONE);
-
-        circleButton15.setVisibility(prefs.getBoolean("boton15", false) ? View.VISIBLE : View.GONE);
-        tv15.setVisibility(prefs.getBoolean("tv15", false) ? View.VISIBLE : View.GONE);
-
-        circleButton16.setVisibility(prefs.getBoolean("boton16", false) ? View.VISIBLE : View.GONE);
-        tv16.setVisibility(prefs.getBoolean("tv16", false) ? View.VISIBLE : View.GONE);
-
-        circleButton17.setVisibility(prefs.getBoolean("boton17", false) ? View.VISIBLE : View.GONE);
-        tv17.setVisibility(prefs.getBoolean("tv17", false) ? View.VISIBLE : View.GONE);
-
-        circleButton18.setVisibility(prefs.getBoolean("boton18", false) ? View.VISIBLE : View.GONE);
-        tv18.setVisibility(prefs.getBoolean("tv18", false) ? View.VISIBLE : View.GONE);
-
-        circleButton19.setVisibility(prefs.getBoolean("boton19", false) ? View.VISIBLE : View.GONE);
-        tv19.setVisibility(prefs.getBoolean("tv19", false) ? View.VISIBLE : View.GONE);
-
-        circleButton20.setVisibility(prefs.getBoolean("boton20", false) ? View.VISIBLE : View.GONE);
-        tv20.setVisibility(prefs.getBoolean("tv20", false) ? View.VISIBLE : View.GONE);
-
-
-        circleButton21.setVisibility(prefs.getBoolean("boton21", false) ? View.VISIBLE : View.GONE);
-        tv21.setVisibility(prefs.getBoolean("tv21", false) ? View.VISIBLE : View.GONE);
-
-        circleButton22.setVisibility(prefs.getBoolean("boton22", false) ? View.VISIBLE : View.GONE);
-        tv22.setVisibility(prefs.getBoolean("tv22", false) ? View.VISIBLE : View.GONE);
-
-        circleButton23.setVisibility(prefs.getBoolean("boton23", false) ? View.VISIBLE : View.GONE);
-        tv23.setVisibility(prefs.getBoolean("tv23", false) ? View.VISIBLE : View.GONE);
-
-        circleButton24.setVisibility(prefs.getBoolean("boton24", false) ? View.VISIBLE : View.GONE);
-        tv24.setVisibility(prefs.getBoolean("tv24", false) ? View.VISIBLE : View.GONE);
-
-        circleButton25.setVisibility(prefs.getBoolean("boton25", false) ? View.VISIBLE : View.GONE);
-        tv25.setVisibility(prefs.getBoolean("tv25", false) ? View.VISIBLE : View.GONE);
-
-        circleButton26.setVisibility(prefs.getBoolean("boton26", false) ? View.VISIBLE : View.GONE);
-        tv26.setVisibility(prefs.getBoolean("tv26", false) ? View.VISIBLE : View.GONE);
-
-        circleButton27.setVisibility(prefs.getBoolean("boton27", false) ? View.VISIBLE : View.GONE);
-        tv27.setVisibility(prefs.getBoolean("tv27", false) ? View.VISIBLE : View.GONE);
-
-        circleButton28.setVisibility(prefs.getBoolean("boton28", false) ? View.VISIBLE : View.GONE);
-        tv28.setVisibility(prefs.getBoolean("tv28", false) ? View.VISIBLE : View.GONE);
-
-        circleButton29.setVisibility(prefs.getBoolean("boton29", false) ? View.VISIBLE : View.GONE);
-        tv29.setVisibility(prefs.getBoolean("tv29", false) ? View.VISIBLE : View.GONE);
-
-        circleButton30.setVisibility(prefs.getBoolean("boton30", false) ? View.VISIBLE : View.GONE);
-        tv30.setVisibility(prefs.getBoolean("tv30", false) ? View.VISIBLE : View.GONE);
-
-        circleButton31.setVisibility(prefs.getBoolean("boton31", false) ? View.VISIBLE : View.GONE);
-        tv31.setVisibility(prefs.getBoolean("tv31", false) ? View.VISIBLE : View.GONE);
-
-        circleButton32.setVisibility(prefs.getBoolean("boton32", false) ? View.VISIBLE : View.GONE);
-        tv32.setVisibility(prefs.getBoolean("tv32", false) ? View.VISIBLE : View.GONE);
-
-        circleButton33.setVisibility(prefs.getBoolean("boton33", false) ? View.VISIBLE : View.GONE);
-        tv33.setVisibility(prefs.getBoolean("tv33", false) ? View.VISIBLE : View.GONE);
-
-        circleButton34.setVisibility(prefs.getBoolean("boton34", false) ? View.VISIBLE : View.GONE);
-        tv34.setVisibility(prefs.getBoolean("tv34", false) ? View.VISIBLE : View.GONE);
-
-        circleButton35.setVisibility(prefs.getBoolean("boton35", false) ? View.VISIBLE : View.GONE);
-        tv35.setVisibility(prefs.getBoolean("tv35", false) ? View.VISIBLE : View.GONE);
-
-        circleButton36.setVisibility(prefs.getBoolean("boton36", false) ? View.VISIBLE : View.GONE);
-        tv36.setVisibility(prefs.getBoolean("tv36", false) ? View.VISIBLE : View.GONE);*/
+      //  SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ContentPanelActivity.this);
+      //  SharedPreferences.Editor editor = preferences.edit();
 
         if (circleButton1.getVisibility() == View.GONE && tv1.getVisibility() == View.GONE) {
 
@@ -2095,7 +1830,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                 public void onClick(View view) {
                     final CharSequence modulos[] = new CharSequence[]{"Pago", "Anestesia", "Cirugía", "Recuperación", "Medicamento"};
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("Selecciona Módulo");
                     builder.setItems(modulos, new DialogInterface.OnClickListener() {
                         @Override
@@ -2354,7 +2089,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton6.setColor(Color.RED);
                             } else if (which == 3) {
-                                recuperacionDialog(idDocumentStringS);
+                               recuperacionDialog(idDocumentStringS);
                                 circleButton6.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -2444,7 +2179,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton8.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                anestesiaDialog(idDocumentStringS);
+                               anestesiaDialog(idDocumentStringS);
                                 circleButton8.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -2639,7 +2374,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton12.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                anestesiaDialog(idDocumentStringS);
+                               anestesiaDialog(idDocumentStringS);
                                 circleButton12.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -2688,13 +2423,13 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                anestesiaDialog(idDocumentStringS);
+                               anestesiaDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.RED);
                             } else if (which == 3) {
-                                recuperacionDialog(idDocumentStringS);
+                               recuperacionDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -2940,7 +2675,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton18.setColor(Color.RED);
                             } else if (which == 3) {
-                                recuperacionDialog(idDocumentStringS);
+                               recuperacionDialog(idDocumentStringS);
                                 circleButton18.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -2983,7 +2718,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton19.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                anestesiaDialog(idDocumentStringS);
+                              anestesiaDialog(idDocumentStringS);
                                 circleButton19.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -3038,7 +2773,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton20.setColor(Color.RED);
                             } else if (which == 3) {
-                                recuperacionDialog(idDocumentStringS);
+                               recuperacionDialog(idDocumentStringS);
                                 circleButton20.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -3620,17 +3355,16 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                             if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton32.setColor(Color.GREEN);
-                            }
-                            if (which == 0) {
+                            } else  if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton32.setColor(Color.BLUE);
-                            } else if (which == 1) {
+                            } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton32.setColor(Color.RED);
-                            } else if (which == 2) {
+                            } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
                                 circleButton32.setColor(Color.YELLOW);
-                            } else if (which == 3) {
+                            } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
                                 circleButton32.setVisibility(View.GONE);
                                 tv32.setVisibility(View.GONE);
@@ -3720,7 +3454,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton34.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                anestesiaDialog(idDocumentStringS);
+                               anestesiaDialog(idDocumentStringS);
                                 circleButton34.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -3864,7 +3598,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton37.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                anestesiaDialog(idDocumentStringS);
+                               anestesiaDialog(idDocumentStringS);
                                 circleButton37.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -3910,7 +3644,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton38.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                anestesiaDialog(idDocumentStringS);
+                               anestesiaDialog(idDocumentStringS);
                                 circleButton38.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -3998,7 +3732,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                pagoDialog(idDocumentStringS);
+                               pagoDialog(idDocumentStringS);
                                 circleButton40.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -4046,7 +3780,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton41.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                anestesiaDialog(idDocumentStringS);
+                               anestesiaDialog(idDocumentStringS);
                                 circleButton41.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -4226,7 +3960,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton45.setColor(Color.BLUE);
                             } else if (which == 2) {
-                                cirugiaDialog(idDocumentStringS);
+                               cirugiaDialog(idDocumentStringS);
                                 circleButton45.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
@@ -4364,7 +4098,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton48.setColor(Color.RED);
                             } else if (which == 3) {
-                                recuperacionDialog(idDocumentStringS);
+                               recuperacionDialog(idDocumentStringS);
                                 circleButton48.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -4499,7 +4233,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton51.setColor(Color.RED);
                             } else if (which == 2) {
-                                recuperacionDialog(idDocumentStringS);
+                                 recuperacionDialog(idDocumentStringS);
                                 circleButton51.setColor(Color.YELLOW);
                             } else if (which == 3) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -4681,7 +4415,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton55.setColor(Color.RED);
                             } else if (which == 3) {
-                                recuperacionDialog(idDocumentStringS);
+                               recuperacionDialog(idDocumentStringS);
                                 circleButton55.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -4988,16 +4722,16 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                pagoDialog(idDocumentStringS);
+                              //  pagoDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.GREEN);
                             } else if (which == 1) {
-                                anestesiaDialog(idDocumentStringS);
+                             //   anestesiaDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.BLUE);
                             } else if (which == 2) {
-                                cirugiaDialog(idDocumentStringS);
+                             //   cirugiaDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.RED);
                             } else if (which == 3) {
-                                recuperacionDialog(idDocumentStringS);
+                              //  recuperacionDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -5033,14 +4767,14 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                pagoDialog(idDocumentStringS);
+                               pagoDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.GREEN);
                             }
                             if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.BLUE);
                             } else if (which == 2) {
-                                cirugiaDialog(idDocumentStringS);
+                               cirugiaDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
@@ -5080,7 +4814,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
 
                             if (which == 0) {
-                                pagoDialog(idDocumentStringS);
+                               pagoDialog(idDocumentStringS);
                                 circleButton64.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -5170,13 +4904,13 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                pagoDialog(idDocumentStringS);
+                               pagoDialog(idDocumentStringS);
                                 circleButton66.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton66.setColor(Color.BLUE);
                             } else if (which == 2) {
-                                cirugiaDialog(idDocumentStringS);
+                               cirugiaDialog(idDocumentStringS);
                                 circleButton66.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
@@ -5222,7 +4956,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton67.setColor(Color.BLUE);
                             } else if (which == 2) {
-                                cirugiaDialog(idDocumentStringS);
+                                   cirugiaDialog(idDocumentStringS);
                                 circleButton67.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
@@ -5307,7 +5041,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                                pagoDialog(idDocumentStringS);
+                               pagoDialog(idDocumentStringS);
                                 circleButton69.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -5453,7 +5187,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton72.setColor(Color.RED);
                             } else if (which == 3) {
-                                recuperacionDialog(idDocumentStringS);
+                               recuperacionDialog(idDocumentStringS);
                                 circleButton72.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -5468,7 +5202,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
             });
         }
 
-        editor.commit();
+        //editor.commit();
 
     }
 
@@ -5547,17 +5281,6 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         final Chunk E = new Chunk("El curso post operatorio es responsabilidad del propietario de la mascota esterilizada y deberá ser supervisada por un médico veterinario competente, siguiendo las recomendaciones del médico veterinario que efectúe la cirugía. \n \n", BLACK_BOLD3);
         final Chunk F = new Chunk("REQUISITOS: \n ", BLACK_BOLD3);
 
-     /*   String idDocumentStringS = getIntent().getExtras().getString("numero_folio");
-        String nombre = getIntent().getExtras().getString("nombre");
-        String numero = getIntent().getExtras().getString("numero");
-        String mascota = getIntent().getExtras().getString("mascota");
-        String tmascota = getIntent().getExtras().getString("tmascota");
-        String telefono = getIntent().getExtras().getString("telefono");
-        String direccion = getIntent().getExtras().getString("direccion");
-        String edad = getIntent().getExtras().getString("edad");
-        String raza = getIntent().getExtras().getString("raza");*/
-
-
         if (estado.equals(Environment.MEDIA_MOUNTED)) {
             sdDisponible = true;
             sdAccesoEscritura = true;
@@ -5577,9 +5300,6 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                 File nfile = new File(dir, /*idDocumentS + */".pdf");
                 FileOutputStream fOut = new FileOutputStream(nfile);
                 PdfWriter.getInstance(doc, fOut);
-                //create pdf writer instance
-                // PdfWriter.getInstance(doc, new FileOutputStream(file));
-                //open the document for writing
                 doc.open();
 
                 Drawable d = getResources().getDrawable(R.drawable.logo);
@@ -5668,13 +5388,13 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
             public void onClick(DialogInterface dialog, int which) {
 
                 if (which == 0) {
-                    anestesiaDialog(idDocumentStringS);
+                    //anestesiaDialog(idDocumentStringS);
                     circleButton72.setColor(Color.GREEN);
                 } else if (which == 1) {
-                    cirugiaDialog(idDocumentStringS);
+                    //cirugiaDialog(idDocumentStringS);
                     circleButton72.setColor(Color.YELLOW);
                 } else if (which == 2) {
-                    recuperacionDialog(idDocumentStringS);
+                   // recuperacionDialog(idDocumentStringS);
                     circleButton72.setColor(Color.BLUE);
                 } else if (which == 3) {
                     //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
@@ -6026,7 +5746,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         e.printStackTrace();
                         Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
                     }
-                    buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
+                    // buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
                 }else if(estado_catch.equals("activado")){
                  //   buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
                 }else{
@@ -6097,7 +5817,6 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
             Query query = database.getView("doctor").createQuery();
             query.setDescending(true);
-
 
             try {
 
@@ -6371,7 +6090,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
                     if (estado_catch.equals("activado")){
                         //estado_catch = "activado";
-                        buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
+                       // buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
                     }else if(estado_catch.equals("desactivado")){
                         // buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
                     }else{
@@ -6384,22 +6103,23 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         }
 
 
-    private void setupSync() {
-        try {
-            android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(android.content.Context.WIFI_SERVICE);
-            String serviceName = "My Android Message Service";
-           // Configuration configuration = new Configuration(wifi, database, serviceName);
-
-            Configuration configuration = new Configuration(wifi,database, serviceName);
-            int cbListenerPort = configuration.startCBLiteListener(5432);
-            //configuration.exposeService(cbListenerPort);
-            configuration.expoService(cbListenerPort);
-            configuration.listenForService();
-        } catch (Exception e) {
-            com.couchbase.lite.util.Log.e(Application.TAG, "Sync URL is invalid, setting up sync failed");
-            throw new RuntimeException(e);
-        }
+   private void setupSync() {
+       runOnUiThread(new Runnable() {
+           public void run() {
+               try {
+                   android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(android.content.Context.WIFI_SERVICE);
+                   String serviceName = "My Android Message Service";
+                   Configuration configuration = new Configuration(wifi,database, serviceName);
+                   int cbListenerPort = configuration.startCBLiteListener(5432);
+                   configuration.exposeService(cbListenerPort);
+                   configuration.listenForService();
+               } catch (Exception e) {
+                   com.couchbase.lite.util.Log.e(Application.TAG, "Sync URL is invalid, setting up sync failed");
+                   Log.e("Error", e.toString());
+                   //  throw new RuntimeException(e);
+               }
+           }
+       });
     }
-
 
 }

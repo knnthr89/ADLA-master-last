@@ -11,7 +11,9 @@
         android:layout_below="@+id/spinner"
         android:layout_alignParentStart="true"
         android:layout_marginTop="17dp"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp">
 
         <AutoCompleteTextView
             android:id="@+id/busqueda_registro"
@@ -35,7 +37,9 @@
         android:hint="Médico que operó"
         android:layout_below="@+id/busqueda"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="28dp" />
+        android:layout_marginTop="28dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"/>
 
     <EditText
         android:id="@+id/et"
@@ -50,7 +54,9 @@
         android:hint="@string/action_comments"
         android:layout_below="@+id/opero_et"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="14dp" />
+        android:layout_marginTop="14dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"/>
 
     <Button
         android:id="@+id/btn"

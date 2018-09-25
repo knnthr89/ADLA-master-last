@@ -1,21 +1,22 @@
 package com.example.dev.saludmock.config;
 
-
-
-import android.net.wifi.WifiInfo;
+import android.content.Context;
 import android.net.wifi.WifiManager;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.widget.Toast;
 
-import com.couchbase.lite.Database;
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.android.AndroidContext;
 import com.couchbase.lite.listener.LiteListener;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
+import java.io.IOException;
+import java.net.InetAddress;
+import com.couchbase.lite.Database;
 
-public class Configuration {
+public class Configuration  extends AppCompatActivity {
 
     public static final String SERVICE_TYPE = "_cblite._http._tcp.local.";
 
@@ -25,35 +26,32 @@ public class Configuration {
 
     private JmDNS jmdns;
     private Database database;
-    android.net.wifi.WifiManager.MulticastLock lock;
 
-    public Configuration(WifiManager wifi, Database database, String serviceName) throws IOException{
+    Manager mManager;
+
+    public Configuration(WifiManager wifi, Database database, String serviceName) throws IOException {
         this.database = database;
         this.serviceName = serviceName;
-
-        WifiInfo wifiinfo = wifi.getConnectionInfo();
-        int intaddr = wifiinfo.getIpAddress();
-        byte[] byteaddr = new byte[] { (byte) (intaddr & 0xff), (byte) (intaddr >> 8 & 0xff),
-                (byte) (intaddr >> 16 & 0xff), (byte) (intaddr >> 24 & 0xff) };
-        InetAddress addr = null;
-        try{
-            addr = InetAddress.getByAddress(byteaddr);
-        } catch (UnknownHostException e1){
-            throw  new RuntimeException(e1);
-        }
-
-        lock = wifi.createMulticastLock("mylockthereturn");
-        lock.setReferenceCounted(true);
-        lock.acquire();
-        try{
-            jmdns = JmDNS.create(addr);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        InetAddress addr = InetAddress.getLocalHost();
+        String hostname = InetAddress.getByName(addr.getHostName()).toString();
+        this.jmdns = JmDNS.create(addr, hostname);
     }
 
-    public void expoService(int port) throws IOException {
-        ServiceInfo sInfos =ServiceInfo.create(SERVICE_TYPE, serviceName, port, SERVICE_DESCRIPTION);
+    private Manager getManager() {
+        if (mManager == null) {
+            try {
+                AndroidContext context = new AndroidContext(getApplicationContext());
+                mManager = new Manager(context, Manager.DEFAULT_OPTIONS);
+            } catch (Exception e) {
+                Log.e("TAG", "Cannot create Manager object", e);
+            }
+        }
+        return mManager;
+    }
+
+
+    public void exposeService(int port) throws IOException {
+        ServiceInfo sInfos = ServiceInfo.create(SERVICE_TYPE, serviceName, port, SERVICE_DESCRIPTION);
         jmdns.registerService(sInfos);
     }
 
@@ -61,11 +59,11 @@ public class Configuration {
         jmdns.addServiceListener(SERVICE_TYPE, new DiscoveryListener(database, jmdns, serviceName));
     }
 
-    public int startCBLiteListener(int port){
-        LiteListener ls = new LiteListener(database.getManager(), port, null);
+    public int startCBLiteListener(int port) {
+
+        LiteListener ls = new LiteListener(getManager(), port, null);
         Thread thread = new Thread(ls);
         thread.start();
         return ls.getListenPort();
     }
-
 }
