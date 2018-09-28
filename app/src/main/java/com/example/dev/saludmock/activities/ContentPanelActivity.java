@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.os.Handler;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -20,6 +21,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
@@ -28,6 +31,7 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
@@ -78,6 +82,7 @@ import com.example.dev.saludmock.adapters.NewDoctorAdapter;
 import com.example.dev.saludmock.adapters.NewRegistersArrayAdapter;
 import com.example.dev.saludmock.config.Application;
 import com.example.dev.saludmock.config.Configuration;
+import com.example.dev.saludmock.config.DiscoveryListener;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Font;
@@ -117,8 +122,9 @@ import static com.couchbase.lite.Database.TAG;
  * Created by kennethrizo on 22/11/17.
  */
 
-public class ContentPanelActivity extends ListActivity  implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, View.OnKeyListener {
+public class ContentPanelActivity extends ListActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, View.OnKeyListener {
 
+    Handler mHandler;
 
     String estado = "desactivado";
     String dString;
@@ -524,7 +530,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
     AutoCompleteTextView comentario;
 
-   private CheckBox cirujano1,
+    private CheckBox cirujano1,
             cirujano2,
             cirujano3,
             cirujano4,
@@ -532,10 +538,10 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
             cirujano6,
             cirujano7,
             cirujano8,
-    cirujano9,
-    cirujano10,
-    cirujano11,
-    cirujano12;
+            cirujano9,
+            cirujano10,
+            cirujano11,
+            cirujano12;
 
     Context context = this;
 
@@ -547,16 +553,17 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
     private Application application;
     // String mes = null;
 
+    DiscoveryListener discoveryListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_panel);
-
+        com.couchbase.lite.util.Log.d(Application.TAG, "Starting MainActivity");
         //itemListView = findViewById(R.id.itemListView);
 //        application = (Application) getApplication();
-
-      //  this.database = application.getDatabase();
-
+        application = (Application) getApplication();
+        this.database = application.getDatabase();
 
 
         date = anio + "/" + mes + "/" + dia;
@@ -574,16 +581,16 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         //  imageButton = (ImageButton)findViewById(R.id.imageButton);
 
 
-       //   mascota = getIntent().getStringExtra("mascota");
+        //   mascota = getIntent().getStringExtra("mascota");
 
         // mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-       // et = findViewById(R.id.et);
+        // et = findViewById(R.id.et);
 
 
-         // String idDocumentS = Integer.toString(idDocument);
+        // String idDocumentS = Integer.toString(idDocument);
 
         //  Toast.makeText(getApplicationContext(), idDocumentS, Toast.LENGTH_SHORT).show();
 
@@ -591,7 +598,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         //TRAE NULO A TMASCOTA
 
         //Recibe los datos de los preregistros que vienen de google sheets
-       Bundle datos = this.getIntent().getExtras();
+        Bundle datos = this.getIntent().getExtras();
         if (datos != null) {
 
             try {
@@ -605,7 +612,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
             String dmascota = datos.getString("dmascota");
             String estadorecibido = datos.getString("active");
 
-            if(idDocumentStringS != null && dmascota != null ) {
+            if (idDocumentStringS != null && dmascota != null) {
                 estadorecibido = "activado";
 
                 //se necesita guardar a activado porqur solo lo cambiamos pero no se guarda en el registro
@@ -659,7 +666,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                 }
             }
 
-        }else {
+        } else {
 
 
         }
@@ -674,11 +681,21 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         new Thread(new Runnable() {
             @Override
             public void run() {
-                setupSync();
-                }
+                Looper.prepare();
+                    setupSync();
+
+            }
         }).start();
 
 
+
+    }
+
+    // Here you will enable Multidex
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(getBaseContext());
     }
 
 
@@ -938,8 +955,6 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         }
 
 
-
-
                     }
 
 
@@ -1172,7 +1187,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
-  public void cirugiaDialog(final String idDocumentStringS) {
+    public void cirugiaDialog(final String idDocumentStringS) {
 
         final String tipoMascotaString = null;
         final String operacionAnteriorString;
@@ -1268,21 +1283,21 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                             ncirujano = dString;
                         } else if (cirujano4.isChecked()) {
                             ncirujano = dString;
-                        }else if (cirujano4.isChecked()) {
+                        } else if (cirujano4.isChecked()) {
                             ncirujano = dString;
-                        }else if (cirujano4.isChecked()) {
+                        } else if (cirujano4.isChecked()) {
                             ncirujano = dString;
-                        }else if (cirujano4.isChecked()) {
+                        } else if (cirujano4.isChecked()) {
                             ncirujano = dString;
-                        }else if (cirujano4.isChecked()) {
+                        } else if (cirujano4.isChecked()) {
                             ncirujano = dString;
-                        }else if (cirujano4.isChecked()) {
+                        } else if (cirujano4.isChecked()) {
                             ncirujano = dString;
-                        }else if (cirujano4.isChecked()) {
+                        } else if (cirujano4.isChecked()) {
                             ncirujano = dString;
-                        }else if (cirujano4.isChecked()) {
+                        } else if (cirujano4.isChecked()) {
                             ncirujano = dString;
-                        }else if (cirujano4.isChecked()) {
+                        } else if (cirujano4.isChecked()) {
                             ncirujano = dString;
                         } else {
                             ncirujano = "No se selecciono cirujano";
@@ -1400,7 +1415,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
                         }
-                        }
+                    }
                 });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
@@ -1462,33 +1477,33 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
                         if (antibiotico.isChecked()) {
                             antibioticoString = "si";
-                            } else {
+                        } else {
                             antibioticoString = "no";
-                            }
+                        }
 
                         if (tatuaje.isChecked()) {
                             tatuajeString = "si";
-                            } else {
+                        } else {
                             tatuajeString = "no";
-                            }
+                        }
 
                         if (analgesico.isChecked()) {
                             analgesicoString = "si";
-                            } else {
+                        } else {
                             analgesicoString = "no";
-                            }
+                        }
 
                         if (suero.isChecked()) {
                             sueroString = "si";
-                            } else {
+                        } else {
                             sueroString = "no";
-                            }
+                        }
 
                         if (cicatrizante.isChecked()) {
                             cicatrizanteString = "si";
-                            } else {
+                        } else {
                             cicatrizanteString = "no";
-                            }
+                        }
 
                         if (uno.isChecked()) {
                             tallaIsabelinoString = "1";
@@ -1577,7 +1592,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
         builder.show().getWindow().setLayout(MATCH_PARENT, MATCH_PARENT);
     }
 
-  public void compraMedicamentoDialog(final String idDocumentStringS) {
+    public void compraMedicamentoDialog(final String idDocumentStringS) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ContentPanelActivity.this);
         builder.setTitle("Medicamento");
@@ -1751,8 +1766,8 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                     return true;
                                 }
                             });
-                           // Toast.makeText(getApplicationContext(), preguntaString, Toast.LENGTH_LONG).show();
-                          //  Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
+                            // Toast.makeText(getApplicationContext(), preguntaString, Toast.LENGTH_LONG).show();
+                            //  Toast.makeText(getApplicationContext(), idDocumentStringS, Toast.LENGTH_LONG).show();
 
 
                             Toast.makeText(getApplicationContext(), estado, Toast.LENGTH_SHORT).show();
@@ -1808,8 +1823,8 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
     public void buscaDesocupado(final String idDocumentStringS, final String tipoMascotaString, final String active) {
 
-      //  SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ContentPanelActivity.this);
-      //  SharedPreferences.Editor editor = preferences.edit();
+        //  SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ContentPanelActivity.this);
+        //  SharedPreferences.Editor editor = preferences.edit();
 
         if (circleButton1.getVisibility() == View.GONE && tv1.getVisibility() == View.GONE) {
 
@@ -2089,7 +2104,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton6.setColor(Color.RED);
                             } else if (which == 3) {
-                               recuperacionDialog(idDocumentStringS);
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton6.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -2179,7 +2194,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton8.setColor(Color.GREEN);
                             } else if (which == 1) {
-                               anestesiaDialog(idDocumentStringS);
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton8.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -2374,7 +2389,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton12.setColor(Color.GREEN);
                             } else if (which == 1) {
-                               anestesiaDialog(idDocumentStringS);
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton12.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -2423,13 +2438,13 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.GREEN);
                             } else if (which == 1) {
-                               anestesiaDialog(idDocumentStringS);
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.RED);
                             } else if (which == 3) {
-                               recuperacionDialog(idDocumentStringS);
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton13.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -2675,7 +2690,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton18.setColor(Color.RED);
                             } else if (which == 3) {
-                               recuperacionDialog(idDocumentStringS);
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton18.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -2718,7 +2733,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton19.setColor(Color.GREEN);
                             } else if (which == 1) {
-                              anestesiaDialog(idDocumentStringS);
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton19.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -2773,7 +2788,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton20.setColor(Color.RED);
                             } else if (which == 3) {
-                               recuperacionDialog(idDocumentStringS);
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton20.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -3355,7 +3370,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                             if (which == 0) {
                                 pagoDialog(idDocumentStringS);
                                 circleButton32.setColor(Color.GREEN);
-                            } else  if (which == 1) {
+                            } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton32.setColor(Color.BLUE);
                             } else if (which == 2) {
@@ -3454,7 +3469,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton34.setColor(Color.GREEN);
                             } else if (which == 1) {
-                               anestesiaDialog(idDocumentStringS);
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton34.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -3598,7 +3613,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton37.setColor(Color.GREEN);
                             } else if (which == 1) {
-                               anestesiaDialog(idDocumentStringS);
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton37.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -3644,7 +3659,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton38.setColor(Color.GREEN);
                             } else if (which == 1) {
-                               anestesiaDialog(idDocumentStringS);
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton38.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -3732,7 +3747,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                               pagoDialog(idDocumentStringS);
+                                pagoDialog(idDocumentStringS);
                                 circleButton40.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -3780,7 +3795,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 pagoDialog(idDocumentStringS);
                                 circleButton41.setColor(Color.GREEN);
                             } else if (which == 1) {
-                               anestesiaDialog(idDocumentStringS);
+                                anestesiaDialog(idDocumentStringS);
                                 circleButton41.setColor(Color.BLUE);
                             } else if (which == 2) {
                                 cirugiaDialog(idDocumentStringS);
@@ -3960,7 +3975,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton45.setColor(Color.BLUE);
                             } else if (which == 2) {
-                               cirugiaDialog(idDocumentStringS);
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton45.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
@@ -4098,7 +4113,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton48.setColor(Color.RED);
                             } else if (which == 3) {
-                               recuperacionDialog(idDocumentStringS);
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton48.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -4233,7 +4248,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton51.setColor(Color.RED);
                             } else if (which == 2) {
-                                 recuperacionDialog(idDocumentStringS);
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton51.setColor(Color.YELLOW);
                             } else if (which == 3) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -4415,7 +4430,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton55.setColor(Color.RED);
                             } else if (which == 3) {
-                               recuperacionDialog(idDocumentStringS);
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton55.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -4722,16 +4737,16 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                              //  pagoDialog(idDocumentStringS);
+                                //  pagoDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.GREEN);
                             } else if (which == 1) {
-                             //   anestesiaDialog(idDocumentStringS);
+                                //   anestesiaDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.BLUE);
                             } else if (which == 2) {
-                             //   cirugiaDialog(idDocumentStringS);
+                                //   cirugiaDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.RED);
                             } else if (which == 3) {
-                              //  recuperacionDialog(idDocumentStringS);
+                                //  recuperacionDialog(idDocumentStringS);
                                 circleButton62.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -4767,14 +4782,14 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                               pagoDialog(idDocumentStringS);
+                                pagoDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.GREEN);
                             }
                             if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.BLUE);
                             } else if (which == 2) {
-                               cirugiaDialog(idDocumentStringS);
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton63.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
@@ -4814,7 +4829,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
 
                             if (which == 0) {
-                               pagoDialog(idDocumentStringS);
+                                pagoDialog(idDocumentStringS);
                                 circleButton64.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -4904,13 +4919,13 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                               pagoDialog(idDocumentStringS);
+                                pagoDialog(idDocumentStringS);
                                 circleButton66.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton66.setColor(Color.BLUE);
                             } else if (which == 2) {
-                               cirugiaDialog(idDocumentStringS);
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton66.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
@@ -4956,7 +4971,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 anestesiaDialog(idDocumentStringS);
                                 circleButton67.setColor(Color.BLUE);
                             } else if (which == 2) {
-                                   cirugiaDialog(idDocumentStringS);
+                                cirugiaDialog(idDocumentStringS);
                                 circleButton67.setColor(Color.RED);
                             } else if (which == 3) {
                                 recuperacionDialog(idDocumentStringS);
@@ -5041,7 +5056,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                         public void onClick(DialogInterface dialog, int which) {
 
                             if (which == 0) {
-                               pagoDialog(idDocumentStringS);
+                                pagoDialog(idDocumentStringS);
                                 circleButton69.setColor(Color.GREEN);
                             } else if (which == 1) {
                                 anestesiaDialog(idDocumentStringS);
@@ -5187,7 +5202,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                                 cirugiaDialog(idDocumentStringS);
                                 circleButton72.setColor(Color.RED);
                             } else if (which == 3) {
-                               recuperacionDialog(idDocumentStringS);
+                                recuperacionDialog(idDocumentStringS);
                                 circleButton72.setColor(Color.YELLOW);
                             } else if (which == 4) {
                                 compraMedicamentoDialog(idDocumentStringS);
@@ -5394,7 +5409,7 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
                     //cirugiaDialog(idDocumentStringS);
                     circleButton72.setColor(Color.YELLOW);
                 } else if (which == 2) {
-                   // recuperacionDialog(idDocumentStringS);
+                    // recuperacionDialog(idDocumentStringS);
                     circleButton72.setColor(Color.BLUE);
                 } else if (which == 3) {
                     //Toast.makeText(getApplicationContext(), "Es necesario elegir una opción", Toast.LENGTH_SHORT).show();
@@ -5524,7 +5539,388 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
     private void loadDeletedRecords() throws Exception {
 
-      Object nombre = null,
+        Object nombre = null,
+                nombreMascota = null,
+                peso = null,
+                raza = null,
+                rescatado = null,
+                tamanoMascota = null,
+                telefono = null,
+                tipoMascota,
+                tratamiento = null,
+                vacuna = null,
+                medioSocial = null,
+                lactar = null,
+                folio = null,
+                edad = null,
+                direccion = null,
+                desparacitacion = null,
+                fecha = null,
+                correo = null,
+                comentarioRegistro = null,
+                celo = null,
+                alergia = null,
+
+                precio_anestesia = null,
+                cantidadTarjeta = null,
+                cantidadEfectivo = null,
+
+                dosis1 = null,
+                dosis2 = null,
+                dosis3 = null,
+                fecha_anestesia = null,  //checar si se encuentra el campo en el xls
+
+                cirujano = null,
+                comentario = null,
+                prenada = null,
+                celo_cirugia = null,
+                lactante_cirugia = null,
+                hemorragia = null,
+                parorespiratorio = null,
+                parocardiaco = null,
+                testiculoinguinal = null,
+                finado = null,
+                alergico_cirugia = null,
+                operacion_anterior = null,
+                fecha_cirugia = null,
+
+                antibiotico = null,
+                tatuaje = null,
+                analgesico = null,
+                suero = null,
+                cicatrizante = null,
+                recuperacion_fecha = null,
+                comentario_recuperacion = null,
+                tallaIsabelino = null,
+                llevaIsabelino = null,
+                llevaMedicamento = null,
+
+
+                pregunta_medicamento = null,
+                isabelino = null,
+                isodine = null,
+                mascota_entregada = null,
+                candidato = null,
+                medicamento_fecha = null,
+                estado_catch = null;
+
+
+        //Create a manager
+        Manager manager = null;
+        try {
+            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        database = null;
+        try {
+            database = manager.getDatabase("adla");
+
+
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+
+        com.couchbase.lite.View membersView = database.getView("creat_at");
+
+        if (membersView != date) {
+            membersView.setMap(
+                    new Mapper() {
+                        @Override
+                        public void map(Map<String, Object> document, Emitter emitter) {
+                            com.couchbase.lite.util.Log.e("inside map", "map");
+                            Object date = document.get("creat_at");
+                            if (date != null)
+                                emitter.emit((String) document.get("creat_at"), document);
+
+
+                        }
+                    }, "1" /* The version number of the mapper... */
+            );
+            // }
+
+            Query query = database.getView("creat_at").createQuery();
+            query.setStartKey(date);
+
+            //  Query query1 = database.getView("active").createQuery();
+            //  query1.setStartKey("activado");
+
+            try {
+
+                result = query.run();
+
+            } catch (CouchbaseLiteException e) {
+
+                e.printStackTrace();
+
+            }
+
+            for (Iterator<QueryRow> it = result; it.hasNext(); ) {
+                QueryRow row = it.next();
+
+                folio = row.getDocument().getProperty("folio"); //0
+                nombre = row.getDocument().getProperty("nombreDueno");  //1
+                nombreMascota = row.getDocument().getProperty("nombreMascota");  //2 Trae nulo
+                peso = row.getDocument().getProperty("peso");  //3
+                raza = row.getDocument().getProperty("raza");  //4
+                rescatado = row.getDocument().getProperty("rescatado");  //5
+                tamanoMascota = row.getDocument().getProperty("tamanoMascota");  //6
+                telefono = row.getDocument().getProperty("telefono");  //7
+                tipoMascota = row.getDocument().getProperty("tipoMascota");  //8
+                tratamiento = row.getDocument().getProperty("tratamiento");  //9
+                vacuna = row.getDocument().getProperty("vacuna");   //10
+                medioSocial = row.getDocument().getProperty("mediosocial");  //11
+                lactar = row.getDocument().getProperty("lactar");  //12
+                // folio = row.getDocument().getProperty("folio"); //13
+                edad = row.getDocument().getProperty("edad");  //14
+                direccion = row.getDocument().getProperty("direccion");  //15
+                desparacitacion = row.getDocument().getProperty("desparacitacion");  //16
+                fecha = row.getDocument().getProperty("creat_at"); //17
+                correo = row.getDocument().getProperty("correo");  //18
+                comentarioRegistro = row.getDocument().getProperty("comentarioRegistro"); //19
+                celo = row.getDocument().getProperty("celo"); //20
+                alergia = row.getDocument().getProperty("alergia"); //21
+
+                precio_anestesia = row.getDocument().getProperty("precio_anestesia");
+                cantidadEfectivo = row.getDocument().getProperty("cantidadEfectivo");
+                cantidadTarjeta = row.getDocument().getProperty("cantidadTarjeta");
+
+                dosis1 = row.getDocument().getProperty("dosis1");
+                dosis2 = row.getDocument().getProperty("dosis2");
+                dosis3 = row.getDocument().getProperty("dosis3");
+                fecha_anestesia = row.getDocument().getProperty("fecha_anestesia");
+
+                cirujano = row.getDocument().getProperty("cirujano");
+                comentario = row.getDocument().getProperty("comentario");
+                prenada = row.getDocument().getProperty("preñada");
+                celo_cirugia = row.getDocument().getProperty("celo_cirugia");
+                lactante_cirugia = row.getDocument().getProperty("lactante_cirugia");
+                hemorragia = row.getDocument().getProperty("hemorragia");
+                parorespiratorio = row.getDocument().getProperty("parorespiratorio");
+                parocardiaco = row.getDocument().getProperty("parocardiaco");
+                testiculoinguinal = row.getDocument().getProperty("testiculoinguinal");
+                finado = row.getDocument().getProperty("finado");
+                alergico_cirugia = row.getDocument().getProperty("alergico_cirugia");
+                operacion_anterior = row.getDocument().getProperty("operacion_anterior");
+                fecha_cirugia = row.getDocument().getProperty("fecha_cirugia");
+
+                antibiotico = row.getDocument().getProperty("antibiotico");
+                tatuaje = row.getDocument().getProperty("tatuaje");
+                analgesico = row.getDocument().getProperty("analgesico");
+                suero = row.getDocument().getProperty("suero");
+                cicatrizante = row.getDocument().getProperty("cicatrizante");
+                recuperacion_fecha = row.getDocument().getProperty("recuperacion_fecha");
+                comentario_recuperacion = row.getDocument().getProperty("comentario_recuperacion");
+                tallaIsabelino = row.getDocument().getProperty("tallaIsabelino");
+                llevaIsabelino = row.getDocument().getProperty("tallaIsabelino");
+                llevaMedicamento = row.getDocument().getProperty("llevaMedicamento");
+
+                pregunta_medicamento = row.getDocument().getProperty("pregunta_medicamento");
+                isabelino = row.getDocument().getProperty("isabelino");
+                isodine = row.getDocument().getProperty("isodine");
+                mascota_entregada = row.getDocument().getProperty("mascota_entregada");
+                candidato = row.getDocument().getProperty("candidato");
+                medicamento_fecha = row.getDocument().getProperty("medicamento_fecha");
+                estado_catch = row.getDocument().getProperty("active");
+
+                //  Toast.makeText(getApplicationContext(), String.valueOf(fecha) + " " + folio, Toast.LENGTH_SHORT).show();
+
+                if (estado_catch.equals("desactivado")) {
+                    estado_catch = "activado";
+
+                    //create manager
+                    manager = null;
+                    try {
+                        manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    //Create or open the database named app
+                    Database database = null;
+                    try {
+                        database = manager.getDatabase("adla");
+                    } catch (CouchbaseLiteException d) {
+                        d.printStackTrace();
+                    }
+
+                    //Create a new document
+                    Document document = database.getDocument(String.valueOf(folio));
+
+                    try {
+                        final Object finalEstado_catch = estado_catch;
+                        document.update(new Document.DocumentUpdater() {
+                            @Override
+                            public boolean update(UnsavedRevision newRevision) {
+                                Map<String, Object> properties = newRevision.getProperties();
+                                properties.put("active", finalEstado_catch);
+                                return true;
+                            }
+                        });
+                        Toast.makeText(getApplicationContext(), "correcto", Toast.LENGTH_LONG).show();
+                    } catch (CouchbaseLiteException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
+                    }
+                    // buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
+                } else if (estado_catch.equals("activado")) {
+                    //   buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
+                } else {
+                    // buscaDesocupado(String.valueOf(folio), "Nada", active_catch_boolean);
+                }
+
+            }
+        }
+    }
+
+    private List<QueryRow> getRowsFromQueryEnumerator(QueryEnumerator queryEnumerator) {
+        List<QueryRow> rows = new ArrayList<QueryRow>();
+        for (Iterator<QueryRow> it = queryEnumerator; it.hasNext(); ) {
+            QueryRow row = it.next();
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        return false;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        return false;
+    }
+
+    public void showMeRows() {
+
+        //Create a manager
+        Manager manager = null;
+        try {
+            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Database database = null;
+        try {
+            database = manager.getDatabase("adlad");
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+
+        com.couchbase.lite.View doctorView = database.getView("doctor");
+
+        if (doctorView != null) {
+            doctorView.setMap(
+                    new Mapper() {
+                        @Override
+                        public void map(Map<String, Object> document, Emitter emitter) {
+                            com.couchbase.lite.util.Log.e("inside map", "map");
+                            Object doctorn = document.get("doctor");
+                            if (doctorn != null)
+                                emitter.emit((String) document.get("doctor"), document);
+
+
+                        }
+                    }, "1" /* The version number of the mapper... */
+            );
+            // }
+
+            Query query = database.getView("doctor").createQuery();
+            query.setDescending(true);
+
+            try {
+
+                result = query.run();
+
+            } catch (CouchbaseLiteException e) {
+
+                e.printStackTrace();
+
+            }
+
+            for (Iterator<QueryRow> it = result; it.hasNext(); ) {
+                QueryRow row = it.next();
+
+                Object doctor = row.getDocument().getProperty("doctor");
+
+                Toast.makeText(getApplicationContext(), String.valueOf(doctor), Toast.LENGTH_SHORT).show();
+
+                if (doctor != null) {
+
+                    dString = String.valueOf(doctor);
+
+                    if (cirujano1.getVisibility() == View.GONE) {
+                        cirujano1.setVisibility(View.VISIBLE);
+                        cirujano1.setText(dString);
+                    } else if (cirujano2.getVisibility() == View.GONE) {
+                        cirujano2.setVisibility(View.VISIBLE);
+                        cirujano2.setText(dString);
+                    } else if (cirujano3.getVisibility() == View.GONE) {
+                        cirujano3.setVisibility(View.VISIBLE);
+                        cirujano3.setText(dString);
+                    } else if (cirujano4.getVisibility() == View.GONE) {
+                        cirujano4.setVisibility(View.VISIBLE);
+                        cirujano4.setText(dString);
+                    } else if (cirujano5.getVisibility() == View.GONE) {
+                        cirujano5.setVisibility(View.VISIBLE);
+                        cirujano5.setText(dString);
+                    } else if (cirujano6.getVisibility() == View.GONE) {
+                        cirujano6.setVisibility(View.VISIBLE);
+                        cirujano6.setText(dString);
+                    } else if (cirujano7.getVisibility() == View.GONE) {
+                        cirujano7.setVisibility(View.VISIBLE);
+                        cirujano7.setText(dString);
+                    } else if (cirujano8.getVisibility() == View.GONE) {
+                        cirujano8.setVisibility(View.VISIBLE);
+                        cirujano8.setText(dString);
+                    } else if (cirujano9.getVisibility() == View.GONE) {
+                        cirujano9.setVisibility(View.VISIBLE);
+                        cirujano9.setText(dString);
+                    } else if (cirujano10.getVisibility() == View.GONE) {
+                        cirujano10.setVisibility(View.VISIBLE);
+                        cirujano10.setText(dString);
+                    } else if (cirujano11.getVisibility() == View.GONE) {
+                        cirujano11.setVisibility(View.VISIBLE);
+                        cirujano11.setText(dString);
+                    } else if (cirujano12.getVisibility() == View.GONE) {
+                        cirujano12.setVisibility(View.VISIBLE);
+                        cirujano12.setText(dString);
+                    } else {
+
+                        Toast.makeText(getApplicationContext(), "No hay suficientes Checkbox para los registros", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            }
+
+        } else {
+
+            Toast.makeText(getApplicationContext(), "Sin registros", Toast.LENGTH_SHORT).show();
+
+        }
+
+
+        //  displayRows(result);
+
+        //  getRowsFromQueryEnumerator(result);
+
+        Toast.makeText(getApplicationContext(), "Show", Toast.LENGTH_SHORT).show();
+
+    }
+
+    public void showNoFinishedButtons() throws Exception {
+
+        Toast.makeText(getApplicationContext(), "vamos a cargarlos", Toast.LENGTH_SHORT).show();
+
+        Object nombre = null,
                 nombreMascota = null,
                 peso = null,
                 raza = null,
@@ -5626,14 +6022,14 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
             Query query = database.getView("creat_at").createQuery();
             query.setStartKey(date);
 
-          //  Query query1 = database.getView("active").createQuery();
-          //  query1.setStartKey("activado");
+            //  Query query1 = database.getView("active").createQuery();
+            //  query1.setStartKey("activado");
 
             try {
 
                 result = query.run();
 
-                } catch (CouchbaseLiteException e) {
+            } catch (CouchbaseLiteException e) {
 
                 e.printStackTrace();
 
@@ -5709,417 +6105,36 @@ public class ContentPanelActivity extends ListActivity  implements AdapterView.O
 
                 //  Toast.makeText(getApplicationContext(), String.valueOf(fecha) + " " + folio, Toast.LENGTH_SHORT).show();
 
-                if (estado_catch.equals("desactivado")){
-                    estado_catch = "activado";
-
-                    //create manager
-                     manager = null;
-                    try {
-                        manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    //Create or open the database named app
-                    Database database = null;
-                    try {
-                        database = manager.getDatabase("adla");
-                    } catch (CouchbaseLiteException d) {
-                        d.printStackTrace();
-                    }
-
-                    //Create a new document
-                    Document document = database.getDocument(String.valueOf(folio));
-
-                    try {
-                        final Object finalEstado_catch = estado_catch;
-                        document.update(new Document.DocumentUpdater() {
-                            @Override
-                            public boolean update(UnsavedRevision newRevision) {
-                                Map<String, Object> properties = newRevision.getProperties();
-                                properties.put("active", finalEstado_catch);
-                                return true;
-                            }
-                        });
-                        Toast.makeText(getApplicationContext(), "correcto", Toast.LENGTH_LONG).show();
-                    } catch (CouchbaseLiteException e) {
-                        e.printStackTrace();
-                        Toast.makeText(getApplicationContext(), "Hay un problema con el registro de la dosis con esta mascota!", Toast.LENGTH_LONG).show();
-                    }
+                if (estado_catch.equals("activado")) {
+                    //estado_catch = "activado";
                     // buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
-                }else if(estado_catch.equals("activado")){
-                 //   buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
-                }else{
-                   // buscaDesocupado(String.valueOf(folio), "Nada", active_catch_boolean);
+                } else if (estado_catch.equals("desactivado")) {
+                    // buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
+                } else {
+                    // buscaDesocupado(String.valueOf(folio), "Nada", active_catch_boolean);
                 }
 
             }
         }
-    }
-    private List<QueryRow> getRowsFromQueryEnumerator(QueryEnumerator queryEnumerator) {
-        List<QueryRow> rows = new ArrayList<QueryRow>();
-        for (Iterator<QueryRow> it = queryEnumerator; it.hasNext(); ) {
-            QueryRow row = it.next();
-            rows.add(row);
-        }
-        return rows;
-    }
-
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-        return false;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
     }
 
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        return false;
-    }
 
-    public void showMeRows(){
-
-        //Create a manager
-        Manager manager = null;
+    private void setupSync() {
         try {
-            manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-        } catch (IOException e) {
-            e.printStackTrace();
+            android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(android.content.Context.WIFI_SERVICE);
+            String serviceName = "My Android Message Service";
+            Configuration configuration = new Configuration(wifi, database, serviceName);
+            int cbListenerPort = configuration.startCBLiteListener(8091);
+            configuration.exposeService(cbListenerPort);
+            configuration.listenForService();
+        } catch (Exception e) {
+            com.couchbase.lite.util.Log.e(Application.TAG, "Sync URL is invalid, setting up sync failed");
+            Log.e("Exception", e.toString());
         }
-
-        Database database = null;
-        try {
-            database = manager.getDatabase("adlad");
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-
-        com.couchbase.lite.View doctorView = database.getView("doctor");
-
-        if (doctorView != null) {
-            doctorView.setMap(
-                    new Mapper() {
-                        @Override
-                        public void map(Map<String, Object> document, Emitter emitter) {
-                            com.couchbase.lite.util.Log.e("inside map", "map");
-                            Object doctorn = document.get("doctor");
-                            if (doctorn != null)
-                                emitter.emit((String) document.get("doctor"), document);
-
-
-                        }
-                    }, "1" /* The version number of the mapper... */
-            );
-            // }
-
-            Query query = database.getView("doctor").createQuery();
-            query.setDescending(true);
-
-            try {
-
-                result = query.run();
-
-            } catch (CouchbaseLiteException e) {
-
-                e.printStackTrace();
-
-            }
-
-            for (Iterator<QueryRow> it = result; it.hasNext(); ) {
-                QueryRow row = it.next();
-
-                Object doctor = row.getDocument().getProperty("doctor");
-
-                Toast.makeText(getApplicationContext(), String.valueOf(doctor), Toast.LENGTH_SHORT).show();
-
-                if(doctor != null){
-
-                     dString = String.valueOf(doctor);
-
-                    if(cirujano1.getVisibility() == View.GONE){
-                        cirujano1.setVisibility(View.VISIBLE);
-                        cirujano1.setText(dString);
-                    }else if(cirujano2.getVisibility() == View.GONE){
-                        cirujano2.setVisibility(View.VISIBLE);
-                        cirujano2.setText(dString);
-                    }else if(cirujano3.getVisibility() == View.GONE){
-                        cirujano3.setVisibility(View.VISIBLE);
-                        cirujano3.setText(dString);
-                    }else if(cirujano4.getVisibility() == View.GONE){
-                        cirujano4.setVisibility(View.VISIBLE);
-                        cirujano4.setText(dString);
-                    }else if(cirujano5.getVisibility() == View.GONE){
-                        cirujano5.setVisibility(View.VISIBLE);
-                        cirujano5.setText(dString);
-                    }else if(cirujano6.getVisibility() == View.GONE){
-                        cirujano6.setVisibility(View.VISIBLE);
-                        cirujano6.setText(dString);
-                    }else if(cirujano7.getVisibility() == View.GONE){
-                        cirujano7.setVisibility(View.VISIBLE);
-                        cirujano7.setText(dString);
-                    }else if(cirujano8.getVisibility() == View.GONE){
-                        cirujano8.setVisibility(View.VISIBLE);
-                        cirujano8.setText(dString);
-                    }else if(cirujano9.getVisibility() == View.GONE){
-                        cirujano9.setVisibility(View.VISIBLE);
-                        cirujano9.setText(dString);
-                    }else if(cirujano10.getVisibility() == View.GONE){
-                        cirujano10.setVisibility(View.VISIBLE);
-                        cirujano10.setText(dString);
-                    }else if(cirujano11.getVisibility() == View.GONE){
-                        cirujano11.setVisibility(View.VISIBLE);
-                        cirujano11.setText(dString);
-                    }else if(cirujano12.getVisibility() == View.GONE){
-                        cirujano12.setVisibility(View.VISIBLE);
-                        cirujano12.setText(dString);
-                    }else{
-
-                        Toast.makeText(getApplicationContext(), "No hay suficientes Checkbox para los registros", Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-            }
-
-        }else{
-
-            Toast.makeText(getApplicationContext(), "Sin registros", Toast.LENGTH_SHORT).show();
-
-            }
-
-
-
-          //  displayRows(result);
-
-          //  getRowsFromQueryEnumerator(result);
-
-        Toast.makeText(getApplicationContext(), "Show", Toast.LENGTH_SHORT).show();
-
-        }
-
-        public void showNoFinishedButtons() throws Exception{
-
-        Toast.makeText(getApplicationContext(), "vamos a cargarlos", Toast.LENGTH_SHORT).show();
-
-            Object nombre = null,
-                    nombreMascota = null,
-                    peso = null,
-                    raza = null,
-                    rescatado = null,
-                    tamanoMascota = null,
-                    telefono = null,
-                    tipoMascota,
-                    tratamiento = null,
-                    vacuna = null,
-                    medioSocial = null,
-                    lactar = null,
-                    folio = null,
-                    edad = null,
-                    direccion = null,
-                    desparacitacion = null,
-                    fecha = null,
-                    correo = null,
-                    comentarioRegistro = null,
-                    celo = null,
-                    alergia = null,
-
-                    precio_anestesia = null,
-                    cantidadTarjeta = null,
-                    cantidadEfectivo = null,
-
-                    dosis1 = null,
-                    dosis2 = null,
-                    dosis3 = null,
-                    fecha_anestesia = null,  //checar si se encuentra el campo en el xls
-
-                    cirujano = null,
-                    comentario = null,
-                    prenada = null,
-                    celo_cirugia = null,
-                    lactante_cirugia = null,
-                    hemorragia = null,
-                    parorespiratorio = null,
-                    parocardiaco = null,
-                    testiculoinguinal = null,
-                    finado = null,
-                    alergico_cirugia = null,
-                    operacion_anterior = null,
-                    fecha_cirugia = null,
-
-                    antibiotico = null,
-                    tatuaje = null,
-                    analgesico = null,
-                    suero = null,
-                    cicatrizante = null,
-                    recuperacion_fecha = null,
-                    comentario_recuperacion = null,
-                    tallaIsabelino = null,
-                    llevaIsabelino = null,
-                    llevaMedicamento = null,
-
-
-                    pregunta_medicamento = null,
-                    isabelino = null,
-                    isodine = null,
-                    mascota_entregada = null,
-                    candidato = null,
-                    medicamento_fecha = null,
-                    estado_catch = null;
-
-
-            //Create a manager
-            Manager manager = null;
-            try {
-                manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            database = null;
-            try {
-                database = manager.getDatabase("adla");
-            } catch (CouchbaseLiteException e) {
-                e.printStackTrace();
-            }
-
-            com.couchbase.lite.View membersView = database.getView("creat_at");
-
-            if (membersView != date) {
-                membersView.setMap(
-                        new Mapper() {
-                            @Override
-                            public void map(Map<String, Object> document, Emitter emitter) {
-                                com.couchbase.lite.util.Log.e("inside map", "map");
-                                Object date = document.get("creat_at");
-                                if (date != null)
-                                    emitter.emit((String) document.get("creat_at"), document);
-
-
-                            }
-                        }, "1" /* The version number of the mapper... */
-                );
-                // }
-
-                Query query = database.getView("creat_at").createQuery();
-                query.setStartKey(date);
-
-                //  Query query1 = database.getView("active").createQuery();
-                //  query1.setStartKey("activado");
-
-                try {
-
-                    result = query.run();
-
-                } catch (CouchbaseLiteException e) {
-
-                    e.printStackTrace();
-
-                }
-
-                for (Iterator<QueryRow> it = result; it.hasNext(); ) {
-                    QueryRow row = it.next();
-
-                    folio = row.getDocument().getProperty("folio"); //0
-                    nombre = row.getDocument().getProperty("nombreDueno");  //1
-                    nombreMascota = row.getDocument().getProperty("nombreMascota");  //2 Trae nulo
-                    peso = row.getDocument().getProperty("peso");  //3
-                    raza = row.getDocument().getProperty("raza");  //4
-                    rescatado = row.getDocument().getProperty("rescatado");  //5
-                    tamanoMascota = row.getDocument().getProperty("tamanoMascota");  //6
-                    telefono = row.getDocument().getProperty("telefono");  //7
-                    tipoMascota = row.getDocument().getProperty("tipoMascota");  //8
-                    tratamiento = row.getDocument().getProperty("tratamiento");  //9
-                    vacuna = row.getDocument().getProperty("vacuna");   //10
-                    medioSocial = row.getDocument().getProperty("mediosocial");  //11
-                    lactar = row.getDocument().getProperty("lactar");  //12
-                    // folio = row.getDocument().getProperty("folio"); //13
-                    edad = row.getDocument().getProperty("edad");  //14
-                    direccion = row.getDocument().getProperty("direccion");  //15
-                    desparacitacion = row.getDocument().getProperty("desparacitacion");  //16
-                    fecha = row.getDocument().getProperty("creat_at"); //17
-                    correo = row.getDocument().getProperty("correo");  //18
-                    comentarioRegistro = row.getDocument().getProperty("comentarioRegistro"); //19
-                    celo = row.getDocument().getProperty("celo"); //20
-                    alergia = row.getDocument().getProperty("alergia"); //21
-
-                    precio_anestesia = row.getDocument().getProperty("precio_anestesia");
-                    cantidadEfectivo = row.getDocument().getProperty("cantidadEfectivo");
-                    cantidadTarjeta = row.getDocument().getProperty("cantidadTarjeta");
-
-                    dosis1 = row.getDocument().getProperty("dosis1");
-                    dosis2 = row.getDocument().getProperty("dosis2");
-                    dosis3 = row.getDocument().getProperty("dosis3");
-                    fecha_anestesia = row.getDocument().getProperty("fecha_anestesia");
-
-                    cirujano = row.getDocument().getProperty("cirujano");
-                    comentario = row.getDocument().getProperty("comentario");
-                    prenada = row.getDocument().getProperty("preñada");
-                    celo_cirugia = row.getDocument().getProperty("celo_cirugia");
-                    lactante_cirugia = row.getDocument().getProperty("lactante_cirugia");
-                    hemorragia = row.getDocument().getProperty("hemorragia");
-                    parorespiratorio = row.getDocument().getProperty("parorespiratorio");
-                    parocardiaco = row.getDocument().getProperty("parocardiaco");
-                    testiculoinguinal = row.getDocument().getProperty("testiculoinguinal");
-                    finado = row.getDocument().getProperty("finado");
-                    alergico_cirugia = row.getDocument().getProperty("alergico_cirugia");
-                    operacion_anterior = row.getDocument().getProperty("operacion_anterior");
-                    fecha_cirugia = row.getDocument().getProperty("fecha_cirugia");
-
-                    antibiotico = row.getDocument().getProperty("antibiotico");
-                    tatuaje = row.getDocument().getProperty("tatuaje");
-                    analgesico = row.getDocument().getProperty("analgesico");
-                    suero = row.getDocument().getProperty("suero");
-                    cicatrizante = row.getDocument().getProperty("cicatrizante");
-                    recuperacion_fecha = row.getDocument().getProperty("recuperacion_fecha");
-                    comentario_recuperacion = row.getDocument().getProperty("comentario_recuperacion");
-                    tallaIsabelino = row.getDocument().getProperty("tallaIsabelino");
-                    llevaIsabelino = row.getDocument().getProperty("tallaIsabelino");
-                    llevaMedicamento = row.getDocument().getProperty("llevaMedicamento");
-
-                    pregunta_medicamento = row.getDocument().getProperty("pregunta_medicamento");
-                    isabelino = row.getDocument().getProperty("isabelino");
-                    isodine = row.getDocument().getProperty("isodine");
-                    mascota_entregada = row.getDocument().getProperty("mascota_entregada");
-                    candidato = row.getDocument().getProperty("candidato");
-                    medicamento_fecha = row.getDocument().getProperty("medicamento_fecha");
-                    estado_catch = row.getDocument().getProperty("active");
-
-                    //  Toast.makeText(getApplicationContext(), String.valueOf(fecha) + " " + folio, Toast.LENGTH_SHORT).show();
-
-                    if (estado_catch.equals("activado")){
-                        //estado_catch = "activado";
-                       // buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
-                    }else if(estado_catch.equals("desactivado")){
-                        // buscaDesocupado(String.valueOf(folio), String.valueOf(tipoMascota), String.valueOf(estado_catch));
-                    }else{
-                        // buscaDesocupado(String.valueOf(folio), "Nada", active_catch_boolean);
-                    }
-
-                }
-            }
-
-        }
-
-
-   private void setupSync() {
-       runOnUiThread(new Runnable() {
-           public void run() {
-               try {
-                   android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(android.content.Context.WIFI_SERVICE);
-                   String serviceName = "My Android Message Service";
-                   Configuration configuration = new Configuration(wifi,database, serviceName);
-                   int cbListenerPort = configuration.startCBLiteListener(5432);
-                   configuration.exposeService(cbListenerPort);
-                   configuration.listenForService();
-               } catch (Exception e) {
-                   com.couchbase.lite.util.Log.e(Application.TAG, "Sync URL is invalid, setting up sync failed");
-                   Log.e("Error", e.toString());
-                   //  throw new RuntimeException(e);
-               }
-           }
-       });
     }
-
 }
+
+
+
+

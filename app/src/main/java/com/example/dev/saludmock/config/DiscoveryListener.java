@@ -42,7 +42,7 @@ public class DiscoveryListener implements ServiceListener {
      String [] serviceUrls = event.getInfo().getURLs();
      for (String url : serviceUrls) {
          System.out.println(url);
-         setupSync(database, url + "/messages");
+         setupSync(database, url + "/registers");
      }
     }
 

@@ -15,7 +15,7 @@ android {
         resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
     }
     compileSdkVersion 26
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.2'
     defaultConfig {
         applicationId "com.example.dev.saludmock"
         minSdkVersion 19
@@ -69,8 +69,8 @@ dependencies {
     implementation 'pub.devrel:easypermissions:0.3.0'
     implementation 'com.itextpdf:itextpdf:5.5.6'
     implementation 'com.squareup.picasso:picasso:2.5.2'
-    implementation 'com.couchbase.lite:couchbase-lite-android:1.4.1'
-    implementation 'com.couchbase.lite:couchbase-lite-java-listener:1.4.1'
+
+
     implementation 'com.android.support:support-v4:26.+'
     implementation 'com.android.support:support-vector-drawable:26.+'
     implementation 'com.android.support:recyclerview-v7:26.+'
@@ -83,6 +83,9 @@ dependencies {
     implementation files('/Users/kennethrizo/Downloads/jexcelapi/jxl.jar')
     implementation "com.opencsv:opencsv:4.0"
     implementation 'org.apache.poi:poi:3.14'
+
+    implementation 'com.couchbase.lite:couchbase-lite-android:1.4.1'
+    implementation 'com.couchbase.lite:couchbase-lite-java-listener:1.4.1'
 
 }
 
