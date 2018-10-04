@@ -69,6 +69,7 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Emitter;
+import com.couchbase.lite.LiveQuery;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.Mapper;
 import com.couchbase.lite.Query;
@@ -76,12 +77,14 @@ import com.couchbase.lite.QueryEnumerator;
 import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
+import com.couchbase.lite.listener.Credentials;
 import com.example.dev.saludmock.R;
 import com.example.dev.saludmock.adapters.DataAdapter;
 import com.example.dev.saludmock.adapters.NewDoctorAdapter;
 import com.example.dev.saludmock.adapters.NewRegistersArrayAdapter;
 import com.example.dev.saludmock.config.Application;
 import com.example.dev.saludmock.config.Configuration;
+import com.example.dev.saludmock.config.DataPet;
 import com.example.dev.saludmock.config.DiscoveryListener;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -678,6 +681,11 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
            }
        }*/
 
+        Query all = DataPet.findStatsByDate(database);
+        all.setGroupLevel(0);
+        all.setDescending(true);
+        LiveQuery lq = all.toLiveQuery();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -949,7 +957,7 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                             buscaDesocupado(idDocumentS, tipoMascotaString, estado);
 
                             // Toast.makeText(getApplicationContext(), "El id de registro es " + idDocumentS + " con fecha " + fecha, Toast.LENGTH_SHORT).show();
-                            askPermissionAndWriteFile();
+                           // askPermissionAndWriteFile();
                         } else {
                             // Toast.makeText(Context.CONTEXT_IGNORE_SECURITY, "Debe seleccionar alguna opción en Detalle de la mascota", Toast.LENGTH_SHORT).show();
                         }
@@ -6123,9 +6131,10 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
     private void setupSync() {
         try {
             android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(android.content.Context.WIFI_SERVICE);
+
             String serviceName = "My Android Message Service";
             Configuration configuration = new Configuration(wifi, database, serviceName);
-            int cbListenerPort = configuration.startCBLiteListener(8091);
+            int cbListenerPort = configuration.startCBLiteListener(4984);
             configuration.exposeService(cbListenerPort);
             configuration.listenForService();
         } catch (Exception e) {

@@ -33,6 +33,8 @@ public abstract class LiveQueryAdapter  extends BaseAdapter {
         });
     }
 
+
+
     @Override
     public int getCount() {
         return (enumerator == null) ? 0 : enumerator.getCount();

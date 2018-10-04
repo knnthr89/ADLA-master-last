@@ -11,6 +11,7 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.android.AndroidContext;
+import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.util.Log;
 
@@ -74,7 +75,8 @@ public class Configuration{
     }
 
     public int startCBLiteListener(int port) {
-        LiteListener  ls = new LiteListener(database.getManager(), port, null);
+        Credentials credentials = new Credentials("hello", "pw123");
+        LiteListener  ls = new LiteListener(database.getManager(), port, credentials);
            Thread thread = new Thread(ls);
            thread.start();
            return ls.getListenPort();
