@@ -1,6 +1,7 @@
 package com.example.dev.saludmock.config;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.multidex.MultiDex;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -8,6 +9,7 @@ import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.android.AndroidContext;
 import com.couchbase.lite.util.Log;
+import com.example.dev.saludmock.activities.LoginActivity;
 
 import java.io.IOException;
 
@@ -63,4 +65,5 @@ public class Application extends android.app.Application {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
+
 }

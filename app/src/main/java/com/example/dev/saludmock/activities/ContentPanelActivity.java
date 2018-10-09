@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Handler;
 
 import android.app.DatePickerDialog;
@@ -78,6 +79,7 @@ import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
 import com.couchbase.lite.listener.Credentials;
+import com.couchbase.lite.replicator.Replication;
 import com.example.dev.saludmock.R;
 import com.example.dev.saludmock.adapters.DataAdapter;
 import com.example.dev.saludmock.adapters.NewDoctorAdapter;
@@ -127,7 +129,11 @@ import static com.couchbase.lite.Database.TAG;
 
 public class ContentPanelActivity extends ListActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, View.OnKeyListener {
 
-    Handler mHandler;
+    private Replication pullReplication;
+    private Replication pushReplication;
+
+    WifiP2pManager.Channel mChannel;
+    WifiP2pManager mManager;
 
     String estado = "desactivado";
     String dString;
@@ -564,7 +570,10 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
         setContentView(R.layout.content_panel);
         com.couchbase.lite.util.Log.d(Application.TAG, "Starting MainActivity");
         //itemListView = findViewById(R.id.itemListView);
-//        application = (Application) getApplication();
+
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+//
         application = (Application) getApplication();
         this.database = application.getDatabase();
 
@@ -750,13 +759,14 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                     // startActivity(tintent);
                     return true;
                 case R.id.load_deleted:
-                    try {
+                    stopReplication();
+                    /*try {
                         loadDeletedRecords();
                     } catch (CouchbaseLiteException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }
+                    }*/
                     return true;
             }
             return false;
@@ -6134,12 +6144,26 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
 
             String serviceName = "My Android Message Service";
             Configuration configuration = new Configuration(wifi, database, serviceName);
-            int cbListenerPort = configuration.startCBLiteListener(4984);
+            int cbListenerPort = configuration.startCBLiteListener(5432);
             configuration.exposeService(cbListenerPort);
             configuration.listenForService();
         } catch (Exception e) {
             com.couchbase.lite.util.Log.e(Application.TAG, "Sync URL is invalid, setting up sync failed");
             Log.e("Exception", e.toString());
+        }
+    }
+
+    private void stopReplication() {
+        if (pullReplication != null) {
+            pullReplication.removeChangeListener((Replication.ChangeListener) this);
+            pullReplication.stop();
+            pullReplication = null;
+        }
+
+        if (pushReplication != null) {
+            pushReplication.removeChangeListener((Replication.ChangeListener) this);
+            pushReplication.stop();
+            pushReplication = null;
         }
     }
 }

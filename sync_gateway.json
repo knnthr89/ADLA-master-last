@@ -2,7 +2,7 @@
 	"log": ["HTTP+"],
 	"databases": {
 		"db": {
-			"server": "walrus:",
+			"server": "adla:",
 			"users": {
 				"GUEST": {"disabled": false, "admin_channels": ["*"] }
 			}

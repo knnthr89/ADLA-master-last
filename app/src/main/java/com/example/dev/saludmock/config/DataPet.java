@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class DataPet {
 
-    public static String VIEW_NAME = "messages-vie";
+    public static String VIEW_NAME = "folio";
     // se cambio de valor de variable
     public static String TYPE = "data";
 
@@ -29,7 +29,7 @@ public class DataPet {
     //Lee el query en la actividad principal para sincronización, muy importante
     //lo necesitamos
     public static Query findStatsByDate(Database database) {
-        View view = database.getView(VIEW_NAME + "_stats");
+        View view = database.getView( VIEW_NAME);
         if (view.getMap() == null) {
             view.setMap(new Mapper() {
                 @Override
@@ -42,6 +42,7 @@ public class DataPet {
         }
         return view.createQuery();
     }
+    //constructor
     //que dispositivo lo esta enviando
     public static DataPet from(com.couchbase.lite.Document document) {
         DataPet message = new DataPet(document.getDatabase());
@@ -57,7 +58,6 @@ public class DataPet {
             if (createdAt instanceof Long) {
                 createdAtL = (Long) createdAt;
             }
-
 
             message.setCreatedAt(new Date(createdAtL));
         }

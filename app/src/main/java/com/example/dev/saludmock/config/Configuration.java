@@ -77,6 +77,7 @@ public class Configuration{
     public int startCBLiteListener(int port) {
         Credentials credentials = new Credentials("hello", "pw123");
         LiteListener  ls = new LiteListener(database.getManager(), port, credentials);
+       // LiteListener  ls = new LiteListener(database.getManager(), port, null);
            Thread thread = new Thread(ls);
            thread.start();
            return ls.getListenPort();
