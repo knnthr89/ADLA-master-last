@@ -42,6 +42,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -131,6 +132,8 @@ public class DownloadSheetToDBStep2 extends Activity
      * Create the main activity.
      * @param savedInstanceState previously saved instance data.
      */
+
+    List<String> results = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -560,12 +563,12 @@ public class DownloadSheetToDBStep2 extends Activity
         protected ArrayList<LlenarTablaAdapter.PocketMov> doInBackground(Void... params) {
             try {
                 return list = getDataFromApi();
-
-            } catch (Exception e) {
+                } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
                 return null;
             }
+
         }
 
         /**
@@ -577,7 +580,6 @@ public class DownloadSheetToDBStep2 extends Activity
         private ArrayList<LlenarTablaAdapter.PocketMov> getDataFromApi() throws IOException {
             String spreadsheetId = url;
             String range = "Respuestas de Formulario 1!A2:Q";
-            List<String> results = new ArrayList<String>();
             listado = new ArrayList<LlenarTablaAdapter.PocketMov>();
             ValueRange response = this.mService.spreadsheets().values()
                     .get(spreadsheetId, range)
@@ -594,6 +596,7 @@ public class DownloadSheetToDBStep2 extends Activity
                         } else {
                             poc.setNumero("");
                         }
+                        //Muestra en detalles
                         //B
                         //Nombre del dueño
                         if (row.size() >= 1 || row.isEmpty()) {
@@ -636,28 +639,27 @@ public class DownloadSheetToDBStep2 extends Activity
                         } else {
                             poc.setDmascota("");
                         }
-                        //MARCA ERROR SI VIENE VACIO
+                       //MARCA ERROR SI VIENE VACIO
                         //H Raza
-                        if (row.size() >= 7 || row.isEmpty()) {
+                      if (row.size() >= 7 && row.isEmpty()) {
                             poc.setRaza(row.get(7).toString());
                         } else {
                             poc.setRaza("");
                         }
                         //I
                         //Edad de la mascota
-                        if (row.size() >= 8 || row.isEmpty()) {
+                        if (row.size() >= 8 && row.isEmpty()) {
                             poc.setEdad(row.get(8).toString());
                         } else {
                             poc.setEdad("");
                         }
                         //J
                         //medio social
-                        if (row.size() >= 9 || row.isEmpty()) {
+                        if (row.size() >= 9 && row.isEmpty()) {
                             poc.setSocial(row.get(9).toString());
                         } else {
                             poc.setSocial("");
                         }
-  ///////////////////////******NO GUARDA DATOS DESDE AQUI********///////////////////////////////
                         //K
                         //Comentario
                         if (row.size() >= 0 && row.isEmpty()) {
@@ -737,12 +739,11 @@ public class DownloadSheetToDBStep2 extends Activity
                             poc.setTrescatado("");
                         }
 
-/////////////////////////************************************************////////////////////////////////////
                         for (int j = 0; j < row.size(); j++) {
                             results.add(row.get(j) + ",");
-                        }
+                            }
                         listado.add(poc);
-                    }
+                        }
                 }
 
             return listado;
@@ -764,9 +765,10 @@ public class DownloadSheetToDBStep2 extends Activity
             } else {
               //  output.add(0, "Data retrieved using the Google Sheets API:");
               //  mOutputText.setText(TextUtils.join("\n", output));
-
+                llena();
                 final LlenarTablaAdapter adapter = new LlenarTablaAdapter(getApplicationContext(), R.layout.text_view, list);
                 mListView.setAdapter(adapter);
+
             }
         }
 
@@ -999,6 +1001,14 @@ public class DownloadSheetToDBStep2 extends Activity
     }
 
     private void creaPdf(){
+
+    }
+
+    private void llena(){
+
+
+        Log.e("Results", String.valueOf(results.size()));
+        Log.e("Results", results.toString());
 
     }
 

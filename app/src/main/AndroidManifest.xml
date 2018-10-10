@@ -27,6 +27,9 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.sheets.API_KEY"
+            android:value="451365298338-nrjnt1qbds6uus0i5mg718pco7eoodub.apps.googleusercontent.com" />
         <activity android:name=".AppointmentsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
