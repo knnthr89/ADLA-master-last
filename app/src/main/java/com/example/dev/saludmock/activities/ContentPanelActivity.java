@@ -682,13 +682,13 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
 
 
         }
-      /*  if(datos== null) {
+        if(datos== null) {
            try {
                showNoFinishedButtons();
            } catch (Exception e) {
                e.printStackTrace();
            }
-       }*/
+       }
 
         Query all = DataPet.findStatsByDate(database);
         all.setGroupLevel(0);

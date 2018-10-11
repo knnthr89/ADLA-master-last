@@ -2,6 +2,9 @@ package com.example.dev.saludmock.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -27,6 +30,13 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.sheets.v4.SheetsScopes;
 
 import com.google.api.services.sheets.v4.model.*;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.draw.LineSeparator;
 
 import android.Manifest;
 import android.accounts.AccountManager;
@@ -39,8 +49,11 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,10 +68,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -71,6 +90,11 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class DownloadSheetToDBStep2 extends Activity
         implements EasyPermissions.PermissionCallbacks {
 
+    boolean sdDisponible = false;
+    boolean sdAccesoEscritura = false;
+
+    DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    Date date = new Date();
 
     String estado = "desactivado";
 
@@ -78,6 +102,7 @@ public class DownloadSheetToDBStep2 extends Activity
     private TextView mOutputText;
     private Button mCallApiButton;
     ProgressDialog mProgress;
+
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
@@ -169,6 +194,7 @@ public class DownloadSheetToDBStep2 extends Activity
             }
         });
         activityLayout.addView(mCallApiButton);
+
 
         mOutputText = new TextView(this);
         mOutputText.setLayoutParams(tlp);
@@ -338,6 +364,8 @@ public class DownloadSheetToDBStep2 extends Activity
         }else{
             mes = "Error al recibir el mes";
         }
+
+
     }
 
     /**
@@ -578,6 +606,29 @@ public class DownloadSheetToDBStep2 extends Activity
          * @throws IOException
          */
         private ArrayList<LlenarTablaAdapter.PocketMov> getDataFromApi() throws IOException {
+            try{
+                manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+            try{
+                database = manager.getDatabase("adla");
+            }catch (CouchbaseLiteException d){
+                d.printStackTrace();
+            }
+
+            SharedPreferences preferences = getSharedPreferences("values", MODE_PRIVATE);
+            idDocument = preferences.getInt("idDocument", 0);
+
+            idDocument++;
+
+            SharedPreferences prefs = getSharedPreferences("values", MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("idDocument", idDocument);
+            editor.clear().commit();
+
+            String idDocumentS = Integer.toString(idDocument);
+
             String spreadsheetId = url;
             String range = "Respuestas de Formulario 1!A2:Q";
             listado = new ArrayList<LlenarTablaAdapter.PocketMov>();
@@ -587,164 +638,162 @@ public class DownloadSheetToDBStep2 extends Activity
             List<List<Object>> values = response.getValues();
             if (values != null) {
                 //results.add("Name, Major");
-                for (int i = 0; i < values.size();i++) {
+                for (int i = 0; i < values.size(); i++) {
                     List row = values.get(i);
                         LlenarTablaAdapter.PocketMov poc = new LlenarTablaAdapter.PocketMov();
-                        //AId
+                        Map<String, Object> properties = new HashMap<String, Object>();
+
                         if (row.size() >= 0 || row.isEmpty()) {
-                            poc.setNumero(row.get(0).toString());
-                        } else {
-                            poc.setNumero("");
-                        }
-                        //Muestra en detalles
-                        //B
-                        //Nombre del dueño
-                        if (row.size() >= 1 || row.isEmpty()) {
-                            poc.setNombre(row.get(1).toString());
-                        } else {
-                            poc.setNombre("");
-                        }
-                        //C
-                        //Dirección del dueño
-                        if (row.size() >= 2 || row.isEmpty()) {
-                            poc.setDireccion(row.get(2).toString());
-                        } else {
-                            poc.setDireccion("");
-                        }
-                        //D
-                        //Teléfono del dueño
-                        if (row.size() >= 3 || row.isEmpty()) {
-                            poc.setTelefono(row.get(3).toString());
-                        } else {
-                            poc.setTelefono("");
-                        }
-                        //E
-                        //Correo
-                        if (row.size() >= 4 || row.isEmpty()) {
-                            poc.setCorreo(row.get(4).toString());
-                        } else {
-                            poc.setCorreo("");
-                        }
-                        //F
-                        //Nombre de la mascota
-                        if (row.size() >= 5 || row.isEmpty()) {
-                            poc.setMascota(row.get(5).toString());
-                        } else {
-                            poc.setMascota("");
-                        }
-                        //G
-                        //Detalles de la mascota
-                        if (row.size() >= 6 || row.isEmpty()) {
-                            poc.setDmascota(row.get(6).toString());
-                        } else {
-                            poc.setDmascota("");
-                        }
-                       //MARCA ERROR SI VIENE VACIO
-                        //H Raza
-                      if (row.size() >= 7 && row.isEmpty()) {
-                            poc.setRaza(row.get(7).toString());
-                        } else {
-                            poc.setRaza("");
-                        }
-                        //I
-                        //Edad de la mascota
-                        if (row.size() >= 8 && row.isEmpty()) {
-                            poc.setEdad(row.get(8).toString());
-                        } else {
-                            poc.setEdad("");
-                        }
-                        //J
-                        //medio social
-                        if (row.size() >= 9 && row.isEmpty()) {
-                            poc.setSocial(row.get(9).toString());
-                        } else {
-                            poc.setSocial("");
-                        }
-                        //K
-                        //Comentario
-                        if (row.size() >= 0 && row.isEmpty()) {
-                            poc.setComentario(row.get(10).toString());
-                        } else if (row.isEmpty() && row.size() >= 0) {
-                            poc.setComentario(row.get(10).toString());
-                        }else if (row.size() == 0){
-                            poc.setComentario("");
-                        }else{
-                            poc.setComentario("");
-                        }
-                        //L
-                        //Tratamiento de la mascota
-                        if (row.size() >= 0 && row.isEmpty()) {
-                            poc.setTratamiento(row.get(11).toString());
-                        } else if (row.isEmpty() && row.size() >= 0){
-                            poc.setTratamiento(row.get(11).toString());
-                        }else if (row.size() == 0){
-                            poc.setTratamiento("");
-                        }else{
-                            poc.setTratamiento("");
-                        }
+                        poc.setNumero(row.get(0).toString());
+                        properties.put("folio", row.get(0).toString());
+                    } else {
+                        poc.setNumero("");
+                    }
+                    //B
+                    //Nombre del dueño
+                    if (row.size() >= 1 || row.isEmpty()) {
+                        poc.setNombre(row.get(1).toString());
+                        properties.put("nombreDueno", row.get(1).toString());
+                    } else {
+                        poc.setNombre("");
+                    }
+                    //C
+                    //Dirección del dueño
+                    if (row.size() >= 2 || row.isEmpty()) {
+                        poc.setDireccion(row.get(2).toString());
+                        properties.put("direccion", row.get(2).toString());
+                    } else {
+                        poc.setDireccion("");
+                    }
+                    //D
+                    //Teléfono del dueño
+                    if (row.size() >= 3 || row.isEmpty()) {
+                        poc.setTelefono(row.get(3).toString());
+                        properties.put("telefono", row.get(3).toString());
+                    } else {
+                        poc.setTelefono("");
+                    }
+                    //E
+                    //Correo
+                    if (row.size() >= 4 || row.isEmpty()) {
+                        poc.setCorreo(row.get(4).toString());
+                        properties.put("correo", row.get(4).toString());
+                    } else {
+                        poc.setCorreo("");
+                    }
+                    //F
+                    //Nombre de la mascota
+                    if (row.size() >= 5 || row.isEmpty()) {
+                        poc.setMascota(row.get(5).toString());
+                        properties.put("nombreMascota", row.get(5).toString());
+                    } else {
+                        poc.setMascota("");
+                    }
+                    //G
+                    //Detalles de la mascota
+                    if (row.size() >= 6 || row.isEmpty()) {
+                        poc.setDmascota(row.get(6).toString());
+                        properties.put("tamanoMascota", row.get(6).toString());
+                    } else {
+                        poc.setDmascota("");
+                    }
+                    //MARCA ERROR SI VIENE VACIO
+                    //H Raza
+                    if (row.size() >= 7 || row.isEmpty()) {
+                        poc.setRaza(row.get(7).toString());
+                        properties.put("raza", row.get(7).toString());
+                    } else {
+                        poc.setRaza("");
+                    }
+                    //I
+                    //Edad de la mascota
+                    if (row.size() >= 8 || row.isEmpty()) {
+                        poc.setEdad(row.get(8).toString());
+                        properties.put("edad", row.get(8).toString());
+                    } else {
+                        poc.setEdad("");
+                    }
+                    //J
+                    //medio social
+                    if (row.size() >= 9 || row.isEmpty()) {
+                        poc.setSocial(row.get(9).toString());
+                        properties.put("mediosocial", row.get(9).toString());
+                    } else {
+                        poc.setSocial("");
+                    }
+                    ///////////////////////******NO GUARDA DATOS DESDE AQUI********///////////////////////////////
+                    //K
+                    //Comentario
+                    if (row.size() >= 10 && row.isEmpty()) {
+                        poc.setComentario(row.get(10).toString());
+                        properties.put("comentarioRegistro", row.get(10).toString());
+                    }else{
+                        poc.setComentario("");
+                    }
+                    //L
+                    //Tratamiento de la mascota
+                    if (row.size() >= 11 && row.isEmpty()) {
+                        poc.setTratamiento(row.get(11).toString());
+                        properties.put("tratamiento", row.get(11).toString());
+                    } else{
+                        poc.setTratamiento("");
+                    }
 
-                        //M
-                        //Rescatado
-                      if (row.size() >= 0 && row.isEmpty()) {
-                            poc.setTrescatado(row.get(12).toString());
-                        } else  if (row.isEmpty() && row.size() >= 0) {
-                          poc.setTrescatado(row.get(12).toString());
-                        }else if (row.size() == 0){
-                          poc.setTrescatado("");
-                      }else{
-                          poc.setTrescatado("");
-                      }
-                        //N
-                        //Vacunación
-                       if (row.size() >= 0 && row.isEmpty()) {
-                            poc.setFvacuna(row.get(13).toString());
-                        } else if(row.isEmpty() && row.size() >= 0) {
-                           poc.setFvacuna(row.get(13).toString());
-                        }else if (row.size() == 0){
-                           poc.setTrescatado("");
-                       }else{
-                           poc.setTrescatado("");
-                       }
-                        //O
-                        //Desparacitacion
-                        if (row.size() >= 0 && row.isEmpty()) {
-                            poc.setFdesparacitacion(row.get(14).toString());
-                        } else if (row.isEmpty() && row.size() >= 0) {
-                            poc.setFdesparacitacion(row.get(14).toString());
-                        }else if (row.size() == 0){
-                            poc.setTrescatado("");
-                        }else{
-                            poc.setTrescatado("");
-                        }
-                        //P
-                        //Celo
-                        if (row.size() >= 0 && row.isEmpty()) {
-                            poc.setFcelo(row.get(15).toString());
-                        } else if (row.isEmpty() && row.size() >= 0) {
-                            poc.setFcelo(row.get(15).toString());
-                        }else if (row.size() == 0){
-                            poc.setTrescatado("");
-                        }else{
-                            poc.setTrescatado("");
-                        }
-                        //Q
-                        //Lactar
-                        if (row.size() >= 0 && row.isEmpty()) {
-                            poc.setTlactar(row.get(16).toString());
-                        } else if (row.isEmpty() && row.size() >= 0){
-                            poc.setTlactar(row.get(16).toString());
-                        }else if (row.size() == 0){
-                            poc.setTrescatado("");
-                        }else{
-                            poc.setTrescatado("");
-                        }
+                    //M
+                    //Rescatado
+                    if (row.size() >= 12 && row.isEmpty()) {
+                        poc.setTrescatado(row.get(12).toString());
+                        properties.put("rescatado", row.get(12).toString());
+                    } else{
+                        poc.setTrescatado("");
+                    }
+                    //N
+                    //Vacunación
+                    if (row.size() >= 13 && row.isEmpty()) {
+                        poc.setFvacuna(row.get(13).toString());
+                        properties.put("vacuna", row.get(13).toString());
+                    } else{
+                        poc.setTrescatado("");
+                    }
+                    //O
+                    //Desparacitacion
+                    if (row.size() >= 14 && row.isEmpty()) {
+                        poc.setFdesparacitacion(row.get(14).toString());
+                        properties.put("desparacitacion", row.get(14).toString());
+                    } else{
+                        poc.setTrescatado("");
+                    }
+                    //P
+                    //Celo
+                    if (row.size() >= 15 && row.isEmpty()) {
+                        poc.setFcelo(row.get(15).toString());
+                        properties.put("celo", row.get(15).toString());
+                    }else{
+                        poc.setTrescatado("");
+                    }
+                    //Q
+                    //Lactar
+                    if (row.size() >= 16 && row.isEmpty()) {
+                        poc.setTlactar(row.get(16).toString());
+                        properties.put("lactar", row.get(16).toString());
+                        properties.put("creat_at", fecha);
+                     }else{
+                        poc.setTrescatado("");
+                    }
 
-                        for (int j = 0; j < row.size(); j++) {
-                            results.add(row.get(j) + ",");
-                            }
+                        Document document = database.getDocument(String.valueOf(Math.random()));
+
+                        try{
+                        document.putProperties(properties);
+                    }catch (CouchbaseLiteException e){
+                        e.printStackTrace();
+                    }
+
+
                         listado.add(poc);
-                        }
-                }
+                    }
+
+            }
 
             return listado;
         }
@@ -765,7 +814,6 @@ public class DownloadSheetToDBStep2 extends Activity
             } else {
               //  output.add(0, "Data retrieved using the Google Sheets API:");
               //  mOutputText.setText(TextUtils.join("\n", output));
-                llena();
                 final LlenarTablaAdapter adapter = new LlenarTablaAdapter(getApplicationContext(), R.layout.text_view, list);
                 mListView.setAdapter(adapter);
 
@@ -884,26 +932,7 @@ public class DownloadSheetToDBStep2 extends Activity
 
     private void aceptar(){
 
-     String nombreGuardar = nombre.getText().toString();
-     String mascotaGuardar = mascota.getText().toString();
-     String telefonoGuardar = telefono.getText().toString();
-     String direccionGuardar = direccion.getText().toString();
-     String edadGuardar = edadet.getText().toString();
-     String razaGuardar = razaet.getText().toString();
-     String tamañoMascotaGuardar = tmascotaet.getText().toString();
-     String tratamientoGuardar = tratamientoet.getText().toString();
-     String socialGuardar = socialet.getText().toString();
-     String comentarioGuardar = comentarioet.getText().toString();
-     String trescatadoGuardar = trescatadoet.getText().toString();
-     String fvacunaGuardar = fvacunaet.getText().toString();
-     String fdesparacitacionGuardar = fdesparacitacionet.getText().toString();
-     String fceloGuardar = fceloet.getText().toString();
-     String tlactarGuardar = tlactaret.getText().toString();
-     String correoGuardar = correoet.getText().toString();
-     String detalleMascotaGuardar = dmascotaet.getText().toString();
-     String alergiaGuardar = alergiaet.getText().toString();
-
-     try{
+        try{
          manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
      }catch (IOException e){
         e.printStackTrace();
@@ -931,25 +960,25 @@ public class DownloadSheetToDBStep2 extends Activity
         //The properties that will be saved on the document
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("folio", idDocumentS);
-        properties.put("nombreDueno", nombreGuardar);
-        properties.put("direccion", direccionGuardar);
-        properties.put("telefono", telefonoGuardar);
-        properties.put("correo", correoGuardar);
-        properties.put("nombreMascota", mascotaGuardar);
-        properties.put("mediosocial", socialGuardar);
-        properties.put("raza", razaGuardar);
-        properties.put("edad", edadGuardar);
-        properties.put("tamanoMascota", tamañoMascotaGuardar);
-        properties.put("comentarioRegistro", comentarioGuardar);
-        properties.put("tratamiento", tratamientoGuardar);
-        properties.put("rescatado", trescatadoGuardar);
-        properties.put("vacuna", fvacunaGuardar);
-        properties.put("desparacitacion", fdesparacitacionGuardar);
-        properties.put("celo", fceloGuardar);
-        properties.put("lactar", tlactarGuardar);
-        properties.put("tipoMascota", detalleMascotaGuardar);
+        properties.put("nombreDueno", nombre.getText().toString());
+        properties.put("direccion", direccion.getText().toString());
+        properties.put("telefono", telefono.getText().toString());
+        properties.put("correo", correoet.getText().toString());
+        properties.put("nombreMascota", mascota.getText().toString());
+        properties.put("mediosocial", socialet.getText().toString());
+        properties.put("raza", razaet.getText().toString());
+        properties.put("edad",  edadet.getText().toString());
+        properties.put("tamanoMascota", tmascotaet.getText().toString());
+        properties.put("comentarioRegistro", comentarioet.getText().toString());
+        properties.put("tratamiento", tratamientoet.getText().toString());
+        properties.put("rescatado", trescatadoet.getText().toString());
+        properties.put("vacuna", fvacunaet.getText().toString());
+        properties.put("desparacitacion", fdesparacitacionet.getText().toString());
+        properties.put("celo", fceloet.getText().toString());
+        properties.put("lactar", tlactaret.getText().toString());
+        properties.put("tipoMascota", dmascotaet.getText().toString());
        // properties.put("peso", pesoString);
-        properties.put("alergia", alergiaGuardar);
+        properties.put("alergia", alergiaet.getText().toString());
         properties.put("creat_at", fecha);
         properties.put("campana", anioString + mes);
         properties.put("active", estado);
@@ -967,7 +996,7 @@ public class DownloadSheetToDBStep2 extends Activity
 
         creaPdf();
 
-        if (detalleMascotaGuardar != "Detalle de la Mascota") {
+        if (dmascotaet.getText().toString() != "Detalle de la Mascota") {
 
          //   ContentPanelActivity contentPanelActivity = new ContentPanelActivity();
          //   contentPanelActivity.buscaDesocupado(idDocumentS, detalleMascotaGuardar);
@@ -976,14 +1005,14 @@ public class DownloadSheetToDBStep2 extends Activity
 
             Intent intent = new Intent(DownloadSheetToDBStep2.this, CreatePdfActivity.class);
             intent.putExtra("idDocumentStringS", idDocumentS);
-            intent.putExtra("nombre", nombreGuardar);
-            intent.putExtra("mascota", mascotaGuardar);
-            intent.putExtra("tmascota", tamañoMascotaGuardar);
-            intent.putExtra("telefono", telefonoGuardar);
-            intent.putExtra("direccion", direccionGuardar);
-            intent.putExtra("edad", edadGuardar);
-            intent.putExtra("raza", razaGuardar);
-            intent.putExtra("dmascota", detalleMascotaGuardar);
+            intent.putExtra("nombre", nombre.getText().toString());
+            intent.putExtra("mascota", mascota.getText().toString());
+            intent.putExtra("tmascota", tmascotaet.getText().toString());
+            intent.putExtra("telefono", telefono.getText().toString());
+            intent.putExtra("direccion", direccion.getText().toString());
+            intent.putExtra("edad", edadet.getText().toString());
+            intent.putExtra("raza", razaet.getText().toString());
+            intent.putExtra("dmascota", dmascotaet.getText().toString());
             intent.putExtra("active", estado);
            // intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
@@ -1002,15 +1031,118 @@ public class DownloadSheetToDBStep2 extends Activity
 
     private void creaPdf(){
 
+
+        //Comprobamos el estado de la memoria externa (tarjeta SD)
+        String estado = Environment.getExternalStorageState();
+
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+
+        final Font BLACK_BOLD1 = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, BaseColor.BLACK);
+        final Font BLACK_BOLD2 = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
+        final Font BLACK_BOLD3 = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK);
+
+        final Chunk A = new Chunk("ABOGADOS DE LOS ANIMALES, A.C.", BLACK_BOLD1);
+        final Chunk B = new Chunk("CAMPAÑA DE ESTERILIZACIÓN", BLACK_BOLD2);
+        final Chunk C = new Chunk("SOLICITUD Y RESPONSIVA" + "Ciudad: Querétaro " + "Fecha: ", BLACK_BOLD2);
+        final Chunk D = new Chunk("ABOGADOS DE LOS ANIMALES, A.C.", BLACK_BOLD3);
+        final Chunk E = new Chunk("El curso post operatorio es responsabilidad del propietario de la mascota esterilizada y deberá ser supervisada por un médico veterinario competente, siguiendo las recomendaciones del médico veterinario que efectúe la cirugía. \n \n", BLACK_BOLD3);
+        final Chunk F = new Chunk("REQUISITOS: \n ", BLACK_BOLD3);
+
+        if (estado.equals(Environment.MEDIA_MOUNTED)) {
+            sdDisponible = true;
+            sdAccesoEscritura = true;
+
+            //create document object
+            com.itextpdf.text.Document doc = new com.itextpdf.text.Document();
+            //output file path
+
+            try {
+                String file = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ Cartas Responsivas";
+
+                File dir = new File(file);
+                if (!dir.exists())
+                    dir.mkdirs();
+                Log.d("PDFCreator", "PDF Path:" + file);
+
+                File nfile = new File(dir, Math.random() + ".pdf");
+                FileOutputStream fOut = new FileOutputStream(nfile);
+                PdfWriter.getInstance(doc, fOut);
+                doc.open();
+
+                Drawable d = getResources().getDrawable(R.drawable.logo);
+
+                BitmapDrawable bitDw = ((BitmapDrawable) d);
+
+                Bitmap bmp = bitDw.getBitmap();
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+                Image image = Image.getInstance(stream.toByteArray());
+
+                image.scaleAbsolute(50f, 50f);
+
+                doc.add(image);
+
+                doc.add(new Paragraph(A));
+                doc.add(new Paragraph(B));
+
+                LineSeparator ls = new LineSeparator();
+                doc.add(new Chunk(ls));
+
+                //add paragraph to the document
+                doc.add(new Paragraph(C + dateFormat.format(date)));
+
+                doc.add(new Paragraph(D + "no se hace responsable por muerte, pérdida o algún otro contratiempo que ocurra durante la cirugía o post operatorio. \n"));
+
+                doc.add(new Paragraph(E));
+
+                doc.add(new Paragraph(F));
+
+                doc.add(new Paragraph("1. La persona que presente la mascota para su esterilización debe de ser mayor de edad. \n " +
+                        "2. La mascota deberá tener por lo menos 2 meses de edad o 1 kg de peso. \n" +
+                        "3. La mascota deberá estar sin comer ni beber agua por lo menos 12 horas antes de la cirugía. De lo contrario \n" +
+                        "4. La mascota NO deberá estar lactando, gestando o en celo. \n" +
+                        "5. La mascota deberá estar sana y o más limpa posible.\n" +
+                        "6. Acepta que se marque la oreja de su mascota con un pequeño tatuaje. \n" +
+                        "7. RESCATADOS: " + "Más de 25 días de haberlos rescatados. \n " +
+                        "8. No se le debe de haber aplicado ninguna vacuna 2 semanas antes de la cirugía ni deben de aplicarse vacunas \n" +
+                        "mínimo en los siguientes 20 días después de la cirugía."));
+
+                doc.add(new Paragraph("DATOS DEL PROPIETARIO: \n"));
+
+                doc.add(new Paragraph("Nombre: " /* + nombreString*/));
+                doc.add(new Paragraph("Dirección: " /* + direccionString*/));
+                doc.add(new Paragraph("Cel / Tel: " /*+ telefonoString*/));
+
+                doc.add(new Paragraph("DATOS DE LA MASCOTA: \n"));
+
+                doc.add(new Paragraph("Nombre: " + mascota));
+                doc.add(new Paragraph("Edad: " /*+ edadString*/));
+                doc.add(new Paragraph("Raza: " /*+ razaString*/));
+                doc.add(new Paragraph("Color:___________________ " + "¿Tiene vacuna antirrabica?    Si       No   "));
+                doc.add(new Paragraph("Tamaño:     Ch     Med     Gde    Gigante     Peso:__________________(nosotros l@s pesamos)"));
+                doc.add(new Paragraph("OBSERVACIONES(condición médica, alergías, algunos problemas con el uso de anestesia)_________" +
+                        "___________________________________________________________________________________________________________ \n\n\n"));
+
+
+                doc.add(new Paragraph("Acepto las condiciones y confirmo que recibí el volante de cuidados post operatorio: \n"));
+
+
+                doc.add(new Paragraph("Nombre y Firma:"));
+
+                //close the document
+                doc.close();
+
+                Toast.makeText(getApplicationContext(), "PDF creado correctamente", Toast.LENGTH_SHORT).show();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
-
-    private void llena(){
-
-
-        Log.e("Results", String.valueOf(results.size()));
-        Log.e("Results", results.toString());
-
-    }
-
-
 }
