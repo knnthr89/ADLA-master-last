@@ -122,6 +122,7 @@ public class DownloadSheetToDBStep2 extends Activity
 
     Manager manager = null;
     Database database = null;
+    Document document = null;
 
     int idDocument;
 

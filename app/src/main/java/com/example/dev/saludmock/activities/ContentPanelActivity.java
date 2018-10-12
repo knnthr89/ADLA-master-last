@@ -564,6 +564,8 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
 
     DiscoveryListener discoveryListener;
 
+
+    private Manager manager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -630,14 +632,13 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                 //se necesita guardar a activado porqur solo lo cambiamos pero no se guarda en el registro
 
                 //Create a manager
-                Manager manager = null;
                 try {
                     manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 //Create or open the database named app
-                Database database = null;
+
                 try {
                     database = manager.getDatabase("adla");
                 } catch (CouchbaseLiteException e) {
@@ -893,7 +894,7 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
 
 
                         //create manager
-                        Manager manager = null;
+
                         try {
                             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
                         } catch (IOException e) {
@@ -901,7 +902,7 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                         }
 
                         //Create or open the database named app
-                        Database database = null;
+
                         try {
                             database = manager.getDatabase("adla");
                         } catch (CouchbaseLiteException d) {
@@ -1066,8 +1067,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                         }
 
                         //create manager
-                        Manager manager = null;
-
                         try {
                             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
                         } catch (IOException e) {
@@ -1075,7 +1074,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                         }
 
                         //Create or open the database named app
-                        Database database = null;
                         try {
                             database = manager.getDatabase("adla");
                         } catch (CouchbaseLiteException d) {
@@ -1158,7 +1156,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                         String dosistres = dosis3.getText().toString();
 
                         // Create a manager
-                        Manager manager = null;
                         try {
                             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
                         } catch (IOException e) {
@@ -1166,7 +1163,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                         }
 
                         //Create or open the database named app
-                        Database database = null;
                         try {
                             database = manager.getDatabase("adla");
                         } catch (CouchbaseLiteException e) {
@@ -1377,14 +1373,12 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
 
 
                         //Create a manager
-                        Manager manager = null;
                         try {
                             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                         //Create or open the database named app
-                        Database database = null;
                         try {
                             database = manager.getDatabase("adla");
                         } catch (CouchbaseLiteException e) {
@@ -1557,8 +1551,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                         comentario.getText().toString();
 
                         //Create manager
-                        Manager manager = null;
-
                         try {
                             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
                         } catch (IOException e) {
@@ -1566,8 +1558,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                         }
 
                         //Create or open the database named app
-                        Database database = null;
-
                         try {
                             database = manager.getDatabase("adla");
                         } catch (CouchbaseLiteException e) {
@@ -1630,8 +1620,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
 
         final Switch candidato = view.findViewById(R.id.candidato_switch);
         //Create manager
-        Manager manager = null;
-
         try {
             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
         } catch (IOException e) {
@@ -1639,8 +1627,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
         }
 
         //Create or open the database named app
-        Database database = null;
-
         try {
             database = manager.getDatabase("adla");
         } catch (CouchbaseLiteException e) {
@@ -1749,8 +1735,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                         }
 
                         //Create manager
-                        Manager manager = null;
-
                         try {
                             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
                         } catch (IOException e) {
@@ -1758,8 +1742,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                         }
 
                         //Create or open the database named app
-                        Database database = null;
-
                         try {
                             database = manager.getDatabase("adla");
                         } catch (CouchbaseLiteException e) {
@@ -5624,14 +5606,12 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
 
 
         //Create a manager
-        Manager manager = null;
         try {
             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        database = null;
         try {
             database = manager.getDatabase("adla");
 
@@ -5748,7 +5728,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                     estado_catch = "activado";
 
                     //create manager
-                    manager = null;
                     try {
                         manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
                     } catch (IOException e) {
@@ -5756,7 +5735,6 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
                     }
 
                     //Create or open the database named app
-                    Database database = null;
                     try {
                         database = manager.getDatabase("adla");
                     } catch (CouchbaseLiteException d) {
@@ -5819,14 +5797,14 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
     public void showMeRows() {
 
         //Create a manager
-        Manager manager = null;
+
         try {
             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Database database = null;
+
         try {
             database = manager.getDatabase("adlad");
         } catch (CouchbaseLiteException e) {
@@ -6005,14 +5983,14 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
 
 
         //Create a manager
-        Manager manager = null;
+
         try {
             manager = new Manager(new AndroidContext(getApplicationContext()), Manager.DEFAULT_OPTIONS);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        database = null;
+
         try {
             database = manager.getDatabase("adla");
         } catch (CouchbaseLiteException e) {
@@ -6154,6 +6132,7 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
     }
 
     private void stopReplication() {
+
         if (pullReplication != null) {
             pullReplication.removeChangeListener((Replication.ChangeListener) this);
             pullReplication.stop();
@@ -6165,6 +6144,10 @@ public class ContentPanelActivity extends ListActivity implements AdapterView.On
             pushReplication.stop();
             pushReplication = null;
         }
+
+        Intent intent = new Intent(ContentPanelActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
 
